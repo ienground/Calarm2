@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Calarm2</string>
+    <string name="alarm">Alarm</string>
+    <string name="calarm">Calarm</string>
+    <string name="timer">Timer</string>
+    <string name="stopwatch">Stopwatch</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sun">S</string>
+    <string name="mon">M</string>
+    <string name="tue">T</string>
+    <string name="wed">W</string>
+    <string name="thu">T</string>
+    <string name="fri">F</string>
+    <string name="sat">S</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="sub_alarm">Sub Alarm</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="weekend">Weekend</string>
+    <string name="weekday">Weekday</string>
+    <string name="everyday">Everyday</string>
+
+    <string name="time_format_hour_minute">%1$d시간 %2$d분 전</string>
+    <string name="time_format_hour">%1$d시간 전</string>
+    <string name="time_format_minute">%1$d분 전</string>
+    <string name="no_sub_alarms">No sub alarms</string>
+</resources>
