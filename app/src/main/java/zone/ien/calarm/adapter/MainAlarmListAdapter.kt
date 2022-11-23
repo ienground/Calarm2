@@ -1,18 +1,26 @@
 package zone.ien.calarm.adapter
 
+import android.app.AlarmManager
 import android.content.Context
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.withContext
 import zone.ien.calarm.R
+import zone.ien.calarm.callback.AlarmListCallback
+import zone.ien.calarm.room.AlarmDatabase
 import zone.ien.calarm.room.AlarmEntity
+import zone.ien.calarm.room.SubAlarmDatabase
 import zone.ien.calarm.utils.MyUtils
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,8 +31,12 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
 
     lateinit var context: Context
 
+    private var callbackListener: AlarmListCallback? = null
+    private lateinit var am: AlarmManager
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         context = parent.context
+        am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val view = LayoutInflater.from(context).inflate(R.layout.adapter_main_alarm_list, parent, false)
         return ItemViewHolder(view)
     }
@@ -38,11 +50,7 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
                 set(Calendar.MINUTE, it % 60)
             }
         }
-        val repeat: ArrayList<Boolean> = arrayListOf()
-        for (i in 0 until 7) {
-            repeat.add(items[holder.adapterPosition].repeat.and(2.0.pow(6 - i).toInt()) != 0)
-        }
-        holder.tvRepeatDay.text = MyUtils.getRepeatlabel(context, repeat, items[holder.adapterPosition].isRepeat, items[holder.adapterPosition].time)
+        holder.tvRepeatDay.text = MyUtils.getRepeatlabel(context, items[holder.adapterPosition].repeat, items[holder.adapterPosition].time)
 
         items[holder.adapterPosition].label.let {
             if (it != "") {
@@ -59,6 +67,7 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
         holder.tvApm.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
         holder.tvTime.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
 
+        holder.chipsMiniAlarm.removeAllViews()
         for (alarm in items[holder.adapterPosition].subAlarms) {
             val chip = Chip(context)
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
@@ -76,9 +85,47 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
 
             holder.chipsMiniAlarm.addView(chip)
         }
+
+        holder.switchOn.setOnCheckedChangeListener { compoundButton, b ->
+            callbackListener?.toggle(holder.adapterPosition, items[holder.adapterPosition].id ?: -1, b)
+            holder.tvApm.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
+            holder.tvTime.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
+        }
+
+        holder.itemView.setOnClickListener {
+            callbackListener?.callBack(holder.adapterPosition, items[holder.adapterPosition].id ?: -1)
+        }
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun edit(id: Long, item: AlarmEntity) {
+        val position = items.indexOfFirst { it.id == id }
+        if (position != -1) {
+            items[position] = item
+            items.sortBy { it.time }
+            val newPosition = items.indexOfFirst { it.id == id }
+
+            notifyItemMoved(position, newPosition)
+            notifyItemChanged(newPosition)
+        } else {
+            items.add(item)
+            items.sortBy { it.time }
+            val newPosition = items.indexOfFirst { it.id == id }
+
+            notifyItemInserted(newPosition)
+        }
+    }
+
+    fun delete(id: Long) {
+        val position = items.indexOfFirst { it.id == id }
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun setClickCallback(callbackListener: AlarmListCallback) {
+        this.callbackListener = callbackListener
+    }
 
     inner class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val tvLabel: MaterialTextView = itemView.findViewById(R.id.tv_label)

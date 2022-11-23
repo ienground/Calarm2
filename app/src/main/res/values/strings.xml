@@ -6,13 +6,20 @@
     <string name="stopwatch">Stopwatch</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="sun">S</string>
-    <string name="mon">M</string>
-    <string name="tue">T</string>
-    <string name="wed">W</string>
-    <string name="thu">T</string>
-    <string name="fri">F</string>
-    <string name="sat">S</string>
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun_short">S</string>
+    <string name="mon_short">M</string>
+    <string name="tue_short">T</string>
+    <string name="wed_short">W</string>
+    <string name="thu_short">T</string>
+    <string name="fri_short">F</string>
+    <string name="sat_short">S</string>
     <string name="vibrate">Vibrate</string>
     <string name="sub_alarm">Sub Alarm</string>
     <string name="today">Today</string>
@@ -25,4 +32,25 @@
     <string name="time_format_hour">%1$d시간 전</string>
     <string name="time_format_minute">%1$d분 전</string>
     <string name="no_sub_alarms">No sub alarms</string>
+    <string name="save">Save</string>
+
+    <string name="alarm_ring">Set alarm ring</string>
+    <string name="sub_alarm_dialog_title">minutes before</string>
+    <string name="delete">Delete</string>
+    <string name="delete_title">Delete?</string>
+    <string name="snooze">snooze</string>
+    <string name="alarm_off">Alarm Off</string>
+    <string name="alarm_content_format">EEE a hh:mm</string>
+    <string name="calarm_alarm">Calarm Alarm</string>
+    <string name="turn_off_this_alarm_set">Turn off this alarm set.</string>
+
+    <string name="day_format">%1$d days</string>
+    <string name="hour_format">%1$d hours</string>
+    <string name="minute_format">%1$d minutes</string>
+    <string name="alarm_toast_format">Alarm set for %1$s from now</string>
+    <string name="alarm_toast_min">Alarm set for less than 1 minute from now</string>
+    <string name="no_alarms">No alarms.</string>
+    <string name="sub_alarm_exists">Sub alarm already exists.</string>
+    <string name="missed_notification">Missed Alarm Notification</string>
+    <string name="missed_alarm">Missed Alarm</string>
 </resources>

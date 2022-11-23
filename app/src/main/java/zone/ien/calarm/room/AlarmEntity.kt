@@ -9,7 +9,6 @@ class AlarmEntity(
     var label: String,
     var time: Int,
     var isEnabled: Boolean,
-    var isRepeat: Boolean,
     var repeat: Int,
     var imageUri: String,
     var sound: String,
@@ -19,7 +18,7 @@ class AlarmEntity(
     @Ignore var subAlarms: ArrayList<SubAlarmEntity> = arrayListOf()
 
     override fun toString(): String {
-        val builder = StringBuilder("[$id] $label - 0${time / 60}:${time % 60} : isEnabled $isEnabled isRepeat $isRepeat ")
+        val builder = StringBuilder("[$id] $label - ${time / 60}:${time % 60} : isEnabled $isEnabled ")
         builder.append("${repeat.toString(2)} [")
 
         for (alarm in subAlarms) {

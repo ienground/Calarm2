@@ -38,31 +38,59 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/usual_margin">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/tv_time"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/group_time"
                     android:layout_width="0dp"
                     android:layout_height="140dp"
                     android:clickable="true"
                     android:focusable="auto"
                     android:background="?attr/selectableItemBackground"
-                    android:text="03:00"
-                    android:fontFamily="@font/pretendard_black"
-                    android:textColor="@color/black"
-                    android:textAlignment="center"
-                    android:textSize="48sp"
-                    android:gravity="center"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_apm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AM"
+                        android:fontFamily="@font/pretendard_black"
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv_time"
+                        app:layout_constraintBaseline_toBaselineOf="@id/tv_time" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3:00"
+                        android:fontFamily="@font/pretendard_black"
+                        android:textColor="@color/black"
+                        android:textSize="48sp"
+                        android:gravity="center"
+                        app:layout_constraintStart_toEndOf="@id/tv_apm"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/et_label"
                     style="@style/Widget.Material3.TextInputLayout.FilledBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:hint="Label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_time">
+                    app:layout_constraintTop_toBottomOf="@id/group_time">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -101,7 +129,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/sun"
+                            android:text="@string/sun_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintHorizontal_chainStyle="spread"
                             app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +142,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/mon"
+                            android:text="@string/mon_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_sun"
                             app:layout_constraintEnd_toStartOf="@id/repeat_tue"
@@ -126,7 +154,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/tue"
+                            android:text="@string/tue_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_mon"
                             app:layout_constraintEnd_toStartOf="@id/repeat_wed"
@@ -138,7 +166,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/wed"
+                            android:text="@string/wed_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_tue"
                             app:layout_constraintEnd_toStartOf="@id/repeat_thu"
@@ -150,7 +178,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/thu"
+                            android:text="@string/thu_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_wed"
                             app:layout_constraintEnd_toStartOf="@id/repeat_fri"
@@ -162,7 +190,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/fri"
+                            android:text="@string/fri_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_thu"
                             app:layout_constraintEnd_toStartOf="@id/repeat_sat"
@@ -174,7 +202,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
-                            android:text="@string/sat"
+                            android:text="@string/sat_short"
                             android:fontFamily="@font/pretendard"
                             app:layout_constraintStart_toEndOf="@id/repeat_fri"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -189,6 +217,9 @@
                     android:id="@+id/group_ring"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="?attr/selectableItemBackground"
                     android:layout_marginTop="@dimen/usual_margin"
                     android:paddingVertical="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
@@ -205,6 +236,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_ring"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="bell"
@@ -221,6 +253,9 @@
                     android:id="@+id/group_vibrate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="?attr/selectableItemBackground"
                     android:paddingVertical="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -274,9 +309,10 @@
                     android:textSize="@dimen/tag_size"
                     android:textColor="@color/black"
                     android:fontFamily="@font/pretendard_black"
+                    android:layout_marginEnd="@dimen/usual_margin"
                     android:layout_marginTop="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btn_add"
                     app:layout_constraintTop_toBottomOf="@id/divider1" />
 
                 <ImageButton
@@ -284,7 +320,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_add"
-                    android:background="@null"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tag_sub_alarm"
                     app:layout_constraintBottom_toBottomOf="@id/tag_sub_alarm" />

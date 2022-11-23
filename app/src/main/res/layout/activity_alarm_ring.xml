@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="activity"
+            type="zone.ien.calarm.activity.AlarmRingActivity" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".activity.AlarmRingActivity">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_apm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AM"
+            android:textSize="24sp"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:fontFamily="@font/pretendard_black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_time" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="07\n31"
+            android:textSize="100sp"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:fontFamily="@font/pretendard_black"
+            android:lineSpacingMultiplier="0.9"
+            android:layout_marginTop="@dimen/usual_margin_half"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tv_label"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Label"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:textAlignment="center"
+            android:fontFamily="@font/pretendard"
+            android:layout_margin="@dimen/usual_margin"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/guide"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guide">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_parent_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="?attr/colorAccent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/usual_margin">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_parent_apm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AM"
+                            android:textSize="12sp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/pretendard"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBaseline_toBaselineOf="@id/tv_parent_time" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_parent_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="07:41"
+                            android:textSize="24sp"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/pretendard"
+                            android:layout_marginStart="4dp"
+                            app:layout_constraintStart_toEndOf="@id/tv_parent_apm"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_time_diff"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:text="10 mins before"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:autoSizeMaxTextSize="24sp"
+                    android:autoSizeMinTextSize="14sp"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="1"
+                    android:fontFamily="@font/pretendard"
+                    android:layout_marginHorizontal="@dimen/usual_margin"
+                    app:layout_constraintStart_toEndOf="@id/card_parent_time"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/bg_snooze"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="?attr/colorPrimary"
+            android:alpha="0.8"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/bg_alarm_off"
+            app:layout_constraintTop_toTopOf="@id/bg_alarm_off"/>
+
+        <ImageView
+            android:id="@+id/ic_snooze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_snooze"
+            android:contentDescription="@string/snooze"
+            app:tint="@color/white"
+            app:layout_constraintStart_toStartOf="@id/bg_snooze"
+            app:layout_constraintEnd_toEndOf="@id/bg_snooze"
+            app:layout_constraintTop_toTopOf="@id/bg_snooze"
+            app:layout_constraintBottom_toBottomOf="@id/bg_snooze" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/bg_alarm_off"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="?attr/colorAccent"
+            android:alpha="0.8"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintStart_toEndOf="@id/bg_snooze"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/ic_alarm_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_alarm_off"
+            android:contentDescription="@string/alarm_off"
+            app:tint="@color/white"
+            app:layout_constraintStart_toStartOf="@id/bg_alarm_off"
+            app:layout_constraintEnd_toEndOf="@id/bg_alarm_off"
+            app:layout_constraintTop_toTopOf="@id/bg_alarm_off"
+            app:layout_constraintBottom_toBottomOf="@id/bg_alarm_off" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

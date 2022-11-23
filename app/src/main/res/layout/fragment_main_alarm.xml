@@ -80,6 +80,33 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
+        <ImageView
+            android:id="@+id/ic_no_alarms"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:src="@drawable/ic_alarm_off"
+            android:alpha="0.4"
+            app:tint="@color/black"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list"
+            app:layout_constraintBottom_toTopOf="@id/tv_no_alarms" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_no_alarms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_alarms"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/pretendard"
+            android:alpha="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_no_alarms"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="0dp"

@@ -25,13 +25,18 @@ import zone.ien.calarm.adapter.MainTimerPageAdapter
 import zone.ien.calarm.databinding.FragmentMainAlarmBinding
 import zone.ien.calarm.databinding.FragmentMainCalarmBinding
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
+import zone.ien.calarm.room.SubTimerDatabase
+import zone.ien.calarm.room.TimersDatabase
 import java.util.*
 
 class MainTimerFragment : Fragment() {
 
     lateinit var binding: FragmentMainTimerBinding
     private var mListener: OnFragmentInteractionListener? = null
+    private var timersDatabase: TimersDatabase? = null
+    private var subTimerDatabase: SubTimerDatabase? = null
 
+    var pagePosition = Int.MAX_VALUE / 2
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer, container, false)
@@ -47,10 +52,13 @@ class MainTimerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        timersDatabase = TimersDatabase.getInstance(requireContext())
+        subTimerDatabase = SubTimerDatabase.getInstance(requireContext())
+
 //        binding.viewpager.setPageTransformer(MarginPageTransformer(MyUtils.dpToPx(this, 16f).toInt()))
         binding.viewpager.offscreenPageLimit = 3
         binding.viewpager.adapter = MainTimerPageAdapter(this)
-
+        binding.viewpager.setCurrentItem(pagePosition, false)
 
     }
 

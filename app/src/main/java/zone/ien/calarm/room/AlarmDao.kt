@@ -8,13 +8,13 @@ interface AlarmDao {
     fun getAll(): List<AlarmEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(data: AlarmEntity)
+    fun add(data: AlarmEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(data: AlarmEntity)
 
     @Query("SELECT * FROM AlarmDatabase WHERE id = :id")
-    fun get(id: Int): AlarmEntity
+    fun get(id: Long): AlarmEntity
 
     @Query("DELETE FROM AlarmDatabase WHERE id = :id")
     fun delete(id: Long)
