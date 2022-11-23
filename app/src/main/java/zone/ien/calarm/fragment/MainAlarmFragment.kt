@@ -101,9 +101,11 @@ class MainAlarmFragment : Fragment() {
             adapter = MainAlarmListAdapter(item).apply {
                 setClickCallback(alarmListCallback)
             }
-            binding.list.adapter = adapter
-            binding.icNoAlarms.visibility = if (item.isEmpty()) View.VISIBLE else View.GONE
-            binding.tvNoAlarms.visibility = if (item.isEmpty()) View.VISIBLE else View.GONE
+            withContext(Dispatchers.Main) {
+                binding.list.adapter = adapter
+                binding.icNoAlarms.visibility = if (item.isEmpty()) View.VISIBLE else View.GONE
+                binding.tvNoAlarms.visibility = if (item.isEmpty()) View.VISIBLE else View.GONE
+            }
         }
 
         editActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -133,10 +135,6 @@ class MainAlarmFragment : Fragment() {
                 }
             }
         }
-
-
-
-
     }
 
     override fun onAttach(context: Context) {

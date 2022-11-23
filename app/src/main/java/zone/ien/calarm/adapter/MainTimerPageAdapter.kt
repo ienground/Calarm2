@@ -3,22 +3,21 @@ package zone.ien.calarm.adapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.adapter.FragmentViewHolder
+import zone.ien.calarm.callback.TimerFragmentCallback
 import zone.ien.calarm.fragment.MainTimerClockFragment
 import zone.ien.calarm.fragment.MainTimerListFragment
 import zone.ien.calarm.fragment.MainTimerNumFragment
 
-class MainTimerPageAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
+class MainTimerPageAdapter(fragment: Fragment, var pages: List<Fragment>): FragmentStateAdapter(fragment) {
+
+    private var callbackListener: TimerFragmentCallback? = null
 
     override fun createFragment(position: Int): Fragment {
-        return when (position % PAGE_NUMBER) {
-            0 -> MainTimerClockFragment()
-            1 -> MainTimerListFragment()
-            2 -> MainTimerNumFragment()
-            else -> MainTimerListFragment()
-        }
+        return pages[position % pages.size]
     }
 
-    override fun getItemCount(): Int = Int.MAX_VALUE
+    override fun getItemCount(): Int = 3//Int.MAX_VALUE
 
     companion object {
         internal const val PAGE_NUMBER = 3

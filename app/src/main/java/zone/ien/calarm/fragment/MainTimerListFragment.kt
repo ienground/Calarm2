@@ -1,39 +1,70 @@
 package zone.ien.calarm.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
+import android.app.Activity
 import android.content.*
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.*
 import zone.ien.calarm.R
-import zone.ien.calarm.adapter.MainAlarmListAdapter
-import zone.ien.calarm.adapter.MainCalarmDateAdapter
-import zone.ien.calarm.adapter.MainCalarmEventAdapter
+import zone.ien.calarm.activity.EditTimerActivity
 import zone.ien.calarm.adapter.MainTimerListAdapter
-import zone.ien.calarm.databinding.FragmentMainAlarmBinding
-import zone.ien.calarm.databinding.FragmentMainCalarmBinding
-import zone.ien.calarm.databinding.FragmentMainTimerBinding
+import zone.ien.calarm.callback.TimerFragmentCallback
+import zone.ien.calarm.callback.TimerListCallback
+import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.databinding.FragmentMainTimerListBinding
-import zone.ien.calarm.room.SubTimerEntity
-import zone.ien.calarm.room.TimersEntity
+import zone.ien.calarm.room.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainTimerListFragment : Fragment() {
 
     lateinit var binding: FragmentMainTimerListBinding
     private var mListener: OnFragmentInteractionListener? = null
+    lateinit var editActivityResultLauncher: ActivityResultLauncher<Intent>
 
+    private var timersDatabase: TimersDatabase? = null
+    private var subTimerDatabase: SubTimerDatabase? = null
+    private lateinit var adapter: MainTimerListAdapter
+    private var callbackListener: TimerFragmentCallback? = null
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private val timerListCallback: TimerListCallback = object: TimerListCallback {
+        override fun callBack(position: Int, id: Long) {
+            editActivityResultLauncher.launch(Intent(requireContext(), EditTimerActivity::class.java).apply {
+                putExtra(IntentKey.ITEM_ID, id)
+            })
+        }
+
+        override fun delete(position: Int, id: Long) {
+            MaterialAlertDialogBuilder(requireContext()).apply {
+                setMessage(R.string.delete_title)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    GlobalScope.launch(Dispatchers.IO) {
+                        timersDatabase?.getDao()?.delete(id)
+                        subTimerDatabase?.getDao()?.deleteParentId(id)
+
+                        withContext(Dispatchers.Main) {
+                            adapter.delete(id)
+                            if (adapter.items.isEmpty()) {
+                                callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_NUMPAD)
+                            }
+                        }
+                    }
+                }
+                setNegativeButton(android.R.string.cancel) { _, _ -> }
+            }.show()
+        }
+
+        override fun start(position: Int, id: Long) {
+            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer_list, container, false)
@@ -46,26 +77,45 @@ class MainTimerListFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.list.adapter = MainTimerListAdapter(arrayListOf(
-            TimersEntity("T1", "", 0L).apply {
-                this.subTimers = arrayListOf(
-                    SubTimerEntity(-1, "T1_1", 80, 1, ""),
-                    SubTimerEntity(-1, "T1_2", 20, 2, ""),
-                    SubTimerEntity(-1, "T1_3", 130, 3, ""),
-                )
-            },
-            TimersEntity("T2", "", 1L).apply {
-                this.subTimers = arrayListOf(
-                    SubTimerEntity(-1, "T2_1", 180, 1, ""),
-                    SubTimerEntity(-1, "T2_2", 20, 2, ""),
-                )
+        timersDatabase = TimersDatabase.getInstance(requireContext())
+        subTimerDatabase = SubTimerDatabase.getInstance(requireContext())
+
+        refreshList()
+
+        binding.btnAdd.setOnClickListener {
+            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_NUMPAD)
+        }
+
+        editActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val id = result.data?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1
             }
-        ))
+        }
 
+    }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    fun refreshList() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val timers = timersDatabase?.getDao()?.getAll()
+            if (timers != null) {
+                for (timer in timers) {
+                    val subTimers = subTimerDatabase?.getDao()?.getByParentId(timer.id ?: -1L)
+                    timer.subTimers = subTimers as ArrayList<SubTimerEntity>
+                }
+
+                withContext(Dispatchers.Main) {
+                    adapter = MainTimerListAdapter(timers as ArrayList<TimersEntity>).apply {
+                        setClickCallback(timerListCallback)
+                    }
+                    binding.list.adapter = adapter
+                }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -94,6 +144,10 @@ class MainTimerListFragment : Fragment() {
             //            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun setCallbackListener(callbackListener: TimerFragmentCallback?) {
+        this.callbackListener = callbackListener
     }
 
     interface OnFragmentInteractionListener {

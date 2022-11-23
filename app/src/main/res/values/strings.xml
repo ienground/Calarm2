@@ -53,4 +53,8 @@
     <string name="sub_alarm_exists">Sub alarm already exists.</string>
     <string name="missed_notification">Missed Alarm Notification</string>
     <string name="missed_alarm">Missed Alarm</string>
+    <string name="hour">h</string>
+    <string name="minute">m</string>
+    <string name="second">s</string>
+    <string name="not_scheduled">Not scheduled</string>
 </resources>

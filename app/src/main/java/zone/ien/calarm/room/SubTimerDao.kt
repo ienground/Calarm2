@@ -8,7 +8,7 @@ interface SubTimerDao {
     fun getAll(): List<SubTimerEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(data: SubTimerEntity)
+    fun add(data: SubTimerEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(data: SubTimerEntity)

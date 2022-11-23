@@ -12,11 +12,14 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
+import zone.ien.calarm.callback.TimerListCallback
 import zone.ien.calarm.room.TimersEntity
 
 class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Adapter<MainTimerListAdapter.ItemViewHolder>() {
 
     lateinit var context: Context
+
+    private var callbackListener: TimerListCallback? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         context = parent.context
@@ -45,9 +48,46 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
         }
         holder.tvTime.text = String.format("%02d:%02d", duration / 60, duration % 60)
         holder.badge.text = items[holder.adapterPosition].subTimers.size.toString()
+        holder.btnDelete.setOnClickListener {
+            callbackListener?.delete(holder.adapterPosition, items[holder.adapterPosition].id ?: -1L)
+        }
+        holder.btnStart.setOnClickListener {
+            callbackListener?.start(holder.adapterPosition, items[holder.adapterPosition].id ?: -1L)
+        }
+        holder.itemView.setOnClickListener {
+            callbackListener?.callBack(holder.adapterPosition, items[holder.adapterPosition].id ?: -1L)
+        }
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun edit(id: Long, item: TimersEntity) {
+//        val position = items.indexOfFirst { it.id == id }
+//        if (position != -1) {
+//            items[position] = item
+//            items.sortBy { it.time }
+//            val newPosition = items.indexOfFirst { it.id == id }
+//
+//            notifyItemMoved(position, newPosition)
+//            notifyItemChanged(newPosition)
+//        } else {
+//            items.add(item)
+//            items.sortBy { it.time }
+//            val newPosition = items.indexOfFirst { it.id == id }
+//
+//            notifyItemInserted(newPosition)
+//        }
+    }
+
+    fun delete(id: Long) {
+        val position = items.indexOfFirst { it.id == id }
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun setClickCallback(callbackListener: TimerListCallback) {
+        this.callbackListener = callbackListener
+    }
 
     inner class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val tvLabel: MaterialTextView = itemView.findViewById(R.id.tv_label)

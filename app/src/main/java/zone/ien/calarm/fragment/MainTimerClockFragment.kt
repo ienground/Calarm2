@@ -1,38 +1,21 @@
 package zone.ien.calarm.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.*
-import android.graphics.Typeface
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import com.google.android.material.snackbar.Snackbar
 import zone.ien.calarm.R
-import zone.ien.calarm.adapter.MainAlarmListAdapter
-import zone.ien.calarm.adapter.MainCalarmDateAdapter
-import zone.ien.calarm.adapter.MainCalarmEventAdapter
-import zone.ien.calarm.adapter.MainTimerListAdapter
-import zone.ien.calarm.databinding.FragmentMainAlarmBinding
-import zone.ien.calarm.databinding.FragmentMainCalarmBinding
-import zone.ien.calarm.databinding.FragmentMainTimerBinding
+import zone.ien.calarm.callback.TimerFragmentCallback
 import zone.ien.calarm.databinding.FragmentMainTimerClockBinding
-import zone.ien.calarm.databinding.FragmentMainTimerListBinding
-import java.util.*
 
 class MainTimerClockFragment : Fragment() {
 
     lateinit var binding: FragmentMainTimerClockBinding
     private var mListener: OnFragmentInteractionListener? = null
 
+    private var callbackListener: TimerFragmentCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer_clock, container, false)
@@ -48,7 +31,13 @@ class MainTimerClockFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnAdd.setOnClickListener {
+            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_NUMPAD)
+        }
 
+        binding.btnList.setOnClickListener {
+            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)
+        }
 
     }
 
@@ -79,6 +68,12 @@ class MainTimerClockFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun setCallbackListener(callbackListener: TimerFragmentCallback?) {
+        this.callbackListener = callbackListener
+    }
+
+
 
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(uri: Uri)

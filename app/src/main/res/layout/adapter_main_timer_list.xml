@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_play_circle"
-            android:background="@null"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_delete"
-            android:background="@null"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="@dimen/usual_margin"
             app:layout_constraintEnd_toStartOf="@id/btn_start"
             app:layout_constraintTop_toTopOf="parent" />

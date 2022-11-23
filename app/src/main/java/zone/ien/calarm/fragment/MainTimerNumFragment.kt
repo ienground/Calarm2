@@ -1,39 +1,59 @@
 package zone.ien.calarm.fragment
 
+import android.animation.ValueAnimator
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.*
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.adapter.MainAlarmListAdapter
 import zone.ien.calarm.adapter.MainCalarmDateAdapter
 import zone.ien.calarm.adapter.MainCalarmEventAdapter
 import zone.ien.calarm.adapter.MainTimerListAdapter
+import zone.ien.calarm.callback.TimerFragmentCallback
 import zone.ien.calarm.databinding.FragmentMainAlarmBinding
 import zone.ien.calarm.databinding.FragmentMainCalarmBinding
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
 import zone.ien.calarm.databinding.FragmentMainTimerClockBinding
 import zone.ien.calarm.databinding.FragmentMainTimerListBinding
 import zone.ien.calarm.databinding.FragmentMainTimerNumBinding
+import zone.ien.calarm.room.SubTimerDatabase
+import zone.ien.calarm.room.SubTimerEntity
+import zone.ien.calarm.room.TimersDatabase
+import zone.ien.calarm.room.TimersEntity
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainTimerNumFragment : Fragment() {
 
     lateinit var binding: FragmentMainTimerNumBinding
     private var mListener: OnFragmentInteractionListener? = null
 
+    private var timersDatabase: TimersDatabase? = null
+    private var subTimerDatabase: SubTimerDatabase? = null
+
+    private var callbackListener: TimerFragmentCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer_num, container, false)
@@ -46,9 +66,105 @@ class MainTimerNumFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        timersDatabase = TimersDatabase.getInstance(requireContext())
+        subTimerDatabase = SubTimerDatabase.getInstance(requireContext())
+
+        val nums: ArrayList<Int> = arrayListOf()
+        val btnNum = listOf(binding.btnNum0, binding.btnNum1, binding.btnNum2, binding.btnNum3, binding.btnNum4, binding.btnNum5, binding.btnNum6, binding.btnNum7, binding.btnNum8, binding.btnNum9)
+
+        binding.display.text = timeToText(nums, R.color.colorBLUE)
+        btnNum.forEachIndexed { index, materialButton ->
+            materialButton.setOnClickListener {
+                if (nums.size < 6 && !(nums.isEmpty() && index == 0)) {
+                    if (nums.isEmpty()) {
+                        ValueAnimator.ofFloat(0.3f, 1f).apply {
+                            addUpdateListener {
+                                binding.btnSave.alpha = it.animatedValue as Float
+                                binding.btnStart.alpha = it.animatedValue as Float
+                            }
+                        }.start()
+                    }
+                    nums.add(index)
+                    binding.display.text = timeToText(nums, R.color.colorBLUE)
+                }
+            }
+        }
+
+        binding.btnDelete.setOnClickListener {
+            if (nums.isNotEmpty()) {
+                nums.removeLast()
+                binding.display.text = timeToText(nums, R.color.colorBLUE)
+
+                if (nums.isEmpty()) {
+                    ValueAnimator.ofFloat(1f, 0.3f).apply {
+                        addUpdateListener {
+                            binding.btnSave.alpha = it.animatedValue as Float
+                            binding.btnStart.alpha = it.animatedValue as Float
+                        }
+                    }.start()
+                }
+            }
+        }
+
+        binding.btnDelete.setOnLongClickListener {
+            nums.clear()
+            ValueAnimator.ofFloat(1f, 0.3f).apply {
+                addUpdateListener {
+                    binding.btnSave.alpha = it.animatedValue as Float
+                    binding.btnStart.alpha = it.animatedValue as Float
+                }
+            }.start()
+            binding.display.text = timeToText(nums, R.color.colorBLUE)
+            true
+        }
+
+        binding.btnSave.setOnClickListener {
+            if (nums.isNotEmpty()) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    var duration = 0
+                    val data: ArrayList<Int> = arrayListOf()
+                    for (i in 0 until 6 - nums.size) data.add(0)
+                    data.addAll(nums)
+
+                    duration += 60 * 60 * (data[0] * 10 + data[1])
+                    duration += 60 * (data[2] * 10 + data[3])
+                    duration += (data[4] * 10 + data[5])
+
+                    val timers = TimersEntity("", "", 0L, false, 0L)
+                    val id = timersDatabase?.getDao()?.add(timers)
+
+                    if (id != null) {
+                        subTimerDatabase?.getDao()?.add(SubTimerEntity(id, "", duration, 0, ""))
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        nums.clear()
+                        binding.display.text = timeToText(nums, R.color.colorBLUE)
+                        binding.btnSave.alpha = 0.3f
+                        binding.btnStart.alpha = 0.3f
+                        callbackListener?.addNewTimer(0)
+                    }
+                }
+            }
+        }
+
+        binding.btnStart.setOnClickListener {
+            if (nums.isNotEmpty()) {
+                nums.clear()
+                binding.display.text = timeToText(nums, R.color.colorBLUE)
+                binding.btnSave.alpha = 0.3f
+                binding.btnStart.alpha = 0.3f
+                callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)
+            }
+        }
+
+        binding.btnClose.setOnClickListener {
+            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)
+        }
 
 
     }
@@ -74,11 +190,51 @@ class MainTimerNumFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            //            R.id.menu_share -> {
-            //                startActivity(Intent(MainActivity.instance, ShareImageActivity::class.java))
-            //            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun timeToText(data: ArrayList<Int>, color: Int): SpannableStringBuilder {
+        val nums: MutableList<Int> = mutableListOf()
+        val dataSize = data.size
+        for (i in 0 until 6 - data.size) nums.add(0)
+        nums.addAll(data)
+
+        val span01 = SpannableStringBuilder("${nums[0]}${nums[1]}").apply {
+            if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(42, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val span02 = SpannableStringBuilder(getString(R.string.hour) + "  ").apply {
+            if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(24, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val span03 = SpannableStringBuilder("${nums[2]}${nums[3]}").apply {
+            if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(42, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val span04 = SpannableStringBuilder(getString(R.string.minute) + "  ").apply {
+            if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(24, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val span05 = SpannableStringBuilder("${nums[4]}${nums[5]}").apply {
+            if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(42, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val span06 = SpannableStringBuilder(getString(R.string.second)).apply {
+            if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(AbsoluteSizeSpan(24, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return span01.append(span02).append(span03).append(span04).append(span05).append(span06)
+    }
+
+    fun setCallbackListener(callbackListener: TimerFragmentCallback?) {
+        this.callbackListener = callbackListener
     }
 
     interface OnFragmentInteractionListener {

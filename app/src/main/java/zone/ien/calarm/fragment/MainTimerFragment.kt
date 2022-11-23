@@ -16,12 +16,16 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.adapter.MainAlarmListAdapter
 import zone.ien.calarm.adapter.MainCalarmDateAdapter
 import zone.ien.calarm.adapter.MainCalarmEventAdapter
 import zone.ien.calarm.adapter.MainTimerPageAdapter
+import zone.ien.calarm.callback.TimerFragmentCallback
 import zone.ien.calarm.databinding.FragmentMainAlarmBinding
 import zone.ien.calarm.databinding.FragmentMainCalarmBinding
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
@@ -36,7 +40,23 @@ class MainTimerFragment : Fragment() {
     private var timersDatabase: TimersDatabase? = null
     private var subTimerDatabase: SubTimerDatabase? = null
 
-    var pagePosition = Int.MAX_VALUE / 2
+    var pagePosition = 0
+    lateinit var pages: List<Fragment>
+    lateinit var timerClockFragment: MainTimerClockFragment
+    lateinit var timerListFragment: MainTimerListFragment
+    lateinit var timerNumFragment: MainTimerNumFragment
+
+    private val timerFragmentCallback: TimerFragmentCallback = object: TimerFragmentCallback {
+        override fun scrollTo(page: Int) {
+            binding.viewpager.setCurrentItem(page, true)
+        }
+
+        override fun addNewTimer(id: Long) {
+            // from numpad to list
+            binding.viewpager.setCurrentItem(TIMER_PAGE_LIST, true)
+            timerListFragment.refreshList()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer, container, false)
@@ -49,16 +69,57 @@ class MainTimerFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         timersDatabase = TimersDatabase.getInstance(requireContext())
         subTimerDatabase = SubTimerDatabase.getInstance(requireContext())
 
-//        binding.viewpager.setPageTransformer(MarginPageTransformer(MyUtils.dpToPx(this, 16f).toInt()))
+        timerClockFragment = MainTimerClockFragment().apply { setCallbackListener(timerFragmentCallback) }
+        timerListFragment = MainTimerListFragment().apply { setCallbackListener(timerFragmentCallback) }
+        timerNumFragment = MainTimerNumFragment().apply { setCallbackListener(timerFragmentCallback) }
+        pages = listOf(timerClockFragment, timerListFragment, timerNumFragment)
         binding.viewpager.offscreenPageLimit = 3
-        binding.viewpager.adapter = MainTimerPageAdapter(this)
+        binding.viewpager.adapter = MainTimerPageAdapter(this, pages)
         binding.viewpager.setCurrentItem(pagePosition, false)
+
+        binding.viewpager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            var currentState = 0
+            var currentPos = 0
+
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                if(currentState == ViewPager2.SCROLL_STATE_DRAGGING && currentPos == position) {
+                    if(currentPos == 0) binding.viewpager.currentItem = 2
+                    else if(currentPos == 2) binding.viewpager.currentItem = 0
+                }
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
+            override fun onPageSelected(position: Int) {
+                currentPos = position
+                super.onPageSelected(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                currentState = state
+                super.onPageScrollStateChanged(state)
+            }
+        })
+
+
+
+        GlobalScope.launch(Dispatchers.IO) {
+            val data = timersDatabase?.getDao()?.getAll()
+            withContext(Dispatchers.Main) {
+                binding.viewpager.setCurrentItem(if (data?.isNotEmpty() == true) ++pagePosition else --pagePosition, true)
+            }
+
+        }
 
     }
 
@@ -100,6 +161,10 @@ class MainTimerFragment : Fragment() {
             val args = Bundle()
             arguments = args
         }
+
+        const val TIMER_PAGE_TIMER = 0
+        const val TIMER_PAGE_LIST = 1
+        const val TIMER_PAGE_NUMPAD = 2
     }
 
 }

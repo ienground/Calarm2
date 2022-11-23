@@ -25,72 +25,60 @@ import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
 import zone.ien.calarm.adapter.SubAlarmAdapter
+import zone.ien.calarm.adapter.SubTimerAdapter
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.constant.IntentValue
 import zone.ien.calarm.constant.SharedKey
 import zone.ien.calarm.databinding.ActivityEditAlarmBinding
-import zone.ien.calarm.room.AlarmDatabase
-import zone.ien.calarm.room.AlarmEntity
-import zone.ien.calarm.room.SubAlarmDatabase
-import zone.ien.calarm.room.SubAlarmEntity
+import zone.ien.calarm.databinding.ActivityEditTimerBinding
+import zone.ien.calarm.room.*
 import zone.ien.calarm.utils.MyUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.pow
 
-class EditAlarmActivity : AppCompatActivity() {
+class EditTimerActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityEditAlarmBinding
+    lateinit var binding: ActivityEditTimerBinding
     private lateinit var sharedPreferences: SharedPreferences
-    private var alarmDatabase: AlarmDatabase? = null
-    private var subAlarmDatabase: SubAlarmDatabase? = null
-    private lateinit var chips: List<Chip>
-    private lateinit var adapter: SubAlarmAdapter
+    private var timersDatabase: TimersDatabase? = null
+    private var subTimerDatabase: SubTimerDatabase? = null
+    private lateinit var adapter: SubTimerAdapter
     private lateinit var am: AlarmManager
 
     private val apmFormat = SimpleDateFormat("a", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("h:mm", Locale.getDefault())
 
-    private var ringtones: Map<String, String> = mapOf()
-
-    var item = AlarmEntity("", 0, true, 0, "", "", true)
+    var item = TimersEntity("", "", 0L, false, 0L)
     var id = -1L
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_alarm)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_timer)
         binding.activity = this
 
         am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         sharedPreferences = getSharedPreferences("${packageName}_preferences", Context.MODE_PRIVATE)
-        chips = listOf(
-            binding.repeatSun, binding.repeatMon, binding.repeatTue, binding.repeatWed,
-            binding.repeatThu, binding.repeatFri, binding.repeatSat
-        )
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        alarmDatabase = AlarmDatabase.getInstance(this)
-        subAlarmDatabase = SubAlarmDatabase.getInstance(this)
-
-        ringtones = MyUtils.getAlarmRingtones(this)
-        item.sound = ringtones.values.first()
+        timersDatabase = TimersDatabase.getInstance(this)
+        subTimerDatabase = SubTimerDatabase.getInstance(this)
 
         id = intent.getLongExtra(IntentKey.ITEM_ID, -1L)
-        Calendar.getInstance().let {
-            item.time = it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) + 1
-        }
+
+
 
         if (id != -1L) {
             GlobalScope.launch(Dispatchers.IO) {
-                alarmDatabase?.getDao()?.get(id).let {
+                timersDatabase?.getDao()?.get(id).let {
                     if (it != null) {
                         item = it
-                        item.subAlarms = subAlarmDatabase?.getDao()?.getByParentId(id) as ArrayList<SubAlarmEntity>
+                        item.subTimers = subTimerDatabase?.getDao()?.getByParentId(id) as ArrayList<SubTimerEntity>
                         withContext(Dispatchers.Main) {
                             inflateData(item)
                         }
@@ -100,6 +88,8 @@ class EditAlarmActivity : AppCompatActivity() {
         } else {
             invalidateMenu()
         }
+
+        /*
 
         binding.groupTime.setOnClickListener {
             val timePicker = MaterialTimePicker.Builder()
@@ -177,30 +167,23 @@ class EditAlarmActivity : AppCompatActivity() {
             timePicker.show(supportFragmentManager, "SUB_TIME_PICKER")
         }
 
-        inflateData(item)
+         */
+
+//        inflateData(item)
 
     }
 
-    private fun inflateData(data: AlarmEntity) {
-        val time = Calendar.getInstance().apply {
-            data.time.let {
-                set(Calendar.HOUR_OF_DAY, it / 60)
-                set(Calendar.MINUTE, it % 60)
-            }
-        }
+    private fun inflateData(data: TimersEntity) {
+//        val time = Calendar.getInstance().apply {
+//            data.time.let {
+//                set(Calendar.HOUR_OF_DAY, it / 60)
+//                set(Calendar.MINUTE, it % 60)
+//            }
+//        }
         binding.etLabel.editText?.setText(item.label)
 
-        for (i in 0 until 7) {
-            chips[i].isChecked = item.repeat.and(2.0.pow(6 - i).toInt()) != 0
-        }
-        binding.tvRepeat.text = MyUtils.getRepeatlabel(applicationContext, item.repeat, item.time)
-        binding.tvApm.text = apmFormat.format(time.time)
-        binding.tvTime.text = timeFormat.format(time.time)
-        binding.tvRing.text = with(ringtones.filterValues { it == item.sound }.getKeyArray()) { if (this.isNotEmpty()) first() else "" }
-        binding.switchVibrate.isChecked = data.vibrate
-
-        adapter = SubAlarmAdapter(data.subAlarms)
-        binding.listSubAlarm.adapter = adapter
+        adapter = SubTimerAdapter(data.subTimers)
+        binding.listSubTimer.adapter = adapter
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -221,19 +204,20 @@ class EditAlarmActivity : AppCompatActivity() {
                 onBackPressedDispatcher.onBackPressed()
             }
             R.id.menu_save -> {
+                /*
                 this.item.label = binding.etLabel.editText?.text.toString()
                 this.item.isEnabled = true
                 GlobalScope.launch(Dispatchers.IO) {
-                    val id = alarmDatabase?.getDao()?.add(this@EditAlarmActivity.item)
-                    MyUtils.deleteAlarmClock(applicationContext, am, this@EditAlarmActivity.item)
+                    val id = alarmDatabase?.getDao()?.add(this@EditTimerActivity.item)
+                    MyUtils.deleteAlarmClock(applicationContext, am, this@EditTimerActivity.item)
                     withContext(Dispatchers.IO) {
-                        this@EditAlarmActivity.item.id = id
+                        this@EditTimerActivity.item.id = id
                         subAlarmDatabase?.getDao()?.deleteParentId(id ?: -1)
-                        for (entity in this@EditAlarmActivity.item.subAlarms) {
+                        for (entity in this@EditTimerActivity.item.subAlarms) {
                             entity.parentId = id ?: -1
                             subAlarmDatabase?.getDao()?.add(entity)
                         }
-                        val alarmTime = MyUtils.setAlarmClock(applicationContext, am, this@EditAlarmActivity.item)
+                        val alarmTime = MyUtils.setAlarmClock(applicationContext, am, this@EditTimerActivity.item)
                         withContext(Dispatchers.Main) {
                             Toast.makeText(applicationContext, MyUtils.timeDiffToString(applicationContext, Calendar.getInstance(), alarmTime), Toast.LENGTH_SHORT).show()
                         }
@@ -244,15 +228,18 @@ class EditAlarmActivity : AppCompatActivity() {
                         finish()
                     }
                 }
+
+                 */
             }
             R.id.menu_delete -> {
+                /*
                 MaterialAlertDialogBuilder(this).apply {
                     setMessage(R.string.delete_title)
                     setPositiveButton(android.R.string.ok) { _, _ ->
                         GlobalScope.launch(Dispatchers.IO) {
-                            MyUtils.deleteAlarmClock(applicationContext, am, this@EditAlarmActivity.item)
-                            alarmDatabase?.getDao()?.delete(this@EditAlarmActivity.item.id ?: -1)
-                            subAlarmDatabase?.getDao()?.deleteParentId(this@EditAlarmActivity.item.id ?: -1)
+                            MyUtils.deleteAlarmClock(applicationContext, am, this@EditTimerActivity.item)
+                            alarmDatabase?.getDao()?.delete(this@EditTimerActivity.item.id ?: -1)
+                            subAlarmDatabase?.getDao()?.deleteParentId(this@EditTimerActivity.item.id ?: -1)
                         }
                         setResult(RESULT_OK, Intent().apply {
                             putExtra(IntentKey.ITEM_ID, id)
@@ -262,6 +249,8 @@ class EditAlarmActivity : AppCompatActivity() {
                     }
                     setNegativeButton(android.R.string.cancel) { _, _ -> }
                 }.show()
+
+                 */
             }
         }
         return super.onOptionsItemSelected(item)

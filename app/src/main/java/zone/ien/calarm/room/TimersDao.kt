@@ -8,13 +8,13 @@ interface TimersDao {
     fun getAll(): List<TimersEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(data: TimersEntity)
+    fun add(data: TimersEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(data: TimersEntity)
 
     @Query("SELECT * FROM TimersDatabase WHERE id = :id")
-    fun get(id: Int): TimersEntity
+    fun get(id: Long): TimersEntity
 
     @Query("DELETE FROM TimersDatabase WHERE id = :id")
     fun delete(id: Long)
