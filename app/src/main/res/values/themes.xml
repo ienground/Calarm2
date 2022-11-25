@@ -26,6 +26,12 @@
         <item name="android:insetRight">0dp</item>
     </style>
 
+    <style name="Theme.Calarm.TimerButton.Dialog" parent="Theme.Calarm.TimerButton">
+        <item name="android:layout_width">76dp</item>
+        <item name="android:layout_height">76dp</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
     <style name="ShapeAppearanceOverlay.Calarm.Button.Circle" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

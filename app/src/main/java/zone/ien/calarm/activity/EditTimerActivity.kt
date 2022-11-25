@@ -16,6 +16,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.dialog.MaterialDialogs
@@ -26,6 +27,7 @@ import kotlinx.coroutines.*
 import zone.ien.calarm.R
 import zone.ien.calarm.adapter.SubAlarmAdapter
 import zone.ien.calarm.adapter.SubTimerAdapter
+import zone.ien.calarm.callback.ItemTouchHelperCallback
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.constant.IntentValue
 import zone.ien.calarm.constant.SharedKey
@@ -182,7 +184,9 @@ class EditTimerActivity : AppCompatActivity() {
 //        }
         binding.etLabel.editText?.setText(item.label)
 
-        adapter = SubTimerAdapter(data.subTimers)
+        adapter = SubTimerAdapter(data.subTimers, data.id ?: -1)
+        val itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
+        itemTouchHelper.attachToRecyclerView(binding.listSubTimer)
         binding.listSubTimer.adapter = adapter
     }
 

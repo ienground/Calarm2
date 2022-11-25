@@ -7,7 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.media.RingtoneManager
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import androidx.core.content.ContextCompat
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.constant.ActionKey
@@ -163,5 +168,45 @@ class MyUtils {
 
             return if (difference >= 60 * 1000L) context.getString(R.string.alarm_toast_format, timeBuilder.toString()) else context.getString(R.string.alarm_toast_min)
         }
+
+        fun timeToText(context: Context, data: ArrayList<Int>, color: Int, textSize1: Int = 42, textSize2: Int = 24): SpannableStringBuilder {
+            val nums: MutableList<Int> = mutableListOf()
+            val dataSize = data.size
+            for (i in 0 until 6 - data.size) nums.add(0)
+            nums.addAll(data)
+
+            val span01 = SpannableStringBuilder("${nums[0]}${nums[1]}").apply {
+                if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            val span02 = SpannableStringBuilder(context.getString(R.string.hour) + "  ").apply {
+                if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            val span03 = SpannableStringBuilder("${nums[2]}${nums[3]}").apply {
+                if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            val span04 = SpannableStringBuilder(context.getString(R.string.minute) + "  ").apply {
+                if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            val span05 = SpannableStringBuilder("${nums[4]}${nums[5]}").apply {
+                if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            val span06 = SpannableStringBuilder(context.getString(R.string.second)).apply {
+                if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            return span01.append(span02).append(span03).append(span04).append(span05).append(span06)
+        }
+
     }
 }

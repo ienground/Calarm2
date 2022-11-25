@@ -1,19 +1,26 @@
 package zone.ien.calarm.adapter
 
+import android.animation.ValueAnimator
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import androidx.core.content.res.ResourcesCompat
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
+import zone.ien.calarm.databinding.DialogTimerNumBinding
 import zone.ien.calarm.room.SubAlarmEntity
 import zone.ien.calarm.room.SubTimerEntity
+import zone.ien.calarm.utils.ItemActionListener
+import zone.ien.calarm.utils.MyUtils.Companion.timeToText
 
-class SubTimerAdapter(var items: ArrayList<SubTimerEntity>): RecyclerView.Adapter<SubTimerAdapter.ItemViewHolder>() {
+class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long): RecyclerView.Adapter<SubTimerAdapter.ItemViewHolder>(), ItemActionListener {
 
     lateinit var context: Context
 
@@ -26,9 +33,17 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>): RecyclerView.Adapte
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         items[holder.adapterPosition].time.let {
             holder.tvTime.text =
-                if (it / 60 != 0 && it % 60 != 0) context.getString(R.string.time_format_hour_minute, it / 60, it % 60)
-                else if (it / 60 != 0) context.getString(R.string.time_format_hour, it / 60)
-                else context.getString(R.string.time_format_minute, it % 60)
+                if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+            holder.tvLabel.text = items[holder.adapterPosition].label
+        }
+
+        holder.btnInsertUp.setOnClickListener {
+            getNumpadDialog(true, holder.adapterPosition).show()
+        }
+
+        holder.btnInsertDown.setOnClickListener {
+            getNumpadDialog(false, holder.adapterPosition).show()
         }
 //        holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
 //        holder.btnDelete.setOnClickListener {
@@ -40,6 +55,58 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>): RecyclerView.Adapte
 
     override fun getItemCount(): Int = items.size
 
+    private fun getNumpadDialog(isUp: Boolean, position: Int): MaterialAlertDialogBuilder {
+        return MaterialAlertDialogBuilder(context).apply {
+            val binding: DialogTimerNumBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_timer_num, null, false)
+            val btnNum = listOf(binding.btnNum0, binding.btnNum1, binding.btnNum2, binding.btnNum3, binding.btnNum4, binding.btnNum5, binding.btnNum6, binding.btnNum7, binding.btnNum8, binding.btnNum9)
+            val nums: ArrayList<Int> = arrayListOf()
+
+            binding.display.text = timeToText(this@SubTimerAdapter.context, nums, R.color.colorBLUE, 32, 16)
+            btnNum.forEachIndexed { index, materialButton ->
+                materialButton.setOnClickListener {
+                    if (nums.size < 6 && !(nums.isEmpty() && index == 0)) {
+                        nums.add(index)
+                        binding.display.text = timeToText(this@SubTimerAdapter.context, nums, R.color.colorBLUE, 32, 16)
+                    }
+                }
+            }
+
+            binding.btnDelete.setOnClickListener {
+                if (nums.isNotEmpty()) {
+                    nums.removeLast()
+                    binding.display.text = timeToText(this@SubTimerAdapter.context, nums, R.color.colorBLUE, 32, 16)
+                }
+            }
+
+            binding.btnDelete.setOnLongClickListener {
+                nums.clear()
+                binding.display.text = timeToText(this@SubTimerAdapter.context, nums, R.color.colorBLUE, 32, 16)
+                true
+            }
+
+            setPositiveButton(android.R.string.ok) { dialog, id ->
+                var duration = 0
+                val data: ArrayList<Int> = arrayListOf()
+                for (i in 0 until 6 - nums.size) data.add(0)
+                data.addAll(nums)
+
+                duration += 60 * 60 * (data[0] * 10 + data[1])
+                duration += 60 * (data[2] * 10 + data[3])
+                duration += (data[4] * 10 + data[5])
+
+                items.add(if (isUp) position else position + 1, SubTimerEntity(parentId, "", duration, 0, ""))
+                notifyItemInserted(if (isUp) position else position + 1)
+                dialog.dismiss()
+            }
+
+            setNegativeButton(android.R.string.cancel) { dialog, id ->
+
+            }
+
+            setView(binding.root)
+        }
+    }
+
     fun add(item: SubAlarmEntity) {
 //        items.add(item)
 //        items.sortBy { it.time }
@@ -47,8 +114,16 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>): RecyclerView.Adapte
 //        notifyItemInserted(newIndex)
     }
 
+    override fun onItemSwiped(position: Int) {
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     inner class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-//        val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete)
+        val tvLabel: MaterialTextView = itemView.findViewById(R.id.tv_label)
         val tvTime: MaterialTextView = itemView.findViewById(R.id.tv_time)
+        val btnInsertUp: ImageButton = itemView.findViewById(R.id.btn_insert_up)
+        val btnInsertDown: ImageButton = itemView.findViewById(R.id.btn_insert_down)
+        val btnStart: MaterialButton = itemView.findViewById(R.id.btn_start)
     }
 }

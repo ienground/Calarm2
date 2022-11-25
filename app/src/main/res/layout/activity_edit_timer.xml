@@ -130,25 +130,14 @@
                     android:id="@+id/tag_sub_alarm"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/sub_alarm"
+                    android:text="00:00"
                     android:textSize="@dimen/tag_size"
                     android:textColor="@color/black"
                     android:fontFamily="@font/pretendard_black"
-                    android:layout_marginEnd="@dimen/usual_margin"
                     android:layout_marginTop="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btn_add"
-                    app:layout_constraintTop_toBottomOf="@id/divider1" />
-
-                <ImageButton
-                    android:id="@+id/btn_add"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_add"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/tag_sub_alarm"
-                    app:layout_constraintBottom_toBottomOf="@id/tag_sub_alarm" />
+                    app:layout_constraintTop_toBottomOf="@id/divider1" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list_sub_timer"
