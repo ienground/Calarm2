@@ -10,5 +10,6 @@ class IntentKey {
         const val TIME = "time"
         const val ADDRESS = "address"
         const val CALENDAR_ID = "calendarId"
+        const val COUNTDOWN_TIME = "countdown_time"
     }
 }

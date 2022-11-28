@@ -17,8 +17,10 @@ import zone.ien.calarm.adapter.MainTimerListAdapter
 import zone.ien.calarm.callback.TimerFragmentCallback
 import zone.ien.calarm.callback.TimerListCallback
 import zone.ien.calarm.constant.IntentKey
+import zone.ien.calarm.constant.IntentValue
 import zone.ien.calarm.databinding.FragmentMainTimerListBinding
 import zone.ien.calarm.room.*
+import zone.ien.calarm.service.TimerService
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -63,6 +65,9 @@ class MainTimerListFragment : Fragment() {
 
         override fun start(position: Int, id: Long) {
             callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)
+            requireActivity().startForegroundService(Intent(requireContext(), TimerService::class.java).apply {
+                putExtra(IntentKey.COUNTDOWN_TIME, 15 * 1000L)
+            })
         }
     }
 
@@ -93,6 +98,25 @@ class MainTimerListFragment : Fragment() {
         editActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val id = result.data?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1
+                when (result.data?.getIntExtra(IntentKey.ACTION_TYPE, -1)) {
+                    IntentValue.ACTION_EDIT -> {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val item = timersDatabase?.getDao()?.get(id)
+                            item?.subTimers = subTimerDatabase?.getDao()?.getByParentId(id) as ArrayList<SubTimerEntity>
+                            if (item != null) {
+                                withContext(Dispatchers.Main) {
+                                    adapter.edit(id, item)
+                                }
+                            }
+                        }
+                    }
+                    IntentValue.ACTION_DELETE -> {
+                        adapter.delete(id)
+                        if (adapter.items.isEmpty()) {
+                            callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_NUMPAD)
+                        }
+                    }
+                }
             }
         }
 

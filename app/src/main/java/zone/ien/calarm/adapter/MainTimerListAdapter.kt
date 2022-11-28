@@ -5,15 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
 import zone.ien.calarm.callback.TimerListCallback
 import zone.ien.calarm.room.TimersEntity
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Adapter<MainTimerListAdapter.ItemViewHolder>() {
 
@@ -28,6 +35,7 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        val dateTimeFormat = SimpleDateFormat(context.getString(R.string.dateTimeFormat), Locale.getDefault())
         items[holder.adapterPosition].label.let {
             if (it != "") {
                 holder.tvLabel.visibility = View.VISIBLE
@@ -36,17 +44,32 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
                 holder.tvLabel.visibility = View.GONE
             }
         }
+        holder.chipsMiniTimer.removeAllViews()
         var duration = 0
         for (timer in items[holder.adapterPosition].subTimers) {
             duration += timer.time
 
             val chip = Chip(context)
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
-            chip.text = String.format("%02d:%02d", timer.time / 60, timer.time % 60)
+            chip.text = timer.time.let {
+                if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+            }
 
-            holder.chipsMiniAlarm.addView(chip)
+            holder.chipsMiniTimer.addView(chip)
         }
-        holder.tvTime.text = String.format("%02d:%02d", duration / 60, duration % 60)
+        if (items[holder.adapterPosition].isScheduled) {
+            holder.icSchedule.visibility = View.VISIBLE
+            holder.tvSchedule.visibility = View.VISIBLE
+            holder.tvSchedule.text = dateTimeFormat.format(Date(items[holder.adapterPosition].scheduledTime))
+        } else {
+            holder.icSchedule.visibility = View.GONE
+            holder.tvSchedule.visibility = View.GONE
+        }
+        holder.tvTime.text = duration.let {
+            if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+            else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+        }
         holder.badge.text = items[holder.adapterPosition].subTimers.size.toString()
         holder.btnDelete.setOnClickListener {
             callbackListener?.delete(holder.adapterPosition, items[holder.adapterPosition].id ?: -1L)
@@ -62,21 +85,9 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
     override fun getItemCount(): Int = items.size
 
     fun edit(id: Long, item: TimersEntity) {
-//        val position = items.indexOfFirst { it.id == id }
-//        if (position != -1) {
-//            items[position] = item
-//            items.sortBy { it.time }
-//            val newPosition = items.indexOfFirst { it.id == id }
-//
-//            notifyItemMoved(position, newPosition)
-//            notifyItemChanged(newPosition)
-//        } else {
-//            items.add(item)
-//            items.sortBy { it.time }
-//            val newPosition = items.indexOfFirst { it.id == id }
-//
-//            notifyItemInserted(newPosition)
-//        }
+        val position = items.indexOfFirst { it.id == id }
+        items[position] = item
+        notifyItemChanged(position)
     }
 
     fun delete(id: Long) {
@@ -95,6 +106,8 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
         val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete)
         val badge: MaterialTextView = itemView.findViewById(R.id.badge)
         val tvTime: MaterialTextView = itemView.findViewById(R.id.tv_time)
-        val chipsMiniAlarm: ChipGroup = itemView.findViewById(R.id.chips_mini_alarm)
+        val chipsMiniTimer: ChipGroup = itemView.findViewById(R.id.chips_mini_timer)
+        val icSchedule: ImageView = itemView.findViewById(R.id.ic_schedule)
+        val tvSchedule: MaterialTextView = itemView.findViewById(R.id.tv_schedule)
     }
 }

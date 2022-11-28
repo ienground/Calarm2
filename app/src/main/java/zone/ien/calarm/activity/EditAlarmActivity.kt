@@ -6,19 +6,15 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
-import com.google.android.material.chip.Chip
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -45,7 +41,7 @@ class EditAlarmActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private var alarmDatabase: AlarmDatabase? = null
     private var subAlarmDatabase: SubAlarmDatabase? = null
-    private lateinit var chips: List<Chip>
+    private lateinit var buttons: List<MaterialButton>
     private lateinit var adapter: SubAlarmAdapter
     private lateinit var am: AlarmManager
 
@@ -65,7 +61,7 @@ class EditAlarmActivity : AppCompatActivity() {
 
         am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         sharedPreferences = getSharedPreferences("${packageName}_preferences", Context.MODE_PRIVATE)
-        chips = listOf(
+        buttons = listOf(
             binding.repeatSun, binding.repeatMon, binding.repeatTue, binding.repeatWed,
             binding.repeatThu, binding.repeatFri, binding.repeatSat
         )
@@ -119,7 +115,7 @@ class EditAlarmActivity : AppCompatActivity() {
             timePicker.show(supportFragmentManager, "TIME_PICKER")
         }
 
-        chips.forEachIndexed { index, chip ->
+        buttons.forEachIndexed { index, chip ->
             chip.setOnClickListener {
                 if (chip.isChecked) item.repeat += 2.0.pow(6 - index).toInt()
                 else item.repeat -= 2.0.pow(6 - index).toInt()
@@ -191,7 +187,7 @@ class EditAlarmActivity : AppCompatActivity() {
         binding.etLabel.editText?.setText(item.label)
 
         for (i in 0 until 7) {
-            chips[i].isChecked = item.repeat.and(2.0.pow(6 - i).toInt()) != 0
+            buttons[i].isChecked = item.repeat.and(2.0.pow(6 - i).toInt()) != 0
         }
         binding.tvRepeat.text = MyUtils.getRepeatlabel(applicationContext, item.repeat, item.time)
         binding.tvApm.text = apmFormat.format(time.time)

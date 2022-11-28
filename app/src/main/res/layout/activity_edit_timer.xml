@@ -62,7 +62,7 @@
                     style="@style/Widget.Material3.TextInputLayout.FilledBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Label"
+                    android:hint="@string/label"
                     android:layout_marginTop="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -127,7 +127,7 @@
                     app:layout_constraintTop_toBottomOf="@id/group_schedule" />
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/tag_sub_alarm"
+                    android:id="@+id/tv_duration_sum"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="00:00"
@@ -147,7 +147,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tag_sub_alarm" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_duration_sum" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -18,6 +18,6 @@
 
     <item
         android:id="@+id/navigation_stopwatch"
-        android:icon="@drawable/ic_time"
+        android:icon="@drawable/ic_hourglass_half"
         android:title="@string/stopwatch" />
 </menu>

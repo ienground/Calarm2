@@ -87,7 +87,7 @@
                     style="@style/Widget.Material3.TextInputLayout.FilledBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Label"
+                    android:hint="@string/label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/group_time">
@@ -109,109 +109,119 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/et_label" />
 
-                <com.google.android.material.chip.ChipGroup
+                <com.google.android.material.button.MaterialButtonToggleGroup
                     android:id="@+id/group_repeat"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/usual_margin"
+                    android:orientation="horizontal"
+                    android:weightSum="7"
                     app:singleLine="true"
                     app:singleSelection="false"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_repeat">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_sun"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/sun_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintHorizontal_chainStyle="spread"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_mon"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_sun"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/sun_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintHorizontal_chainStyle="spread"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_mon"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_mon"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/mon_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_sun"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_tue"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_mon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/mon_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_sun"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_tue"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_tue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/tue_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_mon"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_wed"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_tue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/tue_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_mon"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_wed"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_wed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/wed_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_tue"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_thu"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_wed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/wed_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_tue"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_thu"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_thu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/thu_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_wed"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_fri"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_thu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/thu_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_wed"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_fri"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_fri"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/fri_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_thu"
+                        app:layout_constraintEnd_toStartOf="@id/repeat_sat"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_fri"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/fri_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_thu"
-                            app:layout_constraintEnd_toStartOf="@id/repeat_sat"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/repeat_sat"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:checkable="true"
+                        android:text="@string/sat_short"
+                        android:fontFamily="@font/pretendard"
+                        app:layout_constraintStart_toEndOf="@id/repeat_fri"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/repeat_sat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:text="@string/sat_short"
-                            android:fontFamily="@font/pretendard"
-                            app:layout_constraintStart_toEndOf="@id/repeat_fri"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.chip.ChipGroup>
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/group_ring"

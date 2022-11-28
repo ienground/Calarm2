@@ -55,15 +55,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_label" />
 
+        <ImageView
+            android:id="@+id/ic_schedule"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_today"
+            app:layout_constraintStart_toStartOf="@id/tv_time"
+            app:layout_constraintTop_toBottomOf="@id/tv_time" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_schedule"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/dateTimeFormat"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toEndOf="@id/ic_schedule"
+            app:layout_constraintTop_toTopOf="@id/ic_schedule"
+            app:layout_constraintBottom_toBottomOf="@id/ic_schedule" />
+
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_mini_alarm"
+            android:id="@+id/chips_mini_timer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/usual_margin"
             android:layout_marginTop="@dimen/usual_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/badge"
-            app:layout_constraintTop_toBottomOf="@id/tv_time" />
+            app:layout_constraintTop_toBottomOf="@id/ic_schedule" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/badge"
@@ -76,8 +94,8 @@
             android:fontFamily="@font/pretendard_black"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/chips_mini_alarm"
-            app:layout_constraintBottom_toBottomOf="@id/chips_mini_alarm" />
+            app:layout_constraintTop_toTopOf="@id/chips_mini_timer"
+            app:layout_constraintBottom_toBottomOf="@id/chips_mini_timer" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

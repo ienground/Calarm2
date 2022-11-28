@@ -58,4 +58,7 @@
     <string name="second">s</string>
     <string name="not_scheduled">Not scheduled</string>
     <string name="no_label">No label</string>
+    <string name="dateTimeFormat">MMM dd yyyy, a hh:mm</string>
+    <string name="label">Label</string>
+    <string name="countdown">Countdown</string>
 </resources>
