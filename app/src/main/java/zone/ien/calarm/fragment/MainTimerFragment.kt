@@ -63,7 +63,7 @@ class MainTimerFragment : Fragment() {
         binding.fragment = this
 
         setHasOptionsMenu(true)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+//        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
         (requireActivity() as AppCompatActivity).supportActionBar?.title = null
 
         return binding.root

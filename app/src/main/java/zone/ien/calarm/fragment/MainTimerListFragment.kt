@@ -66,7 +66,7 @@ class MainTimerListFragment : Fragment() {
         override fun start(position: Int, id: Long) {
             callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)
             requireActivity().startForegroundService(Intent(requireContext(), TimerService::class.java).apply {
-                putExtra(IntentKey.COUNTDOWN_TIME, 15 * 1000L)
+                putExtra(IntentKey.ITEM_ID, id)
             })
         }
     }

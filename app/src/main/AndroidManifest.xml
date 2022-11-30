@@ -20,6 +20,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Calarm"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.TimerRingActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
         <service
             android:name=".service.TimerService"
             android:enabled="true"
