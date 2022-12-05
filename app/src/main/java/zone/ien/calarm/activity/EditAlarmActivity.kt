@@ -143,6 +143,9 @@ class EditAlarmActivity : AppCompatActivity() {
                     index = which
                     checkedUri = ringtones[ringtones.getKeyArray()[which]] ?: ""
                 }
+                setOnDismissListener {
+                    mediaPlayer.stop()
+                }
                 setPositiveButton(android.R.string.ok) { dialog, _ ->
                     binding.tvRing.text = with(ringtones.filterValues { it == checkedUri }.getKeyArray()) { if (this.isNotEmpty()) first() else "" }
                     item.sound = checkedUri

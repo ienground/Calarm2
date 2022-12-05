@@ -61,4 +61,10 @@
     <string name="dateTimeFormat">MMM dd yyyy, a hh:mm</string>
     <string name="label">Label</string>
     <string name="countdown">Countdown</string>
+    <string name="resume">Resume</string>
+    <string name="pause">Pause</string>
+    <string name="finished">finished</string>
+    <string name="from_alarm_name">from %1$s</string>
+    <string name="time_is_up">Time\'s Up!</string>
+    <string name="close">Close</string>
 </resources>

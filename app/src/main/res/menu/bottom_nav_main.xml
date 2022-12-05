@@ -13,11 +13,11 @@
 
     <item
         android:id="@+id/navigation_timer"
-        android:icon="@drawable/ic_timer"
+        android:icon="@drawable/ic_hourglass_half"
         android:title="@string/timer" />
 
     <item
         android:id="@+id/navigation_stopwatch"
-        android:icon="@drawable/ic_hourglass_half"
+        android:icon="@drawable/ic_timer"
         android:title="@string/stopwatch" />
 </menu>

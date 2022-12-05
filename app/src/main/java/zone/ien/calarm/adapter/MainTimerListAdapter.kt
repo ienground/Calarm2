@@ -46,14 +46,22 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
         }
         holder.chipsMiniTimer.removeAllViews()
         var duration = 0
-        for (timer in items[holder.adapterPosition].subTimers) {
+        items[holder.adapterPosition].subTimers.forEach { timer ->
             duration += timer.time
 
             val chip = Chip(context)
+            chip.isCheckable = true
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
             chip.text = timer.time.let {
                 if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
                 else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+            }
+
+            chip.setOnCheckedChangeListener { compoundButton, b ->
+                chip.text = if (b) timer.label.let { if (it != "") it else context.getString(R.string.no_label) } else timer.time.let {
+                    if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                    else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                }
             }
 
             holder.chipsMiniTimer.addView(chip)

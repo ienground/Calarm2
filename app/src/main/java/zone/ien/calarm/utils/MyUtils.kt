@@ -21,6 +21,8 @@ import zone.ien.calarm.receiver.AlarmReceiver
 import zone.ien.calarm.room.AlarmEntity
 import java.util.*
 import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class MyUtils {
     companion object {
@@ -207,6 +209,9 @@ class MyUtils {
 
             return span01.append(span02).append(span03).append(span04).append(span05).append(span06)
         }
+
+        fun Long.round(digit: Int): Long = (this / digit.toFloat()).roundToLong() * digit
+        fun Int.round(digit: Int): Int = (this / digit.toFloat()).roundToInt() * digit
 
     }
 }

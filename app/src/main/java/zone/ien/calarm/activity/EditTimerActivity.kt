@@ -2,6 +2,7 @@ package zone.ien.calarm.activity
 
 import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -41,11 +42,13 @@ import zone.ien.calarm.constant.IntentValue
 import zone.ien.calarm.constant.SharedKey
 import zone.ien.calarm.databinding.ActivityEditAlarmBinding
 import zone.ien.calarm.databinding.ActivityEditTimerBinding
+import zone.ien.calarm.receiver.TimerAlarmReceiver
 import zone.ien.calarm.room.*
 import zone.ien.calarm.utils.MyUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.PI
 import kotlin.math.pow
 
 class EditTimerActivity : AppCompatActivity() {
@@ -220,6 +223,12 @@ class EditTimerActivity : AppCompatActivity() {
                             entity.parentId = id
                             entity.order = index
                             subTimerDatabase?.getDao()?.add(entity)
+                        }
+                        if (this@EditTimerActivity.item.isScheduled) {
+                            val pendingIntent = PendingIntent.getBroadcast(applicationContext, this@EditTimerActivity.item.id?.toInt() ?: 0, Intent(applicationContext, TimerAlarmReceiver::class.java).apply {
+                                putExtra(IntentKey.ITEM_ID, this@EditTimerActivity.item.id)
+                            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            am.setAlarmClock(AlarmManager.AlarmClockInfo(this@EditTimerActivity.item.scheduledTime, pendingIntent), pendingIntent)
                         }
                         setResult(RESULT_OK, Intent().apply {
                             putExtra(IntentKey.ITEM_ID, id)

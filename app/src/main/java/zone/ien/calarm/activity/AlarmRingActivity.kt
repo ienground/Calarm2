@@ -45,8 +45,6 @@ class AlarmRingActivity : AppCompatActivity() {
         binding.tvTime.text = timeFormat.format(Date(System.currentTimeMillis()))
         binding.tvApm.text = apmFormat.format(Date(System.currentTimeMillis()))
 
-        turnScreenOnAndKeyguardOff()
-
         val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
         val subAlarmId = intent.getLongExtra(IntentKey.SUBALARM_ID, -1)
 

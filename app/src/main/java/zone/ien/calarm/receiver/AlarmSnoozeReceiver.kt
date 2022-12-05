@@ -51,7 +51,7 @@ class AlarmSnoozeReceiver: BroadcastReceiver() {
         LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.SNOOZE_ALARM).apply { putExtra(IntentKey.ITEM_ID, id) })
 
         if (id != -1L) {
-            nm.cancel((250000 + id).toInt())
+            nm.cancel((NotificationID.CALARM_ALARM + id).toInt())
             GlobalScope.launch(Dispatchers.IO) {
                 val data = alarmDatabase?.getDao()?.get(id)
                 if (data != null) {

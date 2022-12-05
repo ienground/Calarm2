@@ -8,6 +8,7 @@
             type="zone.ien.calarm.fragment.MainTimerClockFragment" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
@@ -27,6 +28,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/progress_total"/>
+
+        <ImageView
+            android:id="@+id/background_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/circle"
+            android:visibility="gone"
+            app:tint="@color/blue"
+            app:layout_constraintStart_toStartOf="@id/progress_total"
+            app:layout_constraintEnd_toEndOf="@id/progress_total"
+            app:layout_constraintTop_toTopOf="@id/progress_total"
+            app:layout_constraintBottom_toBottomOf="@id/progress_total" />
 
         <com.dinuscxj.progressbar.CircleProgressBar
             android:id="@+id/progress_total"
@@ -50,6 +63,9 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="@dimen/usual_margin"
+            android:clickable="true"
+            android:focusable="auto"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="@id/progress_total"
             app:layout_constraintEnd_toEndOf="@id/progress_total"

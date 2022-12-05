@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,7 +23,8 @@
         tools:targetApi="31">
         <activity
             android:name=".activity.TimerRingActivity"
-            android:exported="false">
+            android:exported="false"
+            android:showOnLockScreen="true">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -60,6 +62,9 @@
         <receiver android:name=".receiver.AlarmReceiver" />
         <receiver android:name=".receiver.AlarmOffReceiver" />
         <receiver android:name=".receiver.AlarmSnoozeReceiver" />
+        <receiver android:name=".receiver.TimerAlarmReceiver" />
+        <receiver android:name=".receiver.TimerOffReceiver" />
+        <receiver android:name=".receiver.TimerTimeoutReceiver" />
     </application>
 
 </manifest>

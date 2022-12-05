@@ -3,6 +3,7 @@ package zone.ien.calarm.adapter
 import android.app.AlarmManager
 import android.content.Context
 import android.text.SpannableStringBuilder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.callback.AlarmListCallback
 import zone.ien.calarm.room.AlarmDatabase
 import zone.ien.calarm.room.AlarmEntity
@@ -44,6 +46,7 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val apmFormat = SimpleDateFormat("a", Locale.getDefault())
         val timeFormat = SimpleDateFormat("h:mm", Locale.getDefault())
+        val apmTimeFormat = SimpleDateFormat("a h:mm", Locale.getDefault())
         val time = Calendar.getInstance().apply {
             items[holder.adapterPosition].time.let {
                 set(Calendar.HOUR_OF_DAY, it / 60)
@@ -68,12 +71,23 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
         holder.tvTime.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
 
         holder.chipsMiniAlarm.removeAllViews()
-        for (alarm in items[holder.adapterPosition].subAlarms) {
+        items[holder.adapterPosition].subAlarms.forEachIndexed { index, alarm ->
             val chip = Chip(context)
+            val calendar = time.clone() as Calendar
+            calendar.add(Calendar.MINUTE, -alarm.time)
+            chip.isCheckable = true
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
             chip.text = if (alarm.time / 60 != 0 && alarm.time % 60 != 0) context.getString(R.string.time_format_hour_minute, alarm.time / 60, alarm.time % 60)
             else if (alarm.time % 60 == 0) context.getString(R.string.time_format_hour, alarm.time / 60)
             else context.getString(R.string.time_format_minute, alarm.time % 60)
+
+            chip.setOnCheckedChangeListener { compoundButton, b ->
+                chip.text = if (b) apmTimeFormat.format(calendar.time) else {
+                    if (alarm.time / 60 != 0 && alarm.time % 60 != 0) context.getString(R.string.time_format_hour_minute, alarm.time / 60, alarm.time % 60)
+                    else if (alarm.time % 60 == 0) context.getString(R.string.time_format_hour, alarm.time / 60)
+                    else context.getString(R.string.time_format_minute, alarm.time % 60)
+                }
+            }
 
             holder.chipsMiniAlarm.addView(chip)
         }

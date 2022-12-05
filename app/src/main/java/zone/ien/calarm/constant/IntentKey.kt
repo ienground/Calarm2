@@ -14,5 +14,6 @@ class IntentKey {
         const val DURATION = "duration"
         const val ORDER = "order"
         const val STANDARD_TIME = "standard_time"
+        const val IS_FINISHED = "isFinished"
     }
 }

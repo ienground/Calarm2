@@ -27,6 +27,7 @@ import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.constant.ChannelID
 import zone.ien.calarm.constant.IntentID
 import zone.ien.calarm.constant.IntentKey
+import zone.ien.calarm.constant.NotificationID
 import zone.ien.calarm.room.AlarmDatabase
 import zone.ien.calarm.room.SubAlarmDatabase
 import java.text.SimpleDateFormat
@@ -75,7 +76,7 @@ class AlarmReceiver: BroadcastReceiver() {
                             mediaPlayer.start()
                         } catch (_: Exception) { }
 
-                        val fullScreenPendingIntent = PendingIntent.getActivity(context, 0, Intent(context, AlarmRingActivity::class.java).apply {
+                        val fullScreenPendingIntent = PendingIntent.getActivity(context, NotificationID.CALARM_ALARM, Intent(context, AlarmRingActivity::class.java).apply {
                             action = "fullscreen_activity"
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             putExtra(IntentKey.ITEM_ID, id)
@@ -106,7 +107,7 @@ class AlarmReceiver: BroadcastReceiver() {
                             color = ContextCompat.getColor(context, R.color.amber)
                         }
 
-                        nm.notify((250000 + id).toInt(), builder.build())
+                        nm.notify((NotificationID.CALARM_ALARM + id).toInt(), builder.build())
 
                         Handler(Looper.getMainLooper()).postDelayed({
                             val missingBuilder = NotificationCompat.Builder(context, ChannelID.MISSING_ID).apply {
@@ -128,7 +129,7 @@ class AlarmReceiver: BroadcastReceiver() {
                             }
 
                             if (subAlarmId == -1L) {
-                                nm.notify((250000 + id).toInt(), missingBuilder.build())
+                                nm.notify((NotificationID.CALARM_ALARM + id).toInt(), missingBuilder.build())
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.STOP_ALARM))
                             }
                         }, 3 * 60 * 1000)

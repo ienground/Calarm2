@@ -44,7 +44,7 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
         }
 
         holder.btnInsertUp.setOnClickListener {
-            getNumpadDialog(true, holder.adapterPosition).show()
+            getNumpadDialog(false, holder.adapterPosition).show()
         }
 
         holder.btnInsertDown.setOnClickListener {

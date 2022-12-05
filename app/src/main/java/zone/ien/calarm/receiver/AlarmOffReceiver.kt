@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import zone.ien.calarm.constant.ActionKey
 import zone.ien.calarm.constant.IntentID
 import zone.ien.calarm.constant.IntentKey
+import zone.ien.calarm.constant.NotificationID
 import zone.ien.calarm.room.AlarmDatabase
 import zone.ien.calarm.room.SubAlarmDatabase
 import zone.ien.calarm.room.SubAlarmEntity
@@ -54,7 +55,7 @@ class AlarmOffReceiver: BroadcastReceiver() {
         LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.STOP_ALARM).apply { putExtra(IntentKey.ITEM_ID, id) })
 
         if (id != -1L) {
-            nm.cancel((250000 + id).toInt())
+            nm.cancel((NotificationID.CALARM_ALARM + id).toInt())
             GlobalScope.launch(Dispatchers.IO) {
                 val data = alarmDatabase?.getDao()?.get(id)
                 data?.subAlarms = subAlarmDatabase?.getDao()?.getByParentId(id) as ArrayList<SubAlarmEntity>
