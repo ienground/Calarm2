@@ -40,7 +40,7 @@ class MainTimerFragment : Fragment() {
     private var timersDatabase: TimersDatabase? = null
     private var subTimerDatabase: SubTimerDatabase? = null
 
-    var pagePosition = 0
+    private var pagePosition = TIMER_PAGE_NUMPAD
     lateinit var pages: List<Fragment>
     lateinit var timerClockFragment: MainTimerClockFragment
     lateinit var timerListFragment: MainTimerListFragment
@@ -48,6 +48,7 @@ class MainTimerFragment : Fragment() {
 
     private val timerFragmentCallback: TimerFragmentCallback = object: TimerFragmentCallback {
         override fun scrollTo(page: Int) {
+            pagePosition = page
             binding.viewpager.setCurrentItem(page, true)
         }
 
@@ -83,19 +84,16 @@ class MainTimerFragment : Fragment() {
         binding.viewpager.offscreenPageLimit = 3
         binding.viewpager.adapter = MainTimerPageAdapter(this, pages)
         binding.viewpager.setCurrentItem(pagePosition, false)
+        binding.viewpager.isUserInputEnabled = false
 
         binding.viewpager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             var currentState = 0
             var currentPos = 0
 
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                if(currentState == ViewPager2.SCROLL_STATE_DRAGGING && currentPos == position) {
-                    if(currentPos == 0) binding.viewpager.currentItem = 2
-                    else if(currentPos == 2) binding.viewpager.currentItem = 0
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                if (currentState == ViewPager2.SCROLL_STATE_DRAGGING && currentPos == position) {
+                    if (currentPos == 0) binding.viewpager.currentItem = 2
+                    else if (currentPos == 2) binding.viewpager.currentItem = 0
                 }
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
@@ -111,16 +109,20 @@ class MainTimerFragment : Fragment() {
             }
         })
 
-
-
         GlobalScope.launch(Dispatchers.IO) {
             val data = timersDatabase?.getDao()?.getAll()
             withContext(Dispatchers.Main) {
-                binding.viewpager.setCurrentItem(if (data?.isNotEmpty() == true) ++pagePosition else --pagePosition, true)
+                pagePosition = if (data?.isNotEmpty() == true) TIMER_PAGE_LIST else TIMER_PAGE_NUMPAD
+                binding.viewpager.setCurrentItem(pagePosition, true)
             }
-
         }
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.viewpager.setCurrentItem(pagePosition, false)
+        Log.d(TAG, "onStart")
     }
 
     override fun onAttach(context: Context) {

@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity(),
 
         nm.createNotificationChannel(NotificationChannel(ChannelID.DEFAULT_ID, getString(R.string.calarm_alarm), NotificationManager.IMPORTANCE_HIGH))
 
-
         loadFragment(MainAlarmFragment())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -86,6 +85,8 @@ class MainActivity : AppCompatActivity(),
                 }
             )
         }
+
+        binding.bottomNav.setOnItemReselectedListener {  }
 
         // Alarm Activity
         GlobalScope.launch(Dispatchers.IO) {

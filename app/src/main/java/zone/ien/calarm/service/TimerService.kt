@@ -38,6 +38,8 @@ class TimerService : Service() {
     private var time = 0L
     private var item: TimersEntity? = null
     private var timer: Timer? = null
+    private var id: Long = -1
+    private var duration = 0L
 
     private var timeUntilFinished: ArrayList<Long> = arrayListOf()
     private var millisLeft = 0L
@@ -69,21 +71,52 @@ class TimerService : Service() {
         nm.createNotificationChannel(NotificationChannel(ChannelID.COUNTDOWN_ID, getString(R.string.countdown), NotificationManager.IMPORTANCE_HIGH))
         playPausePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(IntentID.PLAY_PAUSE_TIMER), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+        id = intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1
+        duration = intent?.getLongExtra(IntentKey.DURATION, 0L) ?: 0L
+        Log.d(TAG, duration.toString())
         GlobalScope.launch(Dispatchers.IO) {
-            item = timersDatabase?.getDao()?.get(intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1)
-            if (item != null) {
-                item?.subTimers = subTimerDatabase?.getDao()?.getByParentId(intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1) as ArrayList<SubTimerEntity>
-                timeUntilFinished = arrayListOf()
+            if (id != -1L) {
+                item = timersDatabase?.getDao()?.get(id)
+                if (item != null) {
+                    item?.subTimers = subTimerDatabase?.getDao()?.getByParentId(intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1) as ArrayList<SubTimerEntity>
+                    timeUntilFinished = arrayListOf()
 
-                for (timer in item?.subTimers ?: arrayListOf()) {
-                    timeUntilFinished.add(time + timer.time)
-                    time += timer.time
+                    for (timer in item?.subTimers ?: arrayListOf()) {
+                        timeUntilFinished.add(time + timer.time)
+                        time += timer.time
+                    }
+
+                    standardTime = time * 1000L
+
+                    withContext(Dispatchers.Main) {
+                        timerStart(time * 1000L)
+                        countDownTimer?.start()
+                        isPaused = false
+
+                        registerReceiver(object: BroadcastReceiver() {
+                            override fun onReceive(context: Context, intent: Intent) {
+                                isPaused = !isPaused
+                                if (isPaused) {
+                                    countDownTimer?.cancel()
+                                    timerNotification?.clearActions()
+                                    timerNotification?.addAction(R.drawable.ic_play_arrow, getString(R.string.resume), playPausePendingIntent)
+                                    timerNotification?.setSmallIcon(R.drawable.ic_hourglass_empty)
+                                    nm.notify(NotificationID.CALARM_TIMER, timerNotification?.build())
+                                } else {
+                                    timerStart(millisLeft)
+                                    countDownTimer?.start()
+                                    timerNotification?.clearActions()
+                                    timerNotification?.addAction(R.drawable.ic_pause, getString(R.string.pause), playPausePendingIntent)
+                                    timerNotification?.setSmallIcon(R.drawable.ic_hourglass_full)
+                                    nm.notify(NotificationID.CALARM_TIMER, timerNotification?.build())
+                                }
+                            }
+                        }, IntentFilter(IntentID.PLAY_PAUSE_TIMER))
+                    }
                 }
-
-                standardTime = time * 1000L
-
+            } else if (duration != 0L) {
                 withContext(Dispatchers.Main) {
-                    timerStart(time * 1000L)
+                    timerStart(duration)
                     countDownTimer?.start()
                     isPaused = false
 
@@ -108,6 +141,7 @@ class TimerService : Service() {
                     }, IntentFilter(IntentID.PLAY_PAUSE_TIMER))
                 }
             }
+
         }
 
         NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
@@ -127,142 +161,211 @@ class TimerService : Service() {
         countDownTimer = object: CountDownTimer(timerTime, 500) {
             override fun onTick(millisUntilFinished: Long) {
                 millisLeft = millisUntilFinished
-                if (item != null && timeUntilFinished[order] * 1000L < time * 1000L - millisUntilFinished) {
-                    order++
-                    standardTime = millisUntilFinished
 
-                    if (order - 1 < (item?.subTimers?.lastIndex ?: -1)) { // not last item
-                        NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
-                            setContentTitle("${item?.subTimers?.get(order - 1)?.label.let {
-                                if (it != "") it
-                                else {
-                                    item?.subTimers?.get(order - 1)?.time.let { t ->
-                                        if (t != null) {
-                                            if (t / 3600 != 0) String.format("%02d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60)
-                                            else String.format("%02d:%02d", (t % 3600) / 60, t % 60)
-                                        } else {
-                                            getString(R.string.no_label)
+                if (item != null) {
+                    if (timeUntilFinished[order] * 1000L < time * 1000L - millisUntilFinished) {
+                        order++
+                        standardTime = millisUntilFinished
+
+                        if (order - 1 < (item?.subTimers?.lastIndex ?: -1)) { // not last item
+                            NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
+                                setContentTitle("${item?.subTimers?.get(order - 1)?.label.let {
+                                    if (it != "") it
+                                    else {
+                                        item?.subTimers?.get(order - 1)?.time.let { t ->
+                                            if (t != null) {
+                                                if (t / 3600 != 0) String.format("%02d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60)
+                                                else String.format("%02d:%02d", (t % 3600) / 60, t % 60)
+                                            } else {
+                                                getString(R.string.no_label)
+                                            }
                                         }
                                     }
-                                }
-                            }} ${getString(R.string.finished)}")
-                            setContentText(getString(R.string.from_alarm_name, item?.label?.let {
-                                if (it != "") it
-                                else {
-                                    time.let { t ->
-                                        if (t / 3600 != 0L) String.format("%02d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60)
-                                        else String.format("%02d:%02d", (t % 3600) / 60, t % 60)
+                                }} ${getString(R.string.finished)}")
+                                setContentText(getString(R.string.from_alarm_name, item?.label?.let {
+                                    if (it != "") it
+                                    else {
+                                        time.let { t ->
+                                            if (t / 3600 != 0L) String.format("%02d:%02d:%02d", t / 3600, (t % 3600) / 60, t % 60)
+                                            else String.format("%02d:%02d", (t % 3600) / 60, t % 60)
+                                        }
                                     }
-                                }
-                            }))
-                            setSmallIcon(R.drawable.ic_check_circle)
-                            setShowWhen(false)
+                                }))
+                                setSmallIcon(R.drawable.ic_check_circle)
+                                setShowWhen(false)
 
-                            nm.notify(NotificationID.CALARM_TIMER_SUB_FINISHED + (item?.subTimers?.get(order - 1)?.id ?: 0).toInt(), build())
+                                nm.notify(NotificationID.CALARM_TIMER_SUB_FINISHED + (item?.subTimers?.get(order - 1)?.id ?: 0).toInt(), build())
+                            }
                         }
                     }
-                }
 
-                sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
-                    putExtra(IntentKey.ITEM_ID, item?.id)
-                    putExtra(IntentKey.DURATION, time * 1000L)
-                    putExtra(IntentKey.ORDER, order)
-                    putExtra(IntentKey.COUNTDOWN_TIME, millisUntilFinished)
-                    putExtra(IntentKey.STANDARD_TIME, standardTime)
-                })
+                    sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
+                        putExtra(IntentKey.ITEM_ID, item?.id)
+                        putExtra(IntentKey.DURATION, time * 1000L)
+                        putExtra(IntentKey.ORDER, order)
+                        putExtra(IntentKey.COUNTDOWN_TIME, millisUntilFinished)
+                        putExtra(IntentKey.STANDARD_TIME, standardTime)
+                    })
 
-                val subCountdownTime = (if (millisUntilFinished != 0L) (item?.subTimers?.get(order)?.time ?: 0) * 1000 - (standardTime.toInt() - millisUntilFinished) else 0).round(1000)
-                val countdownTimeFormatted = (millisUntilFinished.round(1000) / 1000).toInt().let {
-                    if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
-                    else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
-                }
-                val subCountdownTimeFormatted = (subCountdownTime / 1000).toInt().let {
-                    if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
-                    else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
-                }
+                    val subCountdownTime = (if (millisUntilFinished != 0L) (item?.subTimers?.get(order)?.time ?: 0) * 1000 - (standardTime.toInt() - millisUntilFinished) else 0).round(1000)
+                    val countdownTimeFormatted = (millisUntilFinished.round(1000) / 1000).toInt().let {
+                        if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                        else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                    }
+                    val subCountdownTimeFormatted = (subCountdownTime / 1000).toInt().let {
+                        if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                        else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                    }
 
-                timerNotification = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
-                    setContentTitle("${item?.subTimers?.get(order)?.label.let { if (it != "") it else getString(R.string.no_label) }} / ${item?.label.let { if (it != "") it else getString(R.string.no_label) }}")
-                    setContentText("$subCountdownTimeFormatted / $countdownTimeFormatted")
-                    setSmallIcon(if (isPaused) R.drawable.ic_hourglass_empty else R.drawable.ic_hourglass_full)
-                    setOngoing(true)
-                    setShowWhen(false)
-                    setOnlyAlertOnce(true)
-                    addAction(if (isPaused) R.drawable.ic_play_arrow else R.drawable.ic_pause, getString(if (isPaused) R.string.resume else R.string.pause), playPausePendingIntent)
-                }
+                    timerNotification = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
+                        setContentTitle("${item?.subTimers?.get(order)?.label.let { if (it != "") it else getString(R.string.no_label) }} / ${item?.label.let { if (it != "") it else getString(R.string.no_label) }}")
+                        setContentText("$subCountdownTimeFormatted / $countdownTimeFormatted")
+                        setSmallIcon(if (isPaused) R.drawable.ic_hourglass_empty else R.drawable.ic_hourglass_full)
+                        setOngoing(true)
+                        setShowWhen(false)
+                        setOnlyAlertOnce(true)
+                        addAction(if (isPaused) R.drawable.ic_play_arrow else R.drawable.ic_pause, getString(if (isPaused) R.string.resume else R.string.pause), playPausePendingIntent)
+                    }
+                } else if (duration != 0L) {
+                    sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
+                        putExtra(IntentKey.DURATION, duration)
+                        putExtra(IntentKey.COUNTDOWN_TIME, millisUntilFinished)
+                    })
 
-//                Log.d(TAG, "notification onTick ${getString(if (isPaused) R.string.resume else R.string.pause)}")
+                    val countdownTimeFormatted = (millisUntilFinished.round(1000) / 1000).toInt().let {
+                        if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                        else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                    }
+
+                    timerNotification = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
+                        setContentTitle(getString(R.string.no_label)) // to time string
+                        setContentText(countdownTimeFormatted)
+                        setSmallIcon(if (isPaused) R.drawable.ic_hourglass_empty else R.drawable.ic_hourglass_full)
+                        setOngoing(true)
+                        setShowWhen(false)
+                        setOnlyAlertOnce(true)
+                        addAction(if (isPaused) R.drawable.ic_play_arrow else R.drawable.ic_pause, getString(if (isPaused) R.string.resume else R.string.pause), playPausePendingIntent)
+                    }
+                }
 
                 nm.notify(NotificationID.CALARM_TIMER, timerNotification?.build())
             }
 
             override fun onFinish() {
-                sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
-                    putExtra(IntentKey.ITEM_ID, item?.id)
-                    putExtra(IntentKey.DURATION, time * 1000L)
-                    putExtra(IntentKey.ORDER, order)
-                    putExtra(IntentKey.COUNTDOWN_TIME, 0)
-                    putExtra(IntentKey.STANDARD_TIME, standardTime)
-                    putExtra(IntentKey.IS_FINISHED, true)
-                })
+                if (item != null) {
+                    sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
+                        putExtra(IntentKey.ITEM_ID, item?.id)
+                        putExtra(IntentKey.DURATION, time * 1000L)
+                        putExtra(IntentKey.ORDER, order)
+                        putExtra(IntentKey.COUNTDOWN_TIME, 0)
+                        putExtra(IntentKey.STANDARD_TIME, standardTime)
+                        putExtra(IntentKey.IS_FINISHED, true)
+                    })
 
-                time = 0
-                order = 0
-                timeUntilFinished.clear()
+                    time = 0
+                    order = 0
+                    timeUntilFinished.clear()
 
-                val fullScreenPendingIntent = PendingIntent.getActivity(applicationContext, NotificationID.CALARM_TIMER_FINISHED, Intent(applicationContext, TimerRingActivity::class.java).apply {
-                    action = "fullscreen_activity"
-                    this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    putExtra(IntentKey.ITEM_ID, item?.id)
-                }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                    val fullScreenPendingIntent = PendingIntent.getActivity(applicationContext, NotificationID.CALARM_TIMER_FINISHED, Intent(applicationContext, TimerRingActivity::class.java).apply {
+                        action = "fullscreen_activity"
+                        this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        putExtra(IntentKey.ITEM_ID, item?.id)
+                    }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-                var timeoutTime = 0
+                    var timeoutTime = 0
 
-                val timerTask = object: TimerTask() {
-                    override fun run() {
-                        sendBroadcast(Intent(IntentID.COUNTDOWN_TICK_TIMEOUT).apply {
-                            putExtra(IntentKey.COUNTDOWN_TIME, ++timeoutTime)
-                        })
+                    val timerTask = object: TimerTask() {
+                        override fun run() {
+                            sendBroadcast(Intent(IntentID.COUNTDOWN_TICK_TIMEOUT).apply {
+                                putExtra(IntentKey.COUNTDOWN_TIME, ++timeoutTime)
+                            })
+
+                            val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(applicationContext, TimerOffReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            val builder = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
+                                setSmallIcon(R.drawable.ic_hourglass_half)
+                                setContentTitle("-${timeoutTime.let {
+                                    if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                                    else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                                }}")
+                                setContentText(getString(R.string.time_is_up))
+                                setAutoCancel(false)
+                                setOngoing(true)
+                                setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_VIBRATE)
+                                setCategory(NotificationCompat.CATEGORY_ALARM)
+                                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                setLocalOnly(true)
+                                setOnlyAlertOnce(true)
+                                setShowWhen(false)
+                                priority = NotificationCompat.PRIORITY_MAX
+                                setContentIntent(fullScreenPendingIntent)
+                                setFullScreenIntent(fullScreenPendingIntent, true)
+                                addAction(R.drawable.ic_close, getString(R.string.close), pendingIntent)
+
+                                color = ContextCompat.getColor(applicationContext, R.color.amber)
+                            }
 
 
-                        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(applicationContext, TimerOffReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                        val builder = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
-                            setSmallIcon(R.drawable.ic_hourglass_half)
-                            setContentTitle("-${timeoutTime.let {
-                                if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
-                                else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
-                            }}")
-                            setContentText(getString(R.string.time_is_up))
-                            setAutoCancel(false)
-                            setOngoing(true)
-                            setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_VIBRATE)
-                            setCategory(NotificationCompat.CATEGORY_ALARM)
-                            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                            setLocalOnly(true)
-                            setOnlyAlertOnce(true)
-                            setShowWhen(false)
-                            priority = NotificationCompat.PRIORITY_MAX
-                            setContentIntent(fullScreenPendingIntent)
-                            setFullScreenIntent(fullScreenPendingIntent, true)
-                            addAction(R.drawable.ic_close, getString(R.string.close), pendingIntent)
+                            nm.notify(NotificationID.CALARM_TIMER_FINISHED, builder.build())
 
-                            color = ContextCompat.getColor(applicationContext, R.color.amber)
                         }
-
-
-                        nm.notify(NotificationID.CALARM_TIMER_FINISHED, builder.build())
-
                     }
+
+                    timer = Timer()
+                    timer?.schedule(timerTask, 0, 1000)
+                } else if (duration != 0L) {
+                    sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
+                        putExtra(IntentKey.DURATION, duration)
+                        putExtra(IntentKey.COUNTDOWN_TIME, 0)
+                        putExtra(IntentKey.IS_FINISHED, true)
+                    })
+
+                    val fullScreenPendingIntent = PendingIntent.getActivity(applicationContext, NotificationID.CALARM_TIMER_FINISHED, Intent(applicationContext, TimerRingActivity::class.java).apply {
+                        action = "fullscreen_activity"
+                        this.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                    var timeoutTime = 0
+
+                    val timerTask = object: TimerTask() {
+                        override fun run() {
+                            sendBroadcast(Intent(IntentID.COUNTDOWN_TICK_TIMEOUT).apply {
+                                putExtra(IntentKey.COUNTDOWN_TIME, ++timeoutTime)
+                            })
+
+
+                            val pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(applicationContext, TimerOffReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            val builder = NotificationCompat.Builder(applicationContext, ChannelID.COUNTDOWN_ID).apply {
+                                setSmallIcon(R.drawable.ic_hourglass_half)
+                                setContentTitle("-${timeoutTime.let {
+                                    if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
+                                    else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
+                                }}")
+                                setContentText(getString(R.string.time_is_up))
+                                setAutoCancel(false)
+                                setOngoing(true)
+                                setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_VIBRATE)
+                                setCategory(NotificationCompat.CATEGORY_ALARM)
+                                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                setLocalOnly(true)
+                                setOnlyAlertOnce(true)
+                                setShowWhen(false)
+                                priority = NotificationCompat.PRIORITY_MAX
+                                setContentIntent(fullScreenPendingIntent)
+                                setFullScreenIntent(fullScreenPendingIntent, true)
+                                addAction(R.drawable.ic_close, getString(R.string.close), pendingIntent)
+
+                                color = ContextCompat.getColor(applicationContext, R.color.amber)
+                            }
+
+
+                            nm.notify(NotificationID.CALARM_TIMER_FINISHED, builder.build())
+
+                        }
+                    }
+
+                    timer = Timer()
+                    timer?.schedule(timerTask, 0, 1000)
                 }
-
-                timer = Timer()
-                timer?.schedule(timerTask, 0, 1000)
-
-//                sendBroadcast(Intent(applicationContext, TimerTimeoutReceiver::class.java).apply {
-//                    putExtra(IntentKey.ITEM_ID, item?.id)
-//                })
-
-//                stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }
     }

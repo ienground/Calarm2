@@ -67,4 +67,5 @@
     <string name="from_alarm_name">from %1$s</string>
     <string name="time_is_up">Time\'s Up!</string>
     <string name="close">Close</string>
+    <string name="stop">Stop</string>
 </resources>

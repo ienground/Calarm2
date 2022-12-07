@@ -32,6 +32,7 @@ import zone.ien.calarm.adapter.MainCalarmDateAdapter
 import zone.ien.calarm.adapter.MainCalarmEventAdapter
 import zone.ien.calarm.adapter.MainTimerListAdapter
 import zone.ien.calarm.callback.TimerFragmentCallback
+import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.databinding.FragmentMainAlarmBinding
 import zone.ien.calarm.databinding.FragmentMainCalarmBinding
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
@@ -42,6 +43,7 @@ import zone.ien.calarm.room.SubTimerDatabase
 import zone.ien.calarm.room.SubTimerEntity
 import zone.ien.calarm.room.TimersDatabase
 import zone.ien.calarm.room.TimersEntity
+import zone.ien.calarm.service.TimerService
 import zone.ien.calarm.utils.MyUtils.Companion.timeToText
 import java.util.*
 import kotlin.collections.ArrayList
@@ -155,11 +157,24 @@ class MainTimerNumFragment : Fragment() {
 
         binding.btnStart.setOnClickListener {
             if (nums.isNotEmpty()) {
+                var duration = 0L
+                val data: ArrayList<Int> = arrayListOf()
+                for (i in 0 until 6 - nums.size) data.add(0)
+                data.addAll(nums)
+
+                duration += 60 * 60 * (data[0] * 10 + data[1])
+                duration += 60 * (data[2] * 10 + data[3])
+                duration += (data[4] * 10 + data[5])
+
                 nums.clear()
+
                 binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
                 binding.btnSave.alpha = 0.3f
                 binding.btnStart.alpha = 0.3f
                 callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)
+                requireActivity().startForegroundService(Intent(requireContext(), TimerService::class.java).apply {
+                    putExtra(IntentKey.DURATION, duration * 1000L)
+                })
             }
         }
 
