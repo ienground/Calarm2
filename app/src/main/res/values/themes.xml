@@ -1,16 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Calarm" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Calarm" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <!-- Secondary brand color. -->m
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorSecondaryVariant">@color/colorAccentDark</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >@color/purple_dark</item>
+        <item name="android:colorBackground">@color/purple_dark</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -35,5 +36,16 @@
     <style name="ShapeAppearanceOverlay.Calarm.Button.Circle" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Theme.Calarm.Splash" parent="Theme.Calarm">
+        <item name="windowSplashScreenBackground">@color/purple_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_icon_color</item>
+        <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/img_dev</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.Calarm</item>
+        <item name="android:windowLightStatusBar" >true</item>
+        <item name="android:windowLightNavigationBar" >true</item>
+        <item name="android:navigationBarColor">@color/purple_dark</item>
     </style>
 </resources>

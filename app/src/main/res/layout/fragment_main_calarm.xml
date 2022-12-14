@@ -66,13 +66,15 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.michalsvec.singlerowcalendar.calendar.SingleRowCalendar
             android:id="@+id/list_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/usual_margin"
             android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:deselection="false"
+            app:longPress="false"
+            app:multiSelection="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />

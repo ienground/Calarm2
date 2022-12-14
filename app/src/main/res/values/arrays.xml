@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="calarm_options_value">
+        <item>@string/first_event</item>
+        <item>@string/fixed_time_event</item>
+        <item>@string/all_events</item>
+    </string-array>
+
+    <string-array name="calarm_options_key">
+        <item>first_event</item>
+        <item>fixed_time_event</item>
+        <item>all_events</item>
+    </string-array>
+</resources>

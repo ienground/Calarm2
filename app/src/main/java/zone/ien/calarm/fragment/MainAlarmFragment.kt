@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.EditAlarmActivity
+import zone.ien.calarm.activity.SettingsActivity
 import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.adapter.MainAlarmListAdapter
 import zone.ien.calarm.callback.AlarmListCallback
@@ -152,15 +153,15 @@ class MainAlarmFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        //        menuInflater.inflate(R.menu.menu_main_home, menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            //            R.id.menu_share -> {
-            //                startActivity(Intent(MainActivity.instance, ShareImageActivity::class.java))
-            //            }
+        when (item.itemId) { 
+            R.id.menu_settings -> {
+                startActivity(Intent(requireContext(), SettingsActivity::class.java))
+            }
         }
         return super.onOptionsItemSelected(item)
     }

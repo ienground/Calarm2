@@ -7,7 +7,8 @@
     android:clickable="true"
     android:focusable="auto"
     android:layout_marginHorizontal="@dimen/usual_margin"
-    android:layout_marginBottom="@dimen/usual_margin">
+    android:layout_marginBottom="@dimen/usual_margin"
+    style="@style/Widget.Material3.CardView.Elevated">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,6 +21,7 @@
             android:layout_height="46dp"
             android:fontFamily="@font/pretendard"
             android:textSize="20sp"
+            android:textColor="@color/white"
             android:text="label"
             android:gravity="center_vertical"
             android:layout_marginEnd="@dimen/usual_margin"
@@ -41,7 +43,7 @@
             android:fontFamily="@font/pretendard"
             android:text="AM"
             android:textSize="18sp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBaseline_toBaselineOf="@id/tv_time" />
 
@@ -52,7 +54,7 @@
             android:fontFamily="@font/pretendard"
             android:text="09:00"
             android:textSize="36sp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_marginStart="4dp"
             app:layout_constraintStart_toEndOf="@id/tv_apm"
             app:layout_constraintTop_toBottomOf="@id/tv_label" />
@@ -63,11 +65,10 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard"
             android:text="HL"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_time" />
-
-
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chips_mini_alarm"

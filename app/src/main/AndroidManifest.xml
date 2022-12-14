@@ -9,6 +9,11 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".MyApplication"
@@ -22,13 +27,28 @@
         android:theme="@style/Theme.Calarm"
         tools:targetApi="31">
         <activity
-            android:name=".activity.TimerRingActivity"
-            android:exported="false"
-            android:showOnLockScreen="true">
+            android:name=".activity.LocationActivity"
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name=".activity.IntroActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.TimerRingActivity"
+            android:exported="false"
+            android:showOnLockScreen="true" />
 
         <service
             android:name=".service.TimerService"
@@ -38,11 +58,10 @@
         <activity
             android:name=".activity.AlarmRingActivity"
             android:exported="false"
-            android:showOnLockScreen="true">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+            android:showOnLockScreen="true" />
+        <activity
+            android:name=".activity.EditCalarmActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.EditAlarmActivity"
             android:exported="false" />
@@ -51,20 +70,32 @@
             android:exported="false" />
         <activity
             android:name=".activity.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:exported="true"
+            android:theme="@style/Theme.Calarm" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
+        <receiver android:name=".receiver.CalarmCreateReceiver" />
+        <receiver android:name=".receiver.CalarmReceiver" />
         <receiver android:name=".receiver.AlarmReceiver" />
         <receiver android:name=".receiver.AlarmOffReceiver" />
         <receiver android:name=".receiver.AlarmSnoozeReceiver" />
         <receiver android:name=".receiver.TimerAlarmReceiver" />
         <receiver android:name=".receiver.TimerOffReceiver" />
-        <receiver android:name=".receiver.TimerTimeoutReceiver" />
+        <receiver
+            android:name=".receiver.CalendarChangeListener"
+            android:enabled="true"
+            android:exported="true"
+            android:priority="1000">
+            <intent-filter>
+                <action android:name="android.intent.action.PROVIDER_CHANGED" />
+
+                <data android:scheme="content" />
+                <data android:host="com.android.calendar" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_api_key" />
     </application>
 
 </manifest>

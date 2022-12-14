@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:key="parent_screen">
+
+    <zone.ien.calarm.preference.AppInfoPreference
+        app:key="app_title"
+        app:layout="@layout/preference_app_info"/>
+
+    <PreferenceCategory app:title="@string/settings" >
+
+        <Preference
+            app:title="@string/home_address"
+            app:key="home" />
+
+        <DropDownPreference
+            app:title="@string/calarm_create_option"
+            app:key="calarm_create_option"
+            app:entryValues="@array/calarm_options_key"
+            app:entries="@array/calarm_options_value"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:title="@string/set_fixed_time"
+            app:key="fixed_time" />
+
+        <Preference
+            app:title="@string/calarm_create_info"
+            app:key="calarm_create_info" />
+
+        <Preference
+            app:title="@string/time_to_go_out"
+            app:key="ready_time" />
+
+
+<!--        <SwitchPreferenceCompat-->
+<!--            app:title="Home address"-->
+<!--            app:widgetLayout="@layout/preference_material_switch" />-->
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/calendar_source_of_calarm">
+
+        <Preference
+            app:title="@string/select_calendar"
+            app:key="select_calendar" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

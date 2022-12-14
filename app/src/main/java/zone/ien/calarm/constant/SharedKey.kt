@@ -9,6 +9,7 @@ class SharedKey {
         const val FIXED_TIME = "fixed_time"
         const val LAST_ALARM_SOUND = "last_alarm_sound"
         const val CALARM_CREATE_INFO = "calarm_create_info"
+        const val HOME_ADDRESS = "home_address"
         const val HOME_LATITUDE = "home_latitude"
         const val HOME_LONGITUDE = "home_longitude"
         const val HOME_CHANGE_TIME = "home_change_time"

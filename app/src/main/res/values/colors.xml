@@ -5,6 +5,16 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="purple_dark">#FF0A0612</color>
+
+    <color name="colorPrimary">#EB9EFF</color>
+    <color name="colorPrimaryDark">#E378FF</color>
+    <color name="colorAccent">#7C4DFF</color>
+    <color name="colorAccentDark">#633ECC</color>
+    <color name="colorAccentAlpha">#557C4DFF</color>
+    <color name="colorAccentTag">#337C4DFF</color>
+    <color name="navigationBarColor">@color/colorAccentAlpha</color>
+    <color name="background">#F2EDFF</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>

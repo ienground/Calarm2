@@ -2,9 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-//    id 'com.google.gms.google-services'
-//    id 'com.google.android.gms.aoss-licenses-plugin'
-//    id 'com.google.firebase.crashlytics'
+    id 'com.google.gms.google-services'
+    id 'com.google.android.gms.oss-licenses-plugin'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -44,19 +44,20 @@ android {
 
 dependencies {
 
-//    implementation platform('com.google.firebase:firebase-bom:30.1.0')
+    implementation platform('com.google.firebase:firebase-bom:30.1.0')
 
     implementation "io.grpc:grpc-okhttp:1.44.1"
 
-//    implementation 'com.google.firebase:firebase-messaging-ktx'
-//    implementation 'com.google.firebase:firebase-analytics-ktx'
-//    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-//    implementation 'com.google.firebase:firebase-inappmessaging-ktx'
-//    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
 
     implementation 'com.google.android.material:material:1.7.0'
 //    implementation 'com.google.android.gms:play-services-ads:21.1.0'
-//    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.play:core-ktx:1.8.1'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
@@ -70,6 +71,8 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.android.volley:volley:1.2.1'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
 
     def room_version = "2.4.3"
     implementation "androidx.room:room-runtime:$room_version"
@@ -95,6 +98,7 @@ dependencies {
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.akexorcist:round-corner-progress-bar:2.1.2'
     implementation 'com.github.hadiidbouk:ChartProgressBar-Android:2.0.6'
+    implementation 'com.michalsvec:single-row-calednar:1.0.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

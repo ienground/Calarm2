@@ -1,33 +1,17 @@
 package zone.ien.calarm.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.*
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
-import zone.ien.calarm.activity.TAG
-import zone.ien.calarm.adapter.MainAlarmListAdapter
-import zone.ien.calarm.adapter.MainCalarmDateAdapter
-import zone.ien.calarm.adapter.MainCalarmEventAdapter
 import zone.ien.calarm.adapter.MainTimerPageAdapter
 import zone.ien.calarm.callback.TimerFragmentCallback
-import zone.ien.calarm.databinding.FragmentMainAlarmBinding
-import zone.ien.calarm.databinding.FragmentMainCalarmBinding
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
 import zone.ien.calarm.room.SubTimerDatabase
 import zone.ien.calarm.room.TimersDatabase
@@ -122,7 +106,6 @@ class MainTimerFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         binding.viewpager.setCurrentItem(pagePosition, false)
-        Log.d(TAG, "onStart")
     }
 
     override fun onAttach(context: Context) {

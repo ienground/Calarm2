@@ -45,6 +45,8 @@ class MainTimerClockFragment : Fragment() {
     private var item: TimersEntity? = null
     private var isTimerInitialized = false
 
+    private var currentStep = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer_clock, container, false)
         binding.fragment = this
@@ -89,11 +91,14 @@ class MainTimerClockFragment : Fragment() {
         binding.progressSub.setProgressFormatter { _, _ -> "" }
         binding.progressTotal.setProgressFormatter { _, _ -> "" }
 
+        val totalProgressAnimator: ValueAnimator = ValueAnimator.ofInt(500, 0)
+        val subProgressAnimator: ValueAnimator = ValueAnimator.ofInt(500, 0)
+        var preOrder = -1
+
         requireContext().registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val duration = intent.getLongExtra(IntentKey.DURATION, -1).toInt()
                 val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
-                Log.d(TAG, "$duration $id $isTimerInitialized")
                 if (id == -1L) {
                     if (!isTimerInitialized) {
                         TimerService.isPaused = false
@@ -113,6 +118,14 @@ class MainTimerClockFragment : Fragment() {
                             context.sendBroadcast(Intent(context, TimerOffReceiver::class.java))
                             callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)
                         }
+                        totalProgressAnimator.let {
+                            it.setIntValues(duration, 0)
+                            it.duration = duration.toLong()
+                            it.addUpdateListener {
+                                binding.progressTotal.progress = (it.animatedValue as Int)
+                            }
+                        }
+                        totalProgressAnimator.start()
                         isTimerInitialized = true
                     } else {
                         val countdownTime = intent.getLongExtra(IntentKey.COUNTDOWN_TIME, 0).toInt()
@@ -121,12 +134,6 @@ class MainTimerClockFragment : Fragment() {
                             if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
                             else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
                         }
-                        ValueAnimator.ofInt(countdownTime, if (countdownTime >= 500) countdownTime - 500 else 0).apply {
-                            this.duration = 50
-                            addUpdateListener {
-                                binding.progressTotal.progress = (it.animatedValue as Int)
-                            }
-                        }.start()
 
                         if (intent.getBooleanExtra(IntentKey.IS_FINISHED, false)) {
                             isTimerInitialized = false
@@ -140,12 +147,11 @@ class MainTimerClockFragment : Fragment() {
                             binding.tvLabelSub.visibility = View.GONE
                         }
                     }
-
                 } else if (item == null) {
                     GlobalScope.launch(Dispatchers.IO) {
                         item = timersDatabase?.getDao()?.get(id)
                         item?.subTimers = subTimersDatabase?.getDao()?.getByParentId(id) as ArrayList<SubTimerEntity>
-
+                        val order = intent.getIntExtra(IntentKey.ORDER, 0)
                         withContext(Dispatchers.Main) {
                             TimerService.isPaused = false
                             binding.btnPlay.visibility = View.VISIBLE
@@ -170,6 +176,27 @@ class MainTimerClockFragment : Fragment() {
                                 context.sendBroadcast(Intent(context, TimerOffReceiver::class.java))
                                 callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)
                             }
+                            totalProgressAnimator.let {
+                                it.setIntValues(duration, 0)
+                                it.duration = duration.toLong()
+                                it.addUpdateListener {
+                                    binding.progressTotal.progress = (it.animatedValue as Int)
+                                }
+                            }
+                            totalProgressAnimator.start()
+
+                            if (order != preOrder) {
+                                preOrder = order
+                                binding.tvLabelSub.text = item?.subTimers?.get(order)?.label
+                                subProgressAnimator.let {
+                                    it.setIntValues((item?.subTimers?.get(order)?.time ?: 0) * 1000, 0)
+                                    it.duration = (item?.subTimers?.get(order)?.time ?: 0) * 1000L
+                                    it.addUpdateListener {
+                                        binding.progressSub.progress = (it.animatedValue as Int)
+                                    }
+                                }
+                                subProgressAnimator.start()
+                            }
 
                             isTimerInitialized = true
                         }
@@ -179,7 +206,19 @@ class MainTimerClockFragment : Fragment() {
                     val order = intent.getIntExtra(IntentKey.ORDER, 0)
                     val subCountdownTime = (if (countdownTime != 0) (item?.subTimers?.get(order)?.time ?: 0) * 1000 - (intent.getLongExtra(IntentKey.STANDARD_TIME, 0).toInt() - countdownTime) else 0)
 
-                    binding.tvLabelSub.text = item?.subTimers?.get(order)?.label
+                    if (order != preOrder) {
+                        preOrder = order
+                        binding.tvLabelSub.text = item?.subTimers?.get(order)?.label
+                        subProgressAnimator.let {
+                            it.setIntValues((item?.subTimers?.get(order)?.time ?: 0) * 1000, 0)
+                            it.duration = (item?.subTimers?.get(order)?.time ?: 0) * 1000L
+                            it.addUpdateListener {
+                                binding.progressSub.progress = (it.animatedValue as Int)
+                            }
+                        }
+                        subProgressAnimator.start()
+                    }
+
                     binding.tvTimeTotal.text = (countdownTime.round(100) / 1000).let {
                         if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
                         else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
@@ -189,18 +228,6 @@ class MainTimerClockFragment : Fragment() {
                         else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
                     }
                     binding.progressSub.max = (item?.subTimers?.get(order)?.time ?: 0) * 1000
-                    ValueAnimator.ofInt(countdownTime, if (countdownTime >= 500) countdownTime - 500 else 0).apply {
-                        this.duration = 50
-                        addUpdateListener {
-                            binding.progressTotal.progress = (it.animatedValue as Int)
-                        }
-                    }.start()
-                    ValueAnimator.ofInt(subCountdownTime, if (subCountdownTime >= 500) subCountdownTime - 500 else 0).apply {
-                        this.duration = 50
-                        addUpdateListener {
-                            binding.progressSub.progress = (it.animatedValue as Int)
-                        }
-                    }.start()
 
                     if (intent.getBooleanExtra(IntentKey.IS_FINISHED, false)) {
                         isTimerInitialized = false
@@ -236,9 +263,14 @@ class MainTimerClockFragment : Fragment() {
                 if (TimerService.isPaused) {
                     binding.tvTimeTotal.clearAnimation()
                     binding.tvTimeSub.clearAnimation()
+                    subProgressAnimator.resume()
+                    totalProgressAnimator.resume()
                 } else {
                     if (binding.tvTimeTotal.visibility == View.VISIBLE) binding.tvTimeTotal.startAnimation(blinkAnimation)
                     binding.tvTimeSub.startAnimation(blinkAnimation)
+
+                    subProgressAnimator.pause()
+                    totalProgressAnimator.pause()
                 }
             }
         }, IntentFilter(IntentID.PLAY_PAUSE_TIMER))
@@ -248,9 +280,9 @@ class MainTimerClockFragment : Fragment() {
                 item = null
                 isTimerInitialized = false
                 binding.backgroundCircle.visibility = View.GONE
-                binding.tvTimeTotal.setTextColor(ContextCompat.getColor(context, R.color.black))
-                binding.tvTimeSub.setTextColor(ContextCompat.getColor(context, R.color.black))
-                binding.tvLabelSub.setTextColor(ContextCompat.getColor(context, R.color.black))
+                binding.tvTimeTotal.setTextColor(ContextCompat.getColor(context, R.color.white))
+                binding.tvTimeSub.setTextColor(ContextCompat.getColor(context, R.color.white))
+                binding.tvLabelSub.setTextColor(ContextCompat.getColor(context, R.color.white))
                 binding.tvTimeTotal.visibility = View.VISIBLE
                 binding.tvLabelSub.visibility = View.VISIBLE
                 callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)

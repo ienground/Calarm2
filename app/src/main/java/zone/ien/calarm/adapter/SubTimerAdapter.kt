@@ -74,10 +74,10 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
             getNumpadDialog(true, holder.adapterPosition).show()
         }
 //        holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
-//        holder.btnDelete.setOnClickListener {
-//            items.removeAt(holder.adapterPosition)
-//            notifyItemRemoved(holder.adapterPosition)
-//        }
+        holder.btnDelete.setOnClickListener {
+            items.removeAt(holder.adapterPosition)
+            notifyItemRemoved(holder.adapterPosition)
+        }
 
     }
 
@@ -164,5 +164,6 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
         val btnInsertUp: ImageButton = itemView.findViewById(R.id.btn_insert_up)
         val btnInsertDown: ImageButton = itemView.findViewById(R.id.btn_insert_down)
         val btnStart: MaterialButton = itemView.findViewById(R.id.btn_start)
+        val btnDelete: MaterialButton = itemView.findViewById(R.id.btn_delete)
     }
 }

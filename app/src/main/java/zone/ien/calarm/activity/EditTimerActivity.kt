@@ -126,13 +126,14 @@ class EditTimerActivity : AppCompatActivity() {
     }
 
     private fun inflateData(data: TimersEntity) {
-        binding.etLabel.editText?.setText(item.label)
+        binding.etLabel.editText?.setText(data.label)
         binding.switchSchedule.isChecked = data.isScheduled
         binding.groupSchedule.isClickable = data.isScheduled
         binding.tvSchedule.text = if (data.isScheduled) dateTimeFormat.format(Date(data.scheduledTime)) else getString(R.string.not_scheduled)
         binding.switchSchedule.setOnCheckedChangeListener { compoundButton, b ->
             binding.groupSchedule.isClickable = b
             if (b) {
+                item.scheduledTime = System.currentTimeMillis()
                 val datePicker = getDatePickerDialog()
                 datePicker.show(supportFragmentManager, "DATE_PICKER")
             } else {

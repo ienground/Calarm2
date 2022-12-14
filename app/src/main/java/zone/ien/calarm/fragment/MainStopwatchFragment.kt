@@ -1,32 +1,16 @@
 package zone.ien.calarm.fragment
 
-import android.app.AlarmManager
-import android.app.PendingIntent
+import android.app.ActionBar.LayoutParams
 import android.content.*
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.viewpager2.widget.MarginPageTransformer
-import com.google.android.material.snackbar.Snackbar
 import zone.ien.calarm.R
-import zone.ien.calarm.adapter.MainAlarmListAdapter
-import zone.ien.calarm.adapter.MainCalarmDateAdapter
-import zone.ien.calarm.adapter.MainCalarmEventAdapter
-import zone.ien.calarm.adapter.MainTimerPageAdapter
-import zone.ien.calarm.databinding.FragmentMainAlarmBinding
-import zone.ien.calarm.databinding.FragmentMainCalarmBinding
+import zone.ien.calarm.activity.SettingsActivity
 import zone.ien.calarm.databinding.FragmentMainStopwatchBinding
-import zone.ien.calarm.databinding.FragmentMainTimerBinding
-import java.util.*
 
 class MainStopwatchFragment : Fragment() {
 
@@ -48,6 +32,8 @@ class MainStopwatchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.cardMain.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+//        binding.cardU1.
 
 
     }
@@ -67,15 +53,15 @@ class MainStopwatchFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        //        menuInflater.inflate(R.menu.menu_main_home, menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            //            R.id.menu_share -> {
-            //                startActivity(Intent(MainActivity.instance, ShareImageActivity::class.java))
-            //            }
+            R.id.menu_settings -> {
+                startActivity(Intent(requireContext(), SettingsActivity::class.java))
+            }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -9,10 +9,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -21,6 +23,7 @@ import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
 import zone.ien.calarm.adapter.SubAlarmAdapter
+import zone.ien.calarm.callback.ItemTouchHelperCallback
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.constant.IntentValue
 import zone.ien.calarm.constant.SharedKey
@@ -95,6 +98,7 @@ class EditAlarmActivity : AppCompatActivity() {
             }
         } else {
             invalidateMenu()
+            inflateData(item)
         }
 
         binding.groupTime.setOnClickListener {
@@ -157,6 +161,9 @@ class EditAlarmActivity : AppCompatActivity() {
                 }
             }.show()
         }
+        binding.switchVibrate.setOnCheckedChangeListener { compoundButton, b ->
+            item.vibrate = b
+        }
         binding.groupVibrate.setOnClickListener { binding.switchVibrate.toggle() }
         binding.btnAdd.setOnClickListener {
             val timePicker = MaterialTimePicker.Builder()
@@ -175,9 +182,6 @@ class EditAlarmActivity : AppCompatActivity() {
             }
             timePicker.show(supportFragmentManager, "SUB_TIME_PICKER")
         }
-
-        inflateData(item)
-
     }
 
     private fun inflateData(data: AlarmEntity) {
@@ -199,11 +203,13 @@ class EditAlarmActivity : AppCompatActivity() {
         binding.switchVibrate.isChecked = data.vibrate
 
         adapter = SubAlarmAdapter(data.subAlarms)
+//        Log.d(TAG, data.subAlarms.toString())
+        val itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
+        itemTouchHelper.attachToRecyclerView(binding.listSubAlarm)
         binding.listSubAlarm.adapter = adapter
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-
         return super.onPrepareOptionsMenu(menu)
     }
 

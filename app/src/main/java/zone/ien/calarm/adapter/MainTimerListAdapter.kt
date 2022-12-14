@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -110,8 +111,8 @@ class MainTimerListAdapter(var items: ArrayList<TimersEntity>): RecyclerView.Ada
 
     inner class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val tvLabel: MaterialTextView = itemView.findViewById(R.id.tv_label)
-        val btnStart: ImageButton = itemView.findViewById(R.id.btn_start)
-        val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete)
+        val btnStart: MaterialButton = itemView.findViewById(R.id.btn_start)
+        val btnDelete: MaterialButton = itemView.findViewById(R.id.btn_delete)
         val badge: MaterialTextView = itemView.findViewById(R.id.badge)
         val tvTime: MaterialTextView = itemView.findViewById(R.id.tv_time)
         val chipsMiniTimer: ChipGroup = itemView.findViewById(R.id.chips_mini_timer)

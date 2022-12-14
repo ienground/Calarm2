@@ -66,6 +66,84 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_main"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/usual_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/usual_margin">
+
+                <ImageView
+                    android:id="@+id/background_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:src="@drawable/circle"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/progress"
+                    app:layout_constraintEnd_toEndOf="@id/progress"
+                    app:layout_constraintStart_toStartOf="@id/progress"
+                    app:layout_constraintTop_toTopOf="@id/progress"
+                    app:tint="@color/blue" />
+
+                <com.dinuscxj.progressbar.CircleProgressBar
+                    android:id="@+id/progress"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="@dimen/usual_margin"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:progress_background_color="@color/gray"
+                    app:progress_end_color="@color/blue"
+                    app:progress_start_color="@color/blue"
+                    app:progress_stroke_cap="round"
+                    app:progress_stroke_width="10dp"
+                    app:style="solid_line" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/usual_margin"
+                    android:fontFamily="@font/pretendard_black"
+                    android:text="12:00"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:textSize="56sp"
+                    app:layout_constraintBottom_toTopOf="@id/progress"
+                    app:layout_constraintEnd_toEndOf="@id/progress"
+                    app:layout_constraintStart_toStartOf="@id/progress"
+                    app:layout_constraintTop_toBottomOf="@id/progress" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="64dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:layout_marginTop="@dimen/usual_margin"
+                    app:icon="@drawable/ic_play_arrow"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="36dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/progress" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

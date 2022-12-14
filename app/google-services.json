@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "766095762209",
+    "project_id": "ienlab-calarm",
+    "storage_bucket": "ienlab-calarm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766095762209:android:3376433b1c9c763eca1460",
+        "android_client_info": {
+          "package_name": "zone.ien.calarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766095762209-ui1qrgejsd8ledfa3t9jftiurdnq8bkb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgXIzvyI3VTcULkCsW3ngFqF7N5iywvIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766095762209-ui1qrgejsd8ledfa3t9jftiurdnq8bkb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -12,13 +12,16 @@ import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.util.TypedValue
 import androidx.core.content.ContextCompat
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.constant.ActionKey
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.receiver.AlarmReceiver
+import zone.ien.calarm.receiver.CalarmReceiver
 import zone.ien.calarm.room.AlarmEntity
+import zone.ien.calarm.room.CalarmEntity
 import java.util.*
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -157,6 +160,42 @@ class MyUtils {
             }
         }
 
+        fun setCalarmClock(context: Context, am: AlarmManager, calarm : CalarmEntity): Calendar {
+            val now = Calendar.getInstance()
+            val calendar = Calendar.getInstance().apply { timeInMillis = calarm.time }
+            val calarmIntent = Intent(context, CalarmReceiver::class.java).apply {
+                action = ActionKey.TIMER_ALARM
+                putExtra(IntentKey.ITEM_ID, calarm.id)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(context, calarm.id?.toInt() ?: -1, calarmIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            am.setAlarmClock(AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent), pendingIntent)
+            for (subCalarm in calarm.subCalarms) {
+                if (subCalarm.isEnabled) {
+                    val subCalendar = calendar.clone() as Calendar
+                    subCalendar.add(Calendar.MINUTE, -subCalarm.time)
+                    val subPendingIntent = PendingIntent.getBroadcast(context, 200000 + (subCalarm.id?.toInt() ?: -1), calarmIntent.apply { putExtra(IntentKey.SUBALARM_ID, subCalarm.id) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    if (subCalendar.timeInMillis < System.currentTimeMillis()) continue
+                    am.setAlarmClock(AlarmManager.AlarmClockInfo(subCalendar.timeInMillis, subPendingIntent), subPendingIntent)
+                }
+            }
+
+            return calendar
+        }
+
+        fun deleteCalarmClock(context: Context, am: AlarmManager, calarm : CalarmEntity) {
+            val calarmIntent = Intent(context, CalarmReceiver::class.java).apply {
+                action = ActionKey.TIMER_ALARM
+                putExtra(IntentKey.ITEM_ID, calarm.id)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(context, calarm.id?.toInt() ?: -1, calarmIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            am.cancel(pendingIntent)
+
+            for (subCalarm in calarm.subCalarms) {
+                val subPendingIntent = PendingIntent.getBroadcast(context, 200000 + (subCalarm.id?.toInt() ?: -1), calarmIntent.apply { putExtra(IntentKey.SUBALARM_ID, subCalarm.id) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                am.cancel(subPendingIntent)
+            }
+        }
+
         fun timeDiffToString(context: Context, t1: Calendar, t2: Calendar): String {
             val difference = t2.timeInMillis - t1.timeInMillis
             val day = difference / AlarmManager.INTERVAL_DAY
@@ -210,6 +249,10 @@ class MyUtils {
             return span01.append(span02).append(span03).append(span04).append(span05).append(span06)
         }
 
+        fun dpToPx(context: Context, size: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, context.resources.displayMetrics).toInt()
+
+        fun Cursor.getSafeLong(columnIndex: Int, defaultValue: Long) = if (isNull(columnIndex)) { defaultValue } else { getLong(columnIndex) }
+        fun Cursor.getSafeString(columnIndex: Int, defaultValue: String) = if (isNull(columnIndex)) { defaultValue } else { getString(columnIndex) }
         fun Long.round(digit: Int): Long = (this / digit.toFloat()).roundToLong() * digit
         fun Int.round(digit: Int): Int = (this / digit.toFloat()).roundToInt() * digit
 
