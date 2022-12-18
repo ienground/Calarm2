@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import zone.ien.calarm.activity.TAG
+import zone.ien.calarm.constant.SharedDefault
 import zone.ien.calarm.constant.SharedKey
 import zone.ien.calarm.data.CalendarEvent
 import zone.ien.calarm.room.CalarmDatabase
@@ -76,7 +77,7 @@ class CalendarChangeListener: BroadcastReceiver() {
                         }
                     }, 1000)
                 } catch (e: Exception) {
-                    val entity = calarmDatabase?.getDao()?.getByDataId(data.id) ?: CalarmEntity(data.id, data.calendarId, true, data.eventLocation, 0f, 0f, "", "", true)
+                    val entity = calarmDatabase?.getDao()?.getByDataId(data.id) ?: CalarmEntity(data.id, data.calendarId, true, data.eventLocation, SharedDefault.HOME_LATITUDE, SharedDefault.HOME_LONGITUDE, "", "", true)
                     entity.address = location
                     entity.sound = sharedPreferences.getString(SharedKey.LAST_ALARM_SOUND, "") ?: ""
 

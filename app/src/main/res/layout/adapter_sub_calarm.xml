@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Material3.CardView.Elevated"
+    android:layout_marginBottom="@dimen/usual_margin">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/usual_margin">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="10min"
+            android:textSize="20sp"
+            android:fontFamily="@font/pretendard_black"
+            android:textColor="@color/white"
+            android:layout_marginEnd="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_delete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ic_shower" />
+
+        <ImageView
+            android:id="@+id/ic_shower"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_shower"
+            app:tint="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_time"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_ready"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1h 5m"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toEndOf="@id/ic_shower"
+            app:layout_constraintTop_toTopOf="@id/ic_shower"
+            app:layout_constraintBottom_toBottomOf="@id/ic_shower" />
+
+        <ImageView
+            android:id="@+id/ic_bus"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_bus"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:tint="@color/white"
+            app:layout_constraintStart_toEndOf="@id/tv_time_ready"
+            app:layout_constraintTop_toBottomOf="@id/tv_time" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_moving"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10m"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toEndOf="@id/ic_bus"
+            app:layout_constraintTop_toTopOf="@id/ic_shower"
+            app:layout_constraintBottom_toBottomOf="@id/ic_shower" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete"
+            android:layout_width="36dp"
+            android:layout_height="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:layout_marginEnd="@dimen/usual_margin"
+            app:iconPadding="0dp"
+            app:iconGravity="textStart"
+            app:iconSize="24dp"
+            app:icon="@drawable/ic_delete"
+            app:backgroundTint="@color/red"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/switch_on"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

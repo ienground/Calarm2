@@ -1,0 +1,26 @@
+{
+  "destination_addresses": [
+    "1200 Chipyeong-dong, Seo-gu, Kwangju, South Korea"
+  ],
+  "origin_addresses": [
+    "43-10 Yongsan 2(i)ga-dong, Yongsan-gu, Seoul, South Korea"
+  ],
+  "rows": [
+    {
+      "elements": [
+        {
+          "distance": {
+            "text": "292 km",
+            "value": 292425
+          },
+          "duration": {
+            "text": "3 hours 7 mins",
+            "value": 11224
+          },
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+}

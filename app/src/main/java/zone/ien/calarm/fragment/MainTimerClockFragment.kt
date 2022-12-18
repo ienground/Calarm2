@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -121,6 +122,7 @@ class MainTimerClockFragment : Fragment() {
                         totalProgressAnimator.let {
                             it.setIntValues(duration, 0)
                             it.duration = duration.toLong()
+                            it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
                             it.addUpdateListener {
                                 binding.progressTotal.progress = (it.animatedValue as Int)
                             }
@@ -179,6 +181,7 @@ class MainTimerClockFragment : Fragment() {
                             totalProgressAnimator.let {
                                 it.setIntValues(duration, 0)
                                 it.duration = duration.toLong()
+                                it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
                                 it.addUpdateListener {
                                     binding.progressTotal.progress = (it.animatedValue as Int)
                                 }
@@ -191,6 +194,7 @@ class MainTimerClockFragment : Fragment() {
                                 subProgressAnimator.let {
                                     it.setIntValues((item?.subTimers?.get(order)?.time ?: 0) * 1000, 0)
                                     it.duration = (item?.subTimers?.get(order)?.time ?: 0) * 1000L
+                                    it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
                                     it.addUpdateListener {
                                         binding.progressSub.progress = (it.animatedValue as Int)
                                     }
@@ -212,6 +216,7 @@ class MainTimerClockFragment : Fragment() {
                         subProgressAnimator.let {
                             it.setIntValues((item?.subTimers?.get(order)?.time ?: 0) * 1000, 0)
                             it.duration = (item?.subTimers?.get(order)?.time ?: 0) * 1000L
+                            it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
                             it.addUpdateListener {
                                 binding.progressSub.progress = (it.animatedValue as Int)
                             }

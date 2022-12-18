@@ -54,7 +54,6 @@
             android:id="@+id/list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/usual_margin"
             android:layout_marginTop="@dimen/usual_margin"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toStartOf="parent"

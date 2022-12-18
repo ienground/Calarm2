@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="auto"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@drawable/ripple_rounded"
                     android:paddingVertical="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

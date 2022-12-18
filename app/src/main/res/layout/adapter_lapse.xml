@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Material3.CardView.Filled"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/usual_margin_half">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.4" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.7" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_lap_no"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Lap 1"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guide1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_flag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="P"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toStartOf="@id/guide1"
+            app:layout_constraintEnd_toEndOf="@id/guide2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_lap"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="01:00:90"
+            android:textColor="@color/white"
+            android:fontFeatureSettings="tnum"
+            android:fontFamily="@font/pretendard_regular"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toStartOf="@id/guide2"
+            app:layout_constraintEnd_toEndOf="@id/guide3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_time_full"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="01:00:10"
+            android:textColor="@color/white"
+            android:fontFeatureSettings="tnum"
+            android:fontFamily="@font/pretendard_regular"
+            android:layout_marginStart="@dimen/usual_margin_half"
+            app:layout_constraintStart_toStartOf="@id/guide3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -74,9 +74,9 @@ class AlarmRingActivity : AppCompatActivity() {
                         binding.tvLabel.text = data.label
                         binding.tvParentApm.text = apmFormat.format(calendar.time)
                         binding.tvParentTime.text = timeFormat2.format(calendar.time)
-                        binding.tvTimeDiff.text = if (initialGap / 60 != 0 && initialGap % 60 != 0) getString(R.string.time_format_hour_minute, initialGap / 60, initialGap % 60)
-                        else if (initialGap % 60 == 0) getString(R.string.time_format_hour, initialGap / 60)
-                        else getString(R.string.time_format_minute, initialGap % 60)
+                        binding.tvTimeDiff.text = if (initialGap / 60 != 0 && initialGap % 60 != 0) getString(R.string.time_format_before_hour_minute, initialGap / 60, initialGap % 60)
+                        else if (initialGap % 60 == 0) getString(R.string.time_format_before_hour, initialGap / 60)
+                        else getString(R.string.time_format_before_minute, initialGap % 60)
 
                         binding.bgSnooze.setOnClickListener { sendBroadcast(snoozeIntent); finish() }
                         binding.bgAlarmOff.setOnClickListener { sendBroadcast(offIntent); finish() }
@@ -86,9 +86,9 @@ class AlarmRingActivity : AppCompatActivity() {
                                 val gap = data.time - Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
                                 binding.tvTime.text = timeFormat.format(Date(System.currentTimeMillis()))
                                 binding.tvApm.text = apmFormat.format(Date(System.currentTimeMillis()))
-                                binding.tvTimeDiff.text = if (gap / 60 != 0 && gap % 60 != 0) context.getString(R.string.time_format_hour_minute, gap / 60, gap % 60)
-                                else if (gap % 60 == 0) context.getString(R.string.time_format_hour, gap / 60)
-                                else context.getString(R.string.time_format_minute, gap % 60)
+                                binding.tvTimeDiff.text = if (gap / 60 != 0 && gap % 60 != 0) context.getString(R.string.time_format_before_hour_minute, gap / 60, gap % 60)
+                                else if (gap % 60 == 0) context.getString(R.string.time_format_before_hour, gap / 60)
+                                else context.getString(R.string.time_format_before_minute, gap % 60)
                             }
                         }, IntentFilter(Intent.ACTION_TIME_TICK))
                     }

@@ -1,18 +1,15 @@
 package zone.ien.calarm.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
-import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.room.SubAlarmEntity
 import zone.ien.calarm.utils.ItemActionListener
 
@@ -29,9 +26,9 @@ class SubAlarmAdapter(var items: ArrayList<SubAlarmEntity>): RecyclerView.Adapte
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         items[holder.adapterPosition].time.let {
             holder.tvTime.text =
-                if (it / 60 != 0 && it % 60 != 0) context.getString(R.string.time_format_hour_minute, it / 60, it % 60)
-                else if (it / 60 != 0) context.getString(R.string.time_format_hour, it / 60)
-                else context.getString(R.string.time_format_minute, it % 60)
+                if (it / 60 != 0 && it % 60 != 0) context.getString(R.string.time_format_before_hour_minute, it / 60, it % 60)
+                else if (it / 60 != 0) context.getString(R.string.time_format_before_hour, it / 60)
+                else context.getString(R.string.time_format_before_minute, it % 60)
         }
         holder.switchOn.setOnCheckedChangeListener { compoundButton, b ->
             holder.tvTime.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)

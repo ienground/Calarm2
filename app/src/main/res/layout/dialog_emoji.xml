@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/usual_margin">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_emoji_preview"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:text="0"
+            android:textSize="32sp"
+            android:gravity="center"
+            android:background="@drawable/circle"
+            android:backgroundTint="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.CardView.Filled"
+            android:layout_marginTop="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_emoji_preview"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/usual_margin">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_01"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintVertical_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_02"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/tv_emoji_recent_05"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_02"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_01"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_03"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_01"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_01"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_03"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_02"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_04"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_01"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_01" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_04"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_03"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_01"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_01"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_05"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/usual_margin"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_06"
+                    app:layout_constraintTop_toBottomOf="@id/tv_emoji_recent_01"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_06"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_05"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_07"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_05"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_05"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_emoji_recent_07"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:textSize="28sp"
+                    android:text="0"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_06"
+                    app:layout_constraintEnd_toStartOf="@id/tv_emoji_recent_more"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_05"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_05"/>
+
+                <ImageView
+                    android:id="@+id/tv_emoji_recent_more"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:background="@drawable/ripple_rounded"
+                    android:src="@drawable/ic_more_horiz"
+                    android:padding="@dimen/usual_margin_half"
+                    app:tint="@color/white"
+                    app:layout_constraintStart_toEndOf="@id/tv_emoji_recent_07"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_emoji_recent_05"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_emoji_recent_05"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

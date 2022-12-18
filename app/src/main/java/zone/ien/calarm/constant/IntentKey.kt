@@ -15,5 +15,7 @@ class IntentKey {
         const val ORDER = "order"
         const val STANDARD_TIME = "standard_time"
         const val IS_FINISHED = "isFinished"
+        const val LAP_FLAG = "lap_flag"
+        const val LAP_TIME = "lap_time"
     }
 }

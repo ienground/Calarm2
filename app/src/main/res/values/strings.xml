@@ -1,11 +1,79 @@
 <resources>
-    <string name="app_name">Calarm2</string>
+    <string name="app_name">Calarm</string>
     <string name="alarm">Alarm</string>
     <string name="calarm">Calarm</string>
     <string name="timer">Timer</string>
     <string name="stopwatch">Stopwatch</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="settings">Settings</string>
+    <string name="deskclock">DeskClock</string>
+    <string name="help">Help</string>
+
+    <!--Overall Using-->
+    <string name="save">Save</string>
+    <string name="time_format_before_hour_minute">%1$d시간 %2$d분 전</string>
+    <string name="time_format_before_hour">%1$d시간 전</string>
+    <string name="time_format_before_minute">%1$d분 전</string>
+    <string name="time_format_hour_minute">%1$d시간 %2$d분</string>
+    <string name="time_format_hour">%1$d시간</string>
+    <string name="time_format_minute">%1$d분</string>
+    <string name="sub_alarm_dialog_title">minutes before</string>
+    <string name="delete">Delete</string>
+    <string name="delete_title">Delete?</string>
+    <string name="delete_content">Are you sure to delete?</string>
+    <string name="hour">h</string>
+    <string name="minute">m</string>
+    <string name="second">s</string>
+    <string name="not_scheduled">Not scheduled</string>
+    <string name="no_label">No label</string>
+    <string name="dateTimeFormat">MMM dd yyyy, hh:mm a</string>
+    <string name="alarm_content_format">EEE hh:mm a</string>
+    <string name="apmTimeFormat">h:mm a</string>
+    <string name="label">Label</string>
+    <string name="resume">Resume</string>
+    <string name="pause">Pause</string>
+    <string name="finished">finished</string>
+    <string name="close">Close</string>
+    <string name="stop">Stop</string>
+    <string name="calarm_alarm">Calarm Alarm</string>
+
+    <!--SettingsActivity-->
+    <string name="home_address">Home address</string>
+    <string name="first_event">Only first event</string>
+    <string name="fixed_time_event">Events before time</string>
+    <string name="all_events">Every event</string>
+    <string name="calarm_create_option">Calarm create option</string>
+    <string name="set_fixed_time">Set time</string>
+    <string name="calarm_create_info">Calarm to generate</string>
+    <string name="calendar_source_of_calarm">Calendar source of Calarm</string>
+    <string name="select_calendar">Select calendar..</string>
+    <string name="time_to_go_out">Time to get ready to go out</string>
+
+    <!--LocationActivity-->
+    <string name="cannot_get_address">Cannot get address</string>
+    <string name="move_to_current_location">Move to current location</string>
+    <string name="search">Search</string>
+    <string name="set_home_location">Set home location</string>
+
+    <!--AlarmService-->
+    <string name="from_alarm_name">from %1$s</string>
+    <string name="missed_notification">Missed Alarm Notification</string>
+    <string name="missed_alarm">Missed Alarm</string>
+    <string name="snooze">snooze</string>
+    <string name="alarm_off">Alarm Off</string>
+
+    <!--MainAlarmFragment-->
+    <string name="no_alarms">No alarms.</string>
+    <string name="add_new_alarm">Add new alarm</string>
+
+    <!--MainTimerFragment-->
+    <string name="add_new_timer">Add new timer</string>
+    <string name="time_is_up">Time\'s Up!</string>
+    <string name="countdown">Countdown</string>
+
+    <!--MainStopwatchFragment-->
+    <string name="tap_to_schedule_stopwatch">Tap to schedule stopwatch</string>
+
+    <!--EditActivity-->
     <string name="sun">Sun</string>
     <string name="mon">Mon</string>
     <string name="tue">Tue</string>
@@ -20,74 +88,25 @@
     <string name="thu_short">T</string>
     <string name="fri_short">F</string>
     <string name="sat_short">S</string>
-    <string name="vibrate">Vibrate</string>
     <string name="sub_alarm">Sub Alarm</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="weekend">Weekend</string>
     <string name="weekday">Weekday</string>
     <string name="everyday">Everyday</string>
-
-    <string name="time_format_hour_minute">%1$d시간 %2$d분 전</string>
-    <string name="time_format_hour">%1$d시간 전</string>
-    <string name="time_format_minute">%1$d분 전</string>
-    <string name="no_sub_alarms">No sub alarms</string>
-    <string name="no_sub_calarms">No sub calarms</string>
-    <string name="save">Save</string>
-
     <string name="alarm_ring">Set alarm ring</string>
-    <string name="sub_alarm_dialog_title">minutes before</string>
-    <string name="delete">Delete</string>
-    <string name="delete_title">Delete?</string>
-    <string name="snooze">snooze</string>
-    <string name="alarm_off">Alarm Off</string>
-    <string name="alarm_content_format">EEE a hh:mm</string>
-    <string name="calarm_alarm">Calarm Alarm</string>
-    <string name="turn_off_this_alarm_set">Turn off this alarm set.</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="sub_alarm_exists">Sub alarm already exists.</string>
 
+    <!--MainAlarmListAdapter-->
+    <string name="no_sub_alarms">No sub alarms</string>
     <string name="day_format">%1$d days</string>
     <string name="hour_format">%1$d hours</string>
     <string name="minute_format">%1$d minutes</string>
     <string name="alarm_toast_format">Alarm set for %1$s from now</string>
     <string name="alarm_toast_min">Alarm set for less than 1 minute from now</string>
-    <string name="no_alarms">No alarms.</string>
-    <string name="sub_alarm_exists">Sub alarm already exists.</string>
-    <string name="missed_notification">Missed Alarm Notification</string>
-    <string name="missed_alarm">Missed Alarm</string>
-    <string name="hour">h</string>
-    <string name="minute">m</string>
-    <string name="second">s</string>
-    <string name="not_scheduled">Not scheduled</string>
-    <string name="no_label">No label</string>
-    <string name="dateTimeFormat">MMM dd yyyy, a hh:mm</string>
-    <string name="label">Label</string>
-    <string name="countdown">Countdown</string>
-    <string name="resume">Resume</string>
-    <string name="pause">Pause</string>
-    <string name="finished">finished</string>
-    <string name="from_alarm_name">from %1$s</string>
-    <string name="time_is_up">Time\'s Up!</string>
-    <string name="close">Close</string>
-    <string name="stop">Stop</string>
-    <string name="add_new_alarm">Add new alarm</string>
-    <string name="add_new_timer">Add new timer</string>
 
-    <string name="settings">Settings</string>
-    <string name="home_address">Home address</string>
-
-    <string name="first_event">Only first event</string>
-    <string name="fixed_time_event">Events before time</string>
-    <string name="all_events">Every event</string>
-    <string name="calarm_create_option">Calarm create option</string>
-    <string name="set_fixed_time">Set time</string>
-    <string name="calarm_create_info">Calarm to generate</string>
-    <string name="calendar_source_of_calarm">Calendar source of Calarm</string>
-    <string name="select_calendar">Select calendar..</string>
-    <string name="deskclock">DeskClock</string>
-    <string name="help">Help</string>
-    <string name="time_to_go_out">Time to get ready to go out</string>
-    <string name="cannot_get_address">Cannot get address</string>
-    <string name="move_to_current_location">Move to current location</string>
-    <string name="search">Search</string>
-    <string name="set_home_location">Set home location</string>
+    <!--MainCalarmEventAdapter-->
+    <string name="no_sub_calarms">No sub calarms</string>
+    <string name="lap_no">Lap %1$d</string>
 </resources>

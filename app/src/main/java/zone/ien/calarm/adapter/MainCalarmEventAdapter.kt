@@ -1,9 +1,11 @@
 package zone.ien.calarm.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
@@ -12,8 +14,8 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
 import zone.ien.calarm.callback.AlarmListCallback
+import zone.ien.calarm.room.AlarmEntity
 import zone.ien.calarm.room.CalarmEntity
-import zone.ien.calarm.utils.MyUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -33,7 +35,7 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val apmFormat = SimpleDateFormat("a", Locale.getDefault())
         val timeFormat = SimpleDateFormat("h:mm", Locale.getDefault())
-        val apmTimeFormat = SimpleDateFormat("a h:mm", Locale.getDefault())
+        val apmTimeFormat = SimpleDateFormat(context.getString(R.string.apmTimeFormat), Locale.getDefault())
         val time = Calendar.getInstance().apply {
             timeInMillis = items[holder.adapterPosition].time
         }
@@ -46,6 +48,15 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
                 holder.tvLabel.visibility = View.GONE
             }
         }
+        items[holder.adapterPosition].address.let {
+            if (it != "") {
+                holder.tvAddress.visibility = View.VISIBLE
+                holder.tvAddress.text = it
+            } else {
+                holder.tvAddress.visibility = View.GONE
+            }
+        }
+
         holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
         holder.tvApm.text = apmFormat.format(time.time)
         holder.tvTime.text = timeFormat.format(time.time)
@@ -60,15 +71,17 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
             calendar.add(Calendar.MINUTE, -calarm.time)
             chip.isCheckable = true
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
-            chip.text = if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_hour_minute, calarm.time / 60, calarm.time % 60)
-            else if (calarm.time % 60 == 0) context.getString(R.string.time_format_hour, calarm.time / 60)
-            else context.getString(R.string.time_format_minute, calarm.time % 60)
+            chip.chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+            if (calarm.timeMoving != 0) chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus)
+            chip.text = if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, calarm.time / 60, calarm.time % 60)
+            else if (calarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, calarm.time / 60)
+            else context.getString(R.string.time_format_before_minute, calarm.time % 60)
 
             chip.setOnCheckedChangeListener { compoundButton, b ->
                 chip.text = if (b) apmTimeFormat.format(calendar.time) else {
-                    if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_hour_minute, calarm.time / 60, calarm.time % 60)
-                    else if (calarm.time % 60 == 0) context.getString(R.string.time_format_hour, calarm.time / 60)
-                    else context.getString(R.string.time_format_minute, calarm.time % 60)
+                    if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, calarm.time / 60, calarm.time % 60)
+                    else if (calarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, calarm.time / 60)
+                    else context.getString(R.string.time_format_before_minute, calarm.time % 60)
                 }
             }
 
@@ -95,6 +108,14 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun edit(id: Long, item: CalarmEntity) {
+        val position = items.indexOfFirst { it.id == id }
+        if (position != -1) {
+            items[position] = item
+            notifyItemChanged(position)
+        }
+    }
 
     fun setClickCallback(callbackListener: AlarmListCallback) {
         this.callbackListener = callbackListener

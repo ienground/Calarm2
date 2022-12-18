@@ -25,10 +25,6 @@
             app:key="fixed_time" />
 
         <Preference
-            app:title="@string/calarm_create_info"
-            app:key="calarm_create_info" />
-
-        <Preference
             app:title="@string/time_to_go_out"
             app:key="ready_time" />
 

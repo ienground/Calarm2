@@ -31,7 +31,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="좋은 아침입니다,"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/pretendard"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +44,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="아이엔님!"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:fontFamily="@font/pretendard_black"
                     android:layout_marginEnd="@dimen/usual_margin"
@@ -66,15 +66,79 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <com.dinuscxj.progressbar.CircleProgressBar
+            android:id="@+id/progress"
+            android:layout_width="280dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/usual_margin"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/card_lapse"
+            app:progress_background_color="@color/gray"
+            app:progress_end_color="@color/blue"
+            app:progress_start_color="@color/blue"
+            app:progress_stroke_cap="round"
+            app:progress_stroke_width="10dp"
+            app:style="solid_line" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/progress"
+            app:layout_constraintEnd_toEndOf="@id/progress"
+            app:layout_constraintTop_toTopOf="@id/progress"
+            app:layout_constraintBottom_toBottomOf="@id/progress">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/usual_margin"
+                android:fontFeatureSettings="tnum"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="00"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                android:textSize="56sp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBaseline_toTopOf="@id/tv_time_milli"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_time_milli"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:fontFeatureSettings="tnum"
+                android:fontFamily="@font/pretendard_regular"
+                android:textSize="32sp"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_time" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_main"
+            android:id="@+id/card_schedule"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/usual_margin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:background="@drawable/ripple_rounded"
+            android:clickable="true"
+            android:focusable="auto"
+            android:checkable="true"
+            android:checked="true"
+            app:checkedIcon="@null"
+            style="@style/Widget.Material3.CardView.Outlined"
+            app:cardCornerRadius="40dp"
+            app:layout_constraintStart_toStartOf="@id/progress"
+            app:layout_constraintEnd_toEndOf="@id/progress"
+            app:layout_constraintTop_toBottomOf="@id/progress"
+            app:layout_constraintBottom_toTopOf="@id/btn_play">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -82,68 +146,110 @@
                 android:padding="@dimen/usual_margin">
 
                 <ImageView
-                    android:id="@+id/background_circle"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/circle"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/progress"
-                    app:layout_constraintEnd_toEndOf="@id/progress"
-                    app:layout_constraintStart_toStartOf="@id/progress"
-                    app:layout_constraintTop_toTopOf="@id/progress"
-                    app:tint="@color/blue" />
-
-                <com.dinuscxj.progressbar.CircleProgressBar
-                    android:id="@+id/progress"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_margin="@dimen/usual_margin"
-                    app:layout_constraintDimensionRatio="1:1"
+                    android:id="@+id/ic_alarm"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_alarm"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:progress_background_color="@color/gray"
-                    app:progress_end_color="@color/blue"
-                    app:progress_start_color="@color/blue"
-                    app:progress_stroke_cap="round"
-                    app:progress_stroke_width="10dp"
-                    app:style="solid_line" />
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/tv_time"
+                    android:id="@+id/tv_alarm"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/usual_margin"
-                    android:fontFamily="@font/pretendard_black"
-                    android:text="12:00"
+                    android:text="@string/tap_to_schedule_stopwatch"
+                    android:textAlignment="textEnd"
                     android:textColor="@color/white"
-                    android:textAlignment="center"
-                    android:textSize="56sp"
-                    app:layout_constraintBottom_toTopOf="@id/progress"
-                    app:layout_constraintEnd_toEndOf="@id/progress"
-                    app:layout_constraintStart_toStartOf="@id/progress"
-                    app:layout_constraintTop_toBottomOf="@id/progress" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="64dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:layout_marginTop="@dimen/usual_margin"
-                    app:icon="@drawable/ic_play_arrow"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="36dp"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:fontFamily="@font/pretendard"
+                    android:layout_marginStart="@dimen/usual_margin"
+                    app:layout_constraintStart_toEndOf="@id/ic_alarm"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/progress" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_lapse"
+            android:layout_width="0dp"
+            android:layout_height="0.1dp"
+            android:visibility="gone"
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_marginHorizontal="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progress"
+            app:layout_constraintBottom_toTopOf="@id/btn_play">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/usual_margin"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_play"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:layout_marginTop="@dimen/usual_margin"
+            android:layout_marginBottom="@dimen/usual_margin"
+            app:icon="@drawable/ic_play_arrow"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="36dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_lapse"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reset"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:visibility="invisible"
+            android:layout_marginEnd="32dp"
+            app:icon="@drawable/ic_restart"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="36dp"
+            app:layout_constraintEnd_toStartOf="@id/btn_play"
+            app:layout_constraintTop_toTopOf="@id/btn_play"
+            app:layout_constraintBottom_toBottomOf="@id/btn_play"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_lap"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:layout_marginStart="32dp"
+            android:text="🚩"
+            android:textSize="24sp"
+            android:fontFamily="@font/pretendard_black"
+            android:visibility="invisible"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="36dp"
+            app:layout_constraintStart_toEndOf="@id/btn_play"
+            app:layout_constraintTop_toTopOf="@id/btn_play"
+            app:layout_constraintBottom_toBottomOf="@id/btn_play"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

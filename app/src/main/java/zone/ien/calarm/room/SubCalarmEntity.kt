@@ -8,9 +8,10 @@ import androidx.room.PrimaryKey
 class SubCalarmEntity(
     var parentId: Long,
     var time: Int,
-    var isEnabled: Boolean
+    var isEnabled: Boolean,
+    var timeMoving: Int = 0
 ) {
     @PrimaryKey(autoGenerate = true) var id: Long? = null
 
-    override fun toString(): String = "$id / $parentId / ${time / 60}:${time % 60} / $isEnabled"
+    override fun toString(): String = "$id / $parentId / ${time / 60}:${time % 60} / $isEnabled ${timeMoving}"
 }

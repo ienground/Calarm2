@@ -39,6 +39,7 @@ import zone.ien.calarm.adapter.SubCalarmAdapter
 import zone.ien.calarm.callback.ItemTouchHelperCallback
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.constant.IntentValue
+import zone.ien.calarm.constant.SharedDefault
 import zone.ien.calarm.constant.SharedKey
 import zone.ien.calarm.data.CalendarEvent
 import zone.ien.calarm.databinding.ActivityEditCalarmBinding
@@ -65,7 +66,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
     private var ringtones: Map<String, String> = mapOf()
     private lateinit var geocoder: Geocoder
 
-    private var item = CalarmEntity(0, 0, false, "", 0f, 0f, "", "", false)
+    private var item = CalarmEntity(0, 0, false, "", SharedDefault.HOME_LATITUDE, SharedDefault.HOME_LONGITUDE, "", "", false)
     private var dataId = -1L
     private var preRingtone = ""
     private var preVibrate = false
@@ -77,7 +78,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
                 item.sound = preRingtone
                 item.vibrate = preVibrate
 
-                calarmDatabase?.getDao()?.update(item)
+                calarmDatabase?.getDao()?.add(item)
                 finish()
             }
         }
@@ -104,7 +105,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
         dataId = intent.getLongExtra(IntentKey.ITEM_ID, -1)
         ringtones = MyUtils.getAlarmRingtones(this)
-        item.sound = ringtones.values.first()
+        item.sound = sharedPreferences.getString(SharedKey.LAST_ALARM_SOUND, ringtones.values.first()) ?: ringtones.values.first()
 
         if (dataId != -1L) {
             GlobalScope.launch(Dispatchers.IO) {
@@ -115,8 +116,9 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
                         item.time = calendarEvent.startDate
                         item.label = calendarEvent.title
                         item.subCalarms = subCalarmDatabase?.getDao()?.getByParentId(dataId) as ArrayList<SubCalarmEntity>
+                        item.subCalarms.sortBy { it.time }
                     } else {
-                        item = calendarEvent.let { CalarmEntity(it.id, it.calendarId, false, it.eventLocation, 0f, 0f, "", ringtones.values.first(), false)}
+                        item = calendarEvent.let { CalarmEntity(it.id, it.calendarId, false, it.eventLocation, SharedDefault.HOME_LATITUDE, SharedDefault.HOME_LONGITUDE, "", sharedPreferences.getString(SharedKey.LAST_ALARM_SOUND, ringtones.values.first()) ?: ringtones.values.first(), false)}
                         item.time = calendarEvent.startDate
                         item.label = calendarEvent.title
                     }
@@ -209,8 +211,6 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
                     data.longitude = longitude
 
                     map.animateCamera(CameraUpdateFactory.newLatLng(LatLng(latitude.toDouble(), longitude.toDouble())))
-
-                    Log.d(TAG, "$latitude $longitude $location")
                 }
             }, 1000)
         } catch (_: Exception) { }
@@ -223,7 +223,6 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         binding.switchVibrate.isChecked = data.vibrate
 
         adapter = SubCalarmAdapter(data.subCalarms)
-        Log.d(TAG, data.subCalarms.toString())
         val itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
         itemTouchHelper.attachToRecyclerView(binding.listSubAlarm)
         binding.listSubAlarm.adapter = adapter
@@ -235,7 +234,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_edit, menu)
-        if (dataId == -1L) menu?.findItem(R.id.menu_delete)?.isVisible = false
+        menu?.findItem(R.id.menu_delete)?.isVisible = false
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -257,10 +256,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
                             entity.parentId = dataId
                             subCalarmDatabase?.getDao()?.add(entity)
                         }
-                        val calarmTime = MyUtils.setCalarmClock(applicationContext, am, this@EditCalarmActivity.item)
-//                        withContext(Dispatchers.Main) {
-//                            Toast.makeText(applicationContext, MyUtils.timeDiffToString(applicationContext, Calendar.getInstance(), calarmTime), Toast.LENGTH_SHORT).show()
-//                        }
+                        MyUtils.setCalarmClock(applicationContext, am, this@EditCalarmActivity.item)
                         setResult(RESULT_OK, Intent().apply {
                             putExtra(IntentKey.ITEM_ID, id)
                             putExtra(IntentKey.ACTION_TYPE, IntentValue.ACTION_EDIT)
@@ -268,24 +264,6 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
                         finish()
                     }
                 }
-            }
-            R.id.menu_delete -> {
-//                MaterialAlertDialogBuilder(this).apply {
-//                    setMessage(R.string.delete_title)
-//                    setPositiveButton(android.R.string.ok) { _, _ ->
-//                        GlobalScope.launch(Dispatchers.IO) {
-//                            MyUtils.deleteAlarmClock(applicationContext, am, this@EditCalarmActivity.item)
-//                            alarmDatabase?.getDao()?.delete(this@EditCalarmActivity.item.id ?: -1)
-//                            subAlarmDatabase?.getDao()?.deleteParentId(this@EditCalarmActivity.item.id ?: -1)
-//                        }
-//                        setResult(RESULT_OK, Intent().apply {
-//                            putExtra(IntentKey.ITEM_ID, dataId)
-//                            putExtra(IntentKey.ACTION_TYPE, IntentValue.ACTION_DELETE)
-//                        })
-//                        finish()
-//                    }
-//                    setNegativeButton(android.R.string.cancel) { _, _ -> }
-//                }.show()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -311,8 +289,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition, 18.5f))
     }
 
-    override fun onMapClick(latLng: LatLng) {
-    }
+    override fun onMapClick(latLng: LatLng) {}
 
     private fun getCalendarEventByID(context: Context, id: Long): ArrayList<CalendarEvent> {
         val events = java.util.ArrayList<CalendarEvent>()

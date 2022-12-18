@@ -77,7 +77,7 @@ class EditAlarmActivity : AppCompatActivity() {
         subAlarmDatabase = SubAlarmDatabase.getInstance(this)
 
         ringtones = MyUtils.getAlarmRingtones(this)
-        item.sound = ringtones.values.first()
+        item.sound = sharedPreferences.getString(SharedKey.LAST_ALARM_SOUND, ringtones.values.first()) ?: ringtones.values.first()
 
         id = intent.getLongExtra(IntentKey.ITEM_ID, -1L)
         Calendar.getInstance().let {

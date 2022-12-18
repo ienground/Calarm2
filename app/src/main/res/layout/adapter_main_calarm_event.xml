@@ -20,6 +20,7 @@
             android:fontFamily="@font/pretendard"
             android:textSize="20sp"
             android:text="event"
+            android:textColor="@color/white"
             android:gravity="center_vertical"
             android:layout_marginEnd="@dimen/usual_margin"
             app:layout_constraintStart_toStartOf="parent"
@@ -51,6 +52,7 @@
             android:fontFamily="@font/pretendard"
             android:text="09:00"
             android:textSize="36sp"
+            android:textColor="@color/white"
             android:layout_marginStart="4dp"
             app:layout_constraintStart_toEndOf="@id/tv_apm"
             app:layout_constraintTop_toBottomOf="@id/tv_label" />
@@ -61,6 +63,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard"
             android:text="HL"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_time" />

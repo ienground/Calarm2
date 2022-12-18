@@ -3,6 +3,7 @@ package zone.ien.calarm.fragment
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.AlarmManager
 import android.content.*
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -33,8 +34,10 @@ import zone.ien.calarm.adapter.MainCalarmEventAdapter
 import zone.ien.calarm.callback.AlarmListCallback
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.constant.IntentValue
+import zone.ien.calarm.constant.SharedDefault
 import zone.ien.calarm.data.CalendarEvent
 import zone.ien.calarm.databinding.FragmentMainCalarmBinding
+import zone.ien.calarm.receiver.CalarmCreateReceiver
 import zone.ien.calarm.room.*
 import zone.ien.calarm.utils.MyUtils
 import zone.ien.calarm.utils.MyUtils.Companion.getSafeLong
@@ -56,6 +59,7 @@ class MainCalarmFragment : Fragment() {
     private var calarmDatabase: CalarmDatabase? = null
     private var subCalarmDatabase: SubCalarmDatabase? = null
     private lateinit var adapter: MainCalarmEventAdapter
+    private lateinit var am: AlarmManager
 
     @OptIn(DelicateCoroutinesApi::class)
     private val alarmListCallback = object: AlarmListCallback {
@@ -70,14 +74,11 @@ class MainCalarmFragment : Fragment() {
             GlobalScope.launch(Dispatchers.IO) {
                 adapter.items[position].isEnabled = isEnabled
                 calarmDatabase?.getDao()?.update(adapter.items[position])
-//                if (isEnabled) {
-//                    val alarmTime = MyUtils.setAlarmClock(requireContext(), am, adapter.items[position])
-//                    withContext(Dispatchers.Main) {
-//                        Toast.makeText(requireContext(), MyUtils.timeDiffToString(requireContext(), Calendar.getInstance(), alarmTime), Toast.LENGTH_SHORT).show()
-//                    }
-//                } else {
-//                    MyUtils.deleteAlarmClock(requireContext(), am, adapter.items[position])
-//                }
+                if (isEnabled) {
+                    MyUtils.setCalarmClock(requireContext(), am, adapter.items[position])
+                } else {
+                    MyUtils.deleteCalarmClock(requireContext(), am, adapter.items[position])
+                }
             }
         }
     }
@@ -89,6 +90,7 @@ class MainCalarmFragment : Fragment() {
         sharedPreferences = requireContext().getSharedPreferences("${requireContext().packageName}_preferences", Context.MODE_PRIVATE)
         calarmDatabase = CalarmDatabase.getInstance(requireContext())
         subCalarmDatabase = SubCalarmDatabase.getInstance(requireContext())
+        am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         setHasOptionsMenu(true)
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
@@ -100,6 +102,11 @@ class MainCalarmFragment : Fragment() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.icIcon.setOnLongClickListener {
+            requireContext().sendBroadcast(Intent(requireContext(), CalarmCreateReceiver::class.java))
+            true
+        }
 
         val calendarIdList = getCalendarIdList()
 
@@ -184,8 +191,9 @@ class MainCalarmFragment : Fragment() {
 
                     for (event in events) {
                         val eventCalendar = Calendar.getInstance().apply { timeInMillis = event.startDate }
-                        val data = calarmDatabase?.getDao()?.getByDataId(event.id) ?: CalarmEntity(event.id, event.calendarId, false, event.eventLocation, 0f, 0f, "", "", true)
+                        val data = calarmDatabase?.getDao()?.getByDataId(event.id) ?: CalarmEntity(event.id, event.calendarId, false, event.eventLocation, SharedDefault.HOME_LATITUDE, SharedDefault.HOME_LONGITUDE, "", "", true)
                         data.subCalarms = subCalarmDatabase?.getDao()?.getByParentId(event.id) as ArrayList<SubCalarmEntity>
+                        data.subCalarms.sortBy { it.time }
                         data.time = eventCalendar.timeInMillis
                         data.label = event.title
 
@@ -223,19 +231,24 @@ class MainCalarmFragment : Fragment() {
                 val id = result.data?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1
                 when (result.data?.getIntExtra(IntentKey.ACTION_TYPE, -1)) {
                     IntentValue.ACTION_EDIT -> {
-//                        GlobalScope.launch(Dispatchers.IO) {
-//                            val item = alarmDatabase?.getDao()?.get(id)
-//                            item?.subAlarms = subAlarmDatabase?.getDao()?.getByParentId(id) as ArrayList<SubAlarmEntity>
-//                            if (item != null) {
-//                                withContext(Dispatchers.Main) {
-//                                    adapter.edit(id, item)
-//                                }
-//                            }
-//                            withContext(Dispatchers.Main) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val item = calarmDatabase?.getDao()?.get(id)
+                            if (item != null) {
+                                val event = getCalendarEventByID(requireContext(), item.dataId).first()
+                                item.subCalarms = subCalarmDatabase?.getDao()?.getByParentId(item.dataId) as ArrayList<SubCalarmEntity>
+                                item.subCalarms.sortBy { it.time }
+                                item.label = event.title
+                                item.time = event.startDate
+
+                                withContext(Dispatchers.Main) {
+                                    adapter.edit(id, item)
+                                }
+                            }
+                            withContext(Dispatchers.Main) {
 //                                binding.icNoAlarms.visibility = if (adapter.items.isEmpty()) View.VISIBLE else View.GONE
 //                                binding.tvNoAlarms.visibility = if (adapter.items.isEmpty()) View.VISIBLE else View.GONE
-//                            }
-//                        }
+                            }
+                        }
                     }
                     IntentValue.ACTION_DELETE -> {
 //                        adapter.delete(id)
@@ -312,6 +325,45 @@ class MainCalarmFragment : Fragment() {
                 } while (cursor.moveToNext())
             }
 
+        }
+
+        return events
+    }
+
+    private fun getCalendarEventByID(context: Context, id: Long): ArrayList<CalendarEvent> {
+        val events = java.util.ArrayList<CalendarEvent>()
+
+        context.contentResolver.query(
+            CalendarContract.Events.CONTENT_URI,
+            arrayOf(
+                CalendarContract.Events._ID,
+                CalendarContract.Events.CALENDAR_ID,
+                CalendarContract.Events.TITLE,
+                CalendarContract.Events.DESCRIPTION,
+                CalendarContract.Events.DTSTART,
+                CalendarContract.Events.EVENT_TIMEZONE,
+                CalendarContract.Events.DTEND,
+                CalendarContract.Events.EVENT_END_TIMEZONE,
+                CalendarContract.Events.ALL_DAY,
+                CalendarContract.Events.EVENT_COLOR,
+                CalendarContract.Events.EVENT_LOCATION,
+            ), "(( ${CalendarContract.Events._ID} = ${id} ) AND ( deleted != 1 ))", null, CalendarContract.Events.DTSTART)?.use { cursor ->
+            while (cursor.moveToNext()) {
+                val event = CalendarEvent(
+                    cursor.getSafeLong(cursor.getColumnIndex(CalendarContract.Events._ID), 0L),
+                    cursor.getSafeLong(cursor.getColumnIndex(CalendarContract.Events.CALENDAR_ID), 0L),
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.TITLE), ""),
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.DESCRIPTION), ""),
+                    cursor.getSafeLong(cursor.getColumnIndex(CalendarContract.Events.DTSTART), 0L),
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.EVENT_TIMEZONE), ""),
+                    cursor.getSafeLong(cursor.getColumnIndex(CalendarContract.Events.DTEND), 0L),
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.EVENT_END_TIMEZONE), ""),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(CalendarContract.Events.ALL_DAY)) == 1,
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.EVENT_COLOR), "0"),
+                    cursor.getSafeString(cursor.getColumnIndex(CalendarContract.Events.EVENT_LOCATION), ""),
+                )
+                events.add(event)
+            }
         }
 
         return events

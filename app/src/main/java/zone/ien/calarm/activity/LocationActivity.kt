@@ -1,24 +1,21 @@
 package zone.ien.calarm.activity
 
-import android.app.PendingIntent
+import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.location.Address
 import android.location.Geocoder
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.app.NotificationCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -42,12 +39,12 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
     lateinit var lm: LocationManager
     lateinit var locationListener: LocationListener
 
-    var currentLatitude = SharedDefault.HOME_LATITUDE
-    var currentLongitude = SharedDefault.HOME_LONGITUDE
+    var currentLatitude = SharedDefault.HOME_LATITUDE.toDouble()
+    var currentLongitude = SharedDefault.HOME_LONGITUDE.toDouble()
     var currentAddress = ""
 
-    var setLatitude = SharedDefault.HOME_LATITUDE
-    var setLongitude = SharedDefault.HOME_LONGITUDE
+    var setLatitude = SharedDefault.HOME_LATITUDE.toDouble()
+    var setLongitude = SharedDefault.HOME_LONGITUDE.toDouble()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,6 +121,7 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
         map = googleMap
         map.setOnMapClickListener(this)
 
+        var address: List<Address> = listOf()
         val cameraPosition = LatLng(setLatitude, setLongitude)
         val markerOptions = MarkerOptions().apply {
             position(cameraPosition)
@@ -153,7 +151,6 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
         map.clear()
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition, 18.5f))
         map.addMarker(markerOptions)
-        binding.tvAddress.text = currentLocationAddress
     }
 
     override fun onMapClick(latLng: LatLng) {
@@ -161,22 +158,32 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
         val markerOptions = MarkerOptions().apply {
             position(cameraPosition)
         }
-        val address = try {
-            geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+        var address: List<Address> = listOf()
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocation(currentLatitude, currentLongitude, 1) { address = it }
+            } else {
+                address = geocoder.getFromLocation(currentLatitude, currentLongitude, 1) as List<Address>
+            }
         } catch (e: Exception) {
             listOf<Address>()
         }
-        val currentLocationAddress = if (address != null && address.isNotEmpty()) {
-            val firstAddress = address.first().getAddressLine(0).replace(address.first().countryName, "")
-            if (firstAddress.isNotBlank() && firstAddress.first() == ' ') firstAddress.substring(1) else firstAddress
-        } else {
-            getString(R.string.cannot_get_address)
-        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val currentLocationAddress = if (address.isNotEmpty()) {
+                val firstAddress = address.first().getAddressLine(0).replace(address.first().countryName, "")
+                if (firstAddress.isNotBlank() && firstAddress.first() == ' ') firstAddress.substring(1) else firstAddress
+            } else {
+                getString(R.string.cannot_get_address)
+            }
+
+            currentAddress = currentLocationAddress
+            binding.tvAddress.text = currentLocationAddress
+        }, 1000)
 
         map.clear()
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition, 18.5f))
         map.addMarker(markerOptions)
-        binding.tvAddress.text = currentLocationAddress
 
         setLatitude = latLng.latitude
         setLongitude = latLng.longitude
@@ -190,7 +197,7 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             R.id.menu_current_location -> {
                 val cameraPosition = LatLng(currentLatitude, currentLongitude)
@@ -206,13 +213,13 @@ class LocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMa
                 val isGPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 val isNetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION), 0)
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 0)
                 } else {
-                    if (isNetworkEnabled) {
-                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10f, locationListener)
-                    } else if (isGPSEnabled) {
+                    if (isGPSEnabled) {
                         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10f, locationListener)
+                    } else if (isNetworkEnabled) {
+                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10f, locationListener)
                     }
                 }
             }
