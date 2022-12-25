@@ -32,8 +32,18 @@ class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<L
 
         holder.tvLapNo.text = context.getString(R.string.lap_no, itemCount - holder.adapterPosition)
         holder.tvFlag.text = items[holder.adapterPosition].flag
-        holder.tvTimeFull.text = items[holder.adapterPosition].time.let { String.format("%d %02d.%02d", (it / 1000) / 60, (it / 1000) % 60, (it % 1000) / 10) }
-        holder.tvTimeLap.text = (items[holder.adapterPosition].time - (if (holder.adapterPosition != itemCount - 1) items[holder.adapterPosition + 1].time else 0)).let { String.format("%d %02d.%02d", (it / 1000) / 60, (it / 1000) % 60, (it % 1000) / 10) }
+        holder.tvTimeFull.text = items[holder.adapterPosition].time.let {
+            if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+        }
+        holder.tvTimeLap.text = (items[holder.adapterPosition].time - (if (holder.adapterPosition != itemCount - 1) items[holder.adapterPosition + 1].time else 0)).let {
+            if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+        }
     }
 
     fun add(item: StopwatchLapse) {

@@ -5,6 +5,7 @@ import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -38,6 +39,7 @@ import zone.ien.calarm.databinding.ActivityMainBinding
 import zone.ien.calarm.fragment.*
 import zone.ien.calarm.receiver.CalarmCreateReceiver
 import zone.ien.calarm.room.*
+import zone.ien.calarm.service.NotificationListener
 import zone.ien.calarm.utils.MyUtils
 import zone.ien.calarm.utils.MyUtils.Companion.getSafeLong
 import zone.ien.calarm.utils.MyUtils.Companion.getSafeString
@@ -112,12 +114,8 @@ class MainActivity : AppCompatActivity(),
         val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { group ->
             group.forEach {
                 when (it.key) {
-                    Manifest.permission.READ_CALENDAR -> {
-
-                    }
-                    Manifest.permission.POST_NOTIFICATIONS -> {
-
-                    }
+                    Manifest.permission.READ_CALENDAR -> {}
+                    Manifest.permission.POST_NOTIFICATIONS -> {}
                     Manifest.permission.ACCESS_FINE_LOCATION -> {
                         if (sharedPreferences.getBoolean(SharedKey.IS_FIRST_VISIT, true)) {
                             val isGPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -138,6 +136,7 @@ class MainActivity : AppCompatActivity(),
             }
         }
         permissionLauncher.launch(permissions.toTypedArray())
+
 
         binding.bottomNav.setOnItemSelectedListener {
             loadFragment(
@@ -169,8 +168,6 @@ class MainActivity : AppCompatActivity(),
                 }
             }
         }
-
-
     }
 
     private fun loadFragment(fragment: Fragment?): Boolean {

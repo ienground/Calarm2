@@ -11,7 +11,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.CalendarContract
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,11 +26,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import zone.ien.calarm.R
+import zone.ien.calarm.adapter.ChannelIdAdapter
 import zone.ien.calarm.adapter.SelectCalendarParentAdapter
+import zone.ien.calarm.callback.ChannelIdCallback
 import zone.ien.calarm.constant.SharedDefault
 import zone.ien.calarm.constant.SharedKey
 import zone.ien.calarm.constant.SharedValue
 import zone.ien.calarm.data.CalendarObject
+import zone.ien.calarm.databinding.ActivitySettingsBinding
+import zone.ien.calarm.databinding.DialogNotiChannelBinding
 import zone.ien.calarm.databinding.DialogSelectCalendarBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,18 +42,32 @@ import kotlin.collections.ArrayList
 
 class SettingsActivity : AppCompatActivity() {
 
+    lateinit var binding: ActivitySettingsBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_activity)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
+        binding.activity = this
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().replace(R.id.settings, SettingsFragment()).commit()
         }
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
         lateinit var sharedPreferences: SharedPreferences
+        lateinit var notiChannelFilterPreferences: SharedPreferences
         lateinit var geocoder: Geocoder
 
         private lateinit var timeFormat: SimpleDateFormat
@@ -54,8 +75,8 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-
             sharedPreferences = requireContext().getSharedPreferences("${requireContext().packageName}_preferences", Context.MODE_PRIVATE)
+            notiChannelFilterPreferences = requireContext().getSharedPreferences("${requireContext().packageName}_noti_channel", Context.MODE_PRIVATE)
             geocoder = Geocoder(requireContext())
             timeFormat = SimpleDateFormat(requireContext().getString(R.string.apmTimeFormat), Locale.getDefault())
 
@@ -64,6 +85,7 @@ class SettingsActivity : AppCompatActivity() {
             val prefCalarmCreateOption = findPreference<DropDownPreference>(SharedKey.CALARM_CREATE_OPTION)
             val prefFixedTime = findPreference<Preference>(SharedKey.FIXED_TIME)
             val prefReadyTime = findPreference<Preference>(SharedKey.READY_TIME)
+            val prefHiddenNotiChannel = findPreference<Preference>("hidden_noti_channels")
 
             val fixedTimeCalendar = Calendar.getInstance().apply {
                 val time = sharedPreferences.getInt(SharedKey.FIXED_TIME, SharedDefault.FIXED_TIME)
@@ -230,6 +252,38 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 timePicker.show(parentFragmentManager, "READY_TIME_PICKER")
 
+                true
+            }
+
+            prefHiddenNotiChannel?.setOnPreferenceClickListener {
+                MaterialAlertDialogBuilder(requireContext()).apply {
+                    val binding: DialogNotiChannelBinding = DataBindingUtil.inflate(LayoutInflater.from(requireContext()), R.layout.dialog_noti_channel, null, false)
+
+                    var adapter: ChannelIdAdapter? = null
+                    val callback = object: ChannelIdCallback {
+                        override fun delete(position: Int, id: String) {
+                            notiChannelFilterPreferences.edit().remove(id).apply()
+                            adapter?.delete(position)
+
+                            if (adapter?.isEmpty() == true) binding.tvEmpty.visibility = View.VISIBLE
+                        }
+                    }
+                    val channels = ArrayList<Pair<String, String>>()
+                    notiChannelFilterPreferences.all.keys.forEach {
+                        if (!notiChannelFilterPreferences.getBoolean(it, true)) {
+                            val data = it.split("☆")
+                            if (data.size == 2) channels.add(Pair(data.first(), data.last()))
+                        }
+                    }
+                    adapter = ChannelIdAdapter(channels)
+                    binding.list.adapter = adapter.apply { setClickCallback(callback) }
+
+                    setTitle(R.string.hidden_noti_channels)
+
+                    if (channels.isEmpty()) binding.tvEmpty.visibility = View.VISIBLE
+
+                    setView(binding.root)
+                }.show()
                 true
             }
         }

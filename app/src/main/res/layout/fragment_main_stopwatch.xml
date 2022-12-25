@@ -27,7 +27,7 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/tv_hello"
+                    android:id="@+id/sub_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="좋은 아침입니다,"
@@ -35,12 +35,12 @@
                     android:fontFamily="@font/pretendard"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/tv_nickname" />
+                    app:layout_constraintBottom_toTopOf="@id/app_title" />
 
                 <TextView
-                    android:id="@+id/tv_nickname"
+                    android:id="@+id/app_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="아이엔님!"
@@ -49,18 +49,9 @@
                     android:fontFamily="@font/pretendard_black"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
-                    app:layout_constraintTop_toBottomOf="@id/tv_hello"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <ImageView
-                    android:id="@+id/ic_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_icon_color"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/sub_title"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -77,8 +68,8 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintBottom_toTopOf="@id/card_lapse"
             app:progress_background_color="@color/gray"
-            app:progress_end_color="@color/blue"
-            app:progress_start_color="@color/blue"
+            app:progress_end_color="?attr/colorPrimaryVariant"
+            app:progress_start_color="?attr/colorPrimaryVariant"
             app:progress_stroke_cap="round"
             app:progress_stroke_width="10dp"
             app:style="solid_line" />
@@ -172,7 +163,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_lapse"
             android:layout_width="0dp"
@@ -208,6 +198,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="36dp"
+            app:backgroundTint="?attr/colorSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/card_lapse"
@@ -227,6 +218,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="36dp"
+            app:backgroundTint="?attr/colorSecondaryVariant"
             app:layout_constraintEnd_toStartOf="@id/btn_play"
             app:layout_constraintTop_toTopOf="@id/btn_play"
             app:layout_constraintBottom_toBottomOf="@id/btn_play"/>
@@ -235,6 +227,7 @@
             android:id="@+id/btn_lap"
             android:layout_width="64dp"
             android:layout_height="64dp"
+            style="?attr/materialButtonOutlinedStyle"
             android:insetLeft="0dp"
             android:insetTop="0dp"
             android:insetRight="0dp"
@@ -244,9 +237,13 @@
             android:textSize="24sp"
             android:fontFamily="@font/pretendard_black"
             android:visibility="invisible"
+            android:padding="0dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="36dp"
+            app:strokeColor="?attr/colorSecondaryVariant"
+            app:rippleColor="?attr/colorSecondaryVariant"
+            app:strokeWidth="3dp"
             app:layout_constraintStart_toEndOf="@id/btn_play"
             app:layout_constraintTop_toTopOf="@id/btn_play"
             app:layout_constraintBottom_toBottomOf="@id/btn_play"/>

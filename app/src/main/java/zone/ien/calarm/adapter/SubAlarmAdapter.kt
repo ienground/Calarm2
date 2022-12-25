@@ -1,6 +1,7 @@
 package zone.ien.calarm.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.room.SubAlarmEntity
 import zone.ien.calarm.utils.ItemActionListener
 
@@ -50,6 +52,7 @@ class SubAlarmAdapter(var items: ArrayList<SubAlarmEntity>): RecyclerView.Adapte
     }
 
     override fun onItemSwiped(position: Int) {
+        Log.d(TAG, "$position")
         items.removeAt(position)
         notifyItemRemoved(position)
     }

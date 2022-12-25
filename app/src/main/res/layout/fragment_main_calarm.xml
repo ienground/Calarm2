@@ -27,40 +27,31 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/tv_hello"
+                    android:id="@+id/sub_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="좋은 아침입니다,"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/pretendard"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/tv_nickname" />
+                    app:layout_constraintBottom_toTopOf="@id/app_title" />
 
                 <TextView
-                    android:id="@+id/tv_nickname"
+                    android:id="@+id/app_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="아이엔님!"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:fontFamily="@font/pretendard_black"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
-                    app:layout_constraintTop_toBottomOf="@id/tv_hello"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <ImageView
-                    android:id="@+id/ic_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_icon_color"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/sub_title"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -72,6 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/usual_margin"
             android:orientation="horizontal"
+            tools:listitem="@layout/adapter_main_calarm_date"
+            tools:itemCount="1"
             app:deselection="false"
             app:longPress="false"
             app:multiSelection="false"
@@ -84,11 +77,39 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/usual_margin"
+            tools:listitem="@layout/adapter_main_calarm_event"
+            tools:itemCount="2"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_date"
             app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_frame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/usual_margin"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list_date"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/adapter_main_calarm_event_shimmer" />
+                <include layout="@layout/adapter_main_calarm_event_shimmer" />
+                <include layout="@layout/adapter_main_calarm_event_shimmer" />
+                <include layout="@layout/adapter_main_calarm_event_shimmer" />
+                <include layout="@layout/adapter_main_calarm_event_shimmer" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

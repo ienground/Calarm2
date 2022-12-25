@@ -1,5 +1,7 @@
 package zone.ien.calarm.fragment
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -103,13 +105,19 @@ class MainCalarmFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.icIcon.setOnLongClickListener {
-            requireContext().sendBroadcast(Intent(requireContext(), CalarmCreateReceiver::class.java))
-            true
+        binding.subTitle.text = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 6..10 -> getString(R.string.user_hello_morning)
+            in 11..16 -> getString(R.string.user_hello_afternoon)
+            in 17..20 -> getString(R.string.user_hello_evening)
+            else -> getString(R.string.user_hello_night)
         }
 
-        val calendarIdList = getCalendarIdList()
+//        binding.shimmerFrame.startShimmer()
+//        binding.shimmerFrame.visibility = View.VISIBLE
+//        binding.listEvent.visibility = View.INVISIBLE
+//        binding.listEvent.alpha = 0f
 
+        val calendarIdList = getCalendarIdList()
         val calendarViewManager = object: CalendarViewManager {
             override fun setCalendarViewResourceId(position: Int, date: Date, isSelected: Boolean): Int = R.layout.adapter_main_calarm_date
             override fun bindDataToCalendarView(holder: SingleRowCalendarAdapter.CalendarViewHolder, date: Date, position: Int, isSelected: Boolean) {
@@ -182,6 +190,13 @@ class MainCalarmFragment : Fragment() {
                 val events = ArrayList<CalendarEvent>()
                 val datas = ArrayList<CalarmEntity>()
                 val calendar = Calendar.getInstance().apply { time = date }.timeZero()
+
+                binding.shimmerFrame.startShimmer()
+                binding.shimmerFrame.visibility = View.VISIBLE
+                binding.listEvent.visibility = View.INVISIBLE
+                binding.shimmerFrame.alpha = 1f
+                binding.listEvent.alpha = 0f
+
                 GlobalScope.launch(Dispatchers.IO) {
                     for (id in calendarIdList) {
                         if (id.second) {
@@ -201,8 +216,29 @@ class MainCalarmFragment : Fragment() {
                     }
 
                     withContext(Dispatchers.Main) {
+                        delay(1000)
                         adapter = MainCalarmEventAdapter(datas).apply { setClickCallback(alarmListCallback) }
                         binding.listEvent.adapter = adapter
+
+                        binding.shimmerFrame.stopShimmer()
+
+                        ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = 500
+                            addUpdateListener {
+                                binding.listEvent.alpha = it.animatedValue as Float
+                                binding.shimmerFrame.alpha = 1f - it.animatedValue as Float
+                            }
+                            addListener(object: AnimatorListenerAdapter() {
+                                override fun onAnimationStart(animation: Animator) {
+                                    super.onAnimationStart(animation)
+                                    binding.listEvent.visibility = View.VISIBLE
+                                }
+                                override fun onAnimationEnd(animation: Animator) {
+                                    super.onAnimationEnd(animation)
+                                    binding.shimmerFrame.visibility = View.INVISIBLE
+                                }
+                            })
+                        }.start()
                     }
 
                 }
@@ -212,6 +248,14 @@ class MainCalarmFragment : Fragment() {
         }
         val calendarChangesObserver = object: CalendarChangesObserver {}
 
+        var todayDatasCount = 0
+        val today = Calendar.getInstance().timeZero()
+        for (id in calendarIdList) {
+            if (id.second) {
+                todayDatasCount += getCalendarEventByDate(today.time, id.first).size
+            }
+        }
+        binding.appTitle.text = getString(R.string.calarm_event_count, todayDatasCount)
         binding.listDate.apply {
             this.calendarViewManager = calendarViewManager
             this.calendarSelectionManager = calendarSelectionManager

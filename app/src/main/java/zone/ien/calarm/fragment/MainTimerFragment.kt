@@ -48,8 +48,15 @@ class MainTimerFragment : Fragment() {
         binding.fragment = this
 
         setHasOptionsMenu(true)
-//        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
         (requireActivity() as AppCompatActivity).supportActionBar?.title = null
+
+        binding.subTitle.text = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 6..10 -> getString(R.string.user_hello_morning)
+            in 11..16 -> getString(R.string.user_hello_afternoon)
+            in 17..20 -> getString(R.string.user_hello_evening)
+            else -> getString(R.string.user_hello_night)
+        }
 
         return binding.root
     }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Material3.CardView.Filled"
+    android:clickable="true"
+    android:focusable="auto"
+    android:layout_marginBottom="@dimen/usual_margin">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/usual_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#APP_NAME"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_regular"
+            android:layout_marginStart="@dimen/usual_margin"
+            android:layout_marginEnd="@dimen/usual_margin"
+            app:layout_constraintStart_toEndOf="@id/iv_icon"
+            app:layout_constraintEnd_toStartOf="@id/btn_close"
+            app:layout_constraintTop_toTopOf="@id/iv_icon"
+            app:layout_constraintBottom_toBottomOf="@id/iv_icon" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#TITLE"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_regular"
+            android:layout_marginTop="@dimen/usual_margin"
+            android:layout_marginEnd="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="@id/tv_app_name"
+            app:layout_constraintEnd_toStartOf="@id/btn_close"
+            app:layout_constraintTop_toBottomOf="@id/iv_icon"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_close"
+            android:layout_width="36dp"
+            android:layout_height="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            app:iconPadding="0dp"
+            app:iconGravity="textStart"
+            app:iconSize="24dp"
+            app:icon="@drawable/ic_close"
+            app:backgroundTint="@color/red"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_app_name"
+            app:layout_constraintBottom_toBottomOf="@id/tv_title" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

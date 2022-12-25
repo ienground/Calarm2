@@ -18,5 +18,6 @@ class SharedKey {
         const val LAST_EMOJI = "last_emoji"
         const val IS_STOPWATCH_SCHEDULED = "is_stopwatch_scheduled"
         const val STOPWATCH_SCHEDULED_TIME = "stopwatch_scheduled_time"
+        const val NO_SHOW_STOPWATCH_RESET_DIALOG = "no_show_stopwatch_reset_dialog"
     }
 }

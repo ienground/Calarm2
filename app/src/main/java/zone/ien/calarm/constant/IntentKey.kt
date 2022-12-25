@@ -17,5 +17,13 @@ class IntentKey {
         const val IS_FINISHED = "isFinished"
         const val LAP_FLAG = "lap_flag"
         const val LAP_TIME = "lap_time"
+
+        // Deskclock
+        const val LISTENER_READY = "listener_ready"
+        const val MEDIA_CHANGE = "media_change"
+        const val NOTIFICATION_ADD = "notification_add"
+        const val NOTIFICATION_REMOVE = "notification_remove"
+        const val NOTIFICATION_INIT = "notification_init"
+        const val KEY = "key"
     }
 }

@@ -11,5 +11,6 @@ class SharedDefault {
         const val READY_TIME = 60
         const val LAST_EMOJI = "‍🏁.🚩.🏳️.🏴.🔑.📱.💎.💿"
         const val IS_STOPWATCH_SCHEDULED = false
+        const val NO_SHOW_STOPWATCH_RESET_DIALOG = false
     }
 }

@@ -161,7 +161,6 @@ class MyUtils {
         }
 
         fun setCalarmClock(context: Context, am: AlarmManager, calarm : CalarmEntity): Calendar {
-            val now = Calendar.getInstance()
             val calendar = Calendar.getInstance().apply { timeInMillis = calarm.time }
             val calarmIntent = Intent(context, CalarmReceiver::class.java).apply {
                 action = ActionKey.TIMER_ALARM

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Material3.CardView.Elevated"
+    android:clickable="true"
+    android:focusable="auto"
+    android:layout_marginBottom="@dimen/usual_margin">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/usual_margin">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_background"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@color/purple"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_icon"
+            app:tint="@color/white"
+            app:layout_constraintStart_toStartOf="@id/iv_background"
+            app:layout_constraintEnd_toEndOf="@id/iv_background"
+            app:layout_constraintTop_toTopOf="@id/iv_background"
+            app:layout_constraintBottom_toBottomOf="@id/iv_background"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#APP_NAME"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_regular"
+            android:layout_marginHorizontal="@dimen/usual_margin"
+            app:layout_constraintStart_toEndOf="@id/iv_background"
+            app:layout_constraintEnd_toStartOf="@id/chip_time"
+            app:layout_constraintTop_toTopOf="@id/iv_background"
+            app:layout_constraintBottom_toBottomOf="@id/iv_background" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:00 PM"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_background"
+            app:layout_constraintBottom_toBottomOf="@id/iv_background"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#TITLE"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:layout_marginTop="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="@id/tv_app_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_icon" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#CONTENT"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_regular"
+            app:layout_constraintStart_toStartOf="@id/tv_app_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

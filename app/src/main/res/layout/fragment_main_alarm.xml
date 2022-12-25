@@ -27,40 +27,31 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/tv_hello"
+                    android:id="@+id/sub_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="좋은 아침입니다,"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/pretendard"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/tv_nickname" />
+                    app:layout_constraintBottom_toTopOf="@id/app_title" />
 
                 <TextView
-                    android:id="@+id/tv_nickname"
+                    android:id="@+id/app_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     tools:text="아이엔님!"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:fontFamily="@font/pretendard_black"
                     android:layout_marginEnd="@dimen/usual_margin"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ic_icon"
-                    app:layout_constraintTop_toBottomOf="@id/tv_hello"
-                    app:layout_constraintBottom_toBottomOf="parent" />
-
-                <ImageView
-                    android:id="@+id/ic_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_icon_color"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/sub_title"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -72,6 +63,7 @@
             android:layout_height="128dp"
             android:src="@drawable/ic_alarm_off"
             android:alpha="0.4"
+            android:visibility="gone"
             app:tint="@color/white"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,6 +80,7 @@
             android:textColor="@color/white"
             android:fontFamily="@font/pretendard"
             android:alpha="0.4"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ic_no_alarms"
@@ -99,10 +92,39 @@
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/usual_margin"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/adapter_main_alarm_list"
+            tools:itemCount="2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_frame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            android:layout_marginTop="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+                <include layout="@layout/adapter_main_alarm_list_shimmer" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/btn_add"

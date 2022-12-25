@@ -8,14 +8,15 @@ import android.app.PendingIntent
 import android.content.*
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.os.persistableBundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -23,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.SettingsActivity
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.adapter.LapseAdapter
 import zone.ien.calarm.constant.IntentID
 import zone.ien.calarm.constant.IntentKey
@@ -35,7 +37,6 @@ import zone.ien.calarm.service.StopwatchService
 import zone.ien.calarm.utils.MyUtils.Companion.dpToPx
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainStopwatchFragment : Fragment() {
@@ -51,6 +52,10 @@ class MainStopwatchFragment : Fragment() {
     private lateinit var dateTimeFormat: SimpleDateFormat
     private var scheduledTime: Long = System.currentTimeMillis()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_stopwatch, container, false)
@@ -70,27 +75,43 @@ class MainStopwatchFragment : Fragment() {
         am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         dateTimeFormat = SimpleDateFormat(getString(R.string.dateTimeFormat), Locale.getDefault())
 
+        binding.subTitle.text = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 6..10 -> getString(R.string.user_hello_morning)
+            in 11..16 -> getString(R.string.user_hello_afternoon)
+            in 17..20 -> getString(R.string.user_hello_evening)
+            else -> getString(R.string.user_hello_night)
+        }
+
         binding.cardSchedule.isChecked = sharedPreferences.getBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, SharedDefault.IS_STOPWATCH_SCHEDULED)
         if (binding.cardSchedule.isChecked) {
             scheduledTime = sharedPreferences.getLong(SharedKey.STOPWATCH_SCHEDULED_TIME, System.currentTimeMillis())
             binding.tvAlarm.text = dateTimeFormat.format(Date(scheduledTime))
+            binding.btnPlay.isEnabled = false
         }
         binding.progress.setProgressFormatter { _, _ -> "" }
         binding.progress.max = 2000
         binding.btnLap.text = (sharedPreferences.getString(SharedKey.LAST_EMOJI, SharedDefault.LAST_EMOJI) ?: SharedDefault.LAST_EMOJI).split(".").first()
 
         binding.btnReset.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setTitle(R.string.delete_title)
-                setMessage(R.string.delete_content)
+            if (sharedPreferences.getBoolean(SharedKey.NO_SHOW_STOPWATCH_RESET_DIALOG, SharedDefault.NO_SHOW_STOPWATCH_RESET_DIALOG)) {
+                requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
+            } else {
+                MaterialAlertDialogBuilder(requireContext()).apply {
+                    setTitle(R.string.delete_title)
+                    val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_reset, LinearLayout(requireContext()), false)
+                    val checkbox: MaterialCheckBox = dialogView.findViewById(R.id.checkbox)
 
-                setPositiveButton(android.R.string.ok) { dialog, id ->
-                    requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
-                }
-                setNegativeButton(android.R.string.cancel) { dialog, id ->
-                    dialog.dismiss()
-                }
-            }.show()
+                    setView(dialogView)
+
+                    setPositiveButton(android.R.string.ok) { dialog, id ->
+                        requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
+                        sharedPreferences.edit().putBoolean(SharedKey.NO_SHOW_STOPWATCH_RESET_DIALOG, checkbox.isChecked).apply()
+                    }
+                    setNegativeButton(android.R.string.cancel) { dialog, id ->
+                        dialog.dismiss()
+                    }
+                }.show()
+            }
         }
         binding.btnLap.setOnClickListener {
             requireContext().sendBroadcast(Intent(IntentID.LAP_STOPWATCH).apply {
@@ -141,6 +162,7 @@ class MainStopwatchFragment : Fragment() {
                 binding.cardSchedule.isChecked = false
                 binding.tvAlarm.text = getString(R.string.tap_to_schedule_stopwatch)
                 sharedPreferences.edit().putBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, false).apply()
+                binding.btnPlay.isEnabled = true
                 val pendingIntent = PendingIntent.getService(requireContext(), 1, Intent(requireContext(), StopwatchService::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 am.cancel(pendingIntent)
             } else {
@@ -254,8 +276,7 @@ class MainStopwatchFragment : Fragment() {
                     }.start()
 
                     isStopwatchRunning = true
-                } else {
-
+                    requireActivity().invalidateMenu()
                 }
             }
         }, IntentFilter(IntentID.STOPWATCH_TICK))
@@ -312,6 +333,7 @@ class MainStopwatchFragment : Fragment() {
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.hour)
                 calendar.set(Calendar.MINUTE, timePicker.minute)
                 binding.cardSchedule.isChecked = true
+                binding.btnPlay.isEnabled = false
                 scheduledTime = calendar.timeInMillis
                 binding.tvAlarm.text = dateTimeFormat.format(calendar.time)
 
@@ -350,7 +372,8 @@ class MainStopwatchFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(R.menu.menu_main_stopwatch, menu)
+        menu.findItem(R.id.menu_share)?.isVisible = isStopwatchRunning
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
@@ -358,6 +381,36 @@ class MainStopwatchFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_settings -> {
                 startActivity(Intent(requireContext(), SettingsActivity::class.java))
+            }
+            R.id.menu_share -> {
+                val builder = StringBuilder()
+                builder.append(getString(R.string.share_stopwatch_title, time.let {
+                    if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                    else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                    else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                    else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                }))
+
+                adapter.items.reversed().forEachIndexed { index, stopwatchLapse ->
+                    Log.d(TAG, "items[$index] = ${stopwatchLapse}")
+                    builder.append("${index + 1} ${stopwatchLapse.flag} ${(if (index == 0) stopwatchLapse.time else stopwatchLapse.time - adapter.items.reversed()[index - 1].time).let {
+                        if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                    }} | ${stopwatchLapse.time.let {
+                        if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                        else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+                    }}\n")
+                }
+                builder.append(getString(R.string.share_stopwatch_end, adapter.itemCount))
+
+                val sharingIntent = Intent(Intent.ACTION_SEND)
+                sharingIntent.type = "text/html"
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, builder.toString())
+                startActivity(Intent.createChooser(sharingIntent, getString(R.string.share)))
             }
         }
         return super.onOptionsItemSelected(item)

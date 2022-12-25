@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import zone.ien.calarm.activity.TAG
+import zone.ien.calarm.adapter.NotificationAdapter
 import zone.ien.calarm.adapter.SubAlarmAdapter
 import zone.ien.calarm.adapter.SubCalarmAdapter
 import zone.ien.calarm.adapter.SubTimerAdapter
@@ -15,7 +16,10 @@ class ItemTouchHelperCallback(private val listener: ItemActionListener): ItemTou
         val dragFlags = ItemTouchHelper.DOWN or ItemTouchHelper.UP
         val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
 
-        return makeMovementFlags(0, if (viewHolder is SubTimerAdapter.ItemViewHolder || viewHolder is SubAlarmAdapter.ItemViewHolder || viewHolder is SubCalarmAdapter.ItemViewHolder) swipeFlags else 0)
+        return makeMovementFlags(0, when (viewHolder) {
+            is SubTimerAdapter.ItemViewHolder, is SubAlarmAdapter.ItemViewHolder, is SubCalarmAdapter.ItemViewHolder, is NotificationAdapter.ItemViewHolder -> swipeFlags
+            else -> 0
+        })
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean { return false }
