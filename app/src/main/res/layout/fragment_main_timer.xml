@@ -43,7 +43,7 @@
                     android:id="@+id/app_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    tools:text="아이엔님!"
+                    android:text="@string/timer"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:fontFamily="@font/pretendard_black"

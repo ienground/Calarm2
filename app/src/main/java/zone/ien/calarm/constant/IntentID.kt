@@ -9,6 +9,7 @@ class IntentID {
         const val COUNTDOWN_TICK_TIMEOUT = "countdown_tick_timeout"
         const val PLAY_PAUSE_TIMER = "play_pause_timer"
         const val PLAY_PAUSE_STOPWATCH = "play_pause_stopwatch"
+        const val PLAY_PAUSE_STOPWATCH_RESULT = "play_pause_stopwatch_result"
         const val STOP_TIMER = "stop_timer"
         const val STOP_STOPWATCH = "stop_stopwatch"
         const val LAP_STOPWATCH = "lap_stopwatch"

@@ -31,7 +31,6 @@ class StopwatchService : Service() {
 
     lateinit var nm: NotificationManager
 
-    private var time = 0L
     private var duration = 0L
 
     private var timerNotification: NotificationCompat.Builder? = null
@@ -42,18 +41,24 @@ class StopwatchService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.cancel(NotificationID.CALARM_STOPWATCH)
         timer?.cancel()
+        time = 0L
         isPaused = true
-        lapses = arrayListOf()
+        isRunning = false
+        lapses.clear()
         sharedPreferences.edit().putBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, false).apply()
 
         sendBroadcast(Intent(IntentID.STOP_STOPWATCH))
+
+        Log.d(TAG, "onDestroy ${lapses}")
+
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent): IBinder? = null
@@ -62,7 +67,7 @@ class StopwatchService : Service() {
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(NotificationChannel(ChannelID.STOPWATCH_ID, getString(R.string.stopwatch), NotificationManager.IMPORTANCE_DEFAULT))
         sharedPreferences = getSharedPreferences("${packageName}_preferences", Context.MODE_PRIVATE)
-        playPausePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(IntentID.PLAY_PAUSE_TIMER), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        playPausePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(IntentID.PLAY_PAUSE_STOPWATCH), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         duration = intent?.getLongExtra(IntentKey.DURATION, 0L) ?: 0L
         stopwatchStart()
@@ -71,6 +76,7 @@ class StopwatchService : Service() {
         registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 isPaused = !isPaused
+                Log.d(TAG, "$isPaused")
                 if (isPaused) {
                     timer?.cancel()
                     timerNotification?.clearActions()
@@ -84,6 +90,8 @@ class StopwatchService : Service() {
                     timerNotification?.setSmallIcon(R.drawable.ic_timer)
                     nm.notify(NotificationID.CALARM_STOPWATCH, timerNotification?.build())
                 }
+
+                sendBroadcast(Intent(IntentID.PLAY_PAUSE_STOPWATCH_RESULT))
             }
         }, IntentFilter(IntentID.PLAY_PAUSE_STOPWATCH))
 
@@ -126,6 +134,7 @@ class StopwatchService : Service() {
                         })
                         setContentText("J")
                         setSmallIcon(R.drawable.ic_timer)
+                        setOnlyAlertOnce(true)
                         setShowWhen(false)
                     }
 
@@ -140,8 +149,10 @@ class StopwatchService : Service() {
     }
 
     companion object {
+        var isRunning = false
         var isPaused = false
         var lapses: ArrayList<StopwatchLapse> = arrayListOf()
+        var time = 0L
     }
 
 

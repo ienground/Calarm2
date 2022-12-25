@@ -1,6 +1,7 @@
 package zone.ien.calarm.utils
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -14,6 +15,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.TypedValue
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.constant.ActionKey
@@ -26,6 +28,7 @@ import java.util.*
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+
 
 class MyUtils {
     companion object {
@@ -209,7 +212,7 @@ class MyUtils {
             return if (difference >= 60 * 1000L) context.getString(R.string.alarm_toast_format, timeBuilder.toString()) else context.getString(R.string.alarm_toast_min)
         }
 
-        fun timeToText(context: Context, data: ArrayList<Int>, color: Int, textSize1: Int = 42, textSize2: Int = 24): SpannableStringBuilder {
+        fun timeToText(context: Context, data: ArrayList<Int>, color: Int, textSize1: Int = 36, textSize2: Int = 24): SpannableStringBuilder {
             val nums: MutableList<Int> = mutableListOf()
             val dataSize = data.size
             for (i in 0 until 6 - data.size) nums.add(0)

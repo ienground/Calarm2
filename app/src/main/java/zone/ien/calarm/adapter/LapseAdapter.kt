@@ -17,6 +17,7 @@ import zone.ien.calarm.data.StopwatchLapse
 class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<LapseAdapter.ItemViewHolder>() {
 
     lateinit var context: Context
+    var time: Long = 0L
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         context = parent.context
@@ -33,15 +34,15 @@ class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<L
         holder.tvLapNo.text = context.getString(R.string.lap_no, itemCount - holder.adapterPosition)
         holder.tvFlag.text = items[holder.adapterPosition].flag
         holder.tvTimeFull.text = items[holder.adapterPosition].time.let {
-            if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
-            else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
-            else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            if (time >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (time >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (time >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
             else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
         }
         holder.tvTimeLap.text = (items[holder.adapterPosition].time - (if (holder.adapterPosition != itemCount - 1) items[holder.adapterPosition + 1].time else 0)).let {
-            if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
-            else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
-            else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            if (time >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (time / 1000) % 60, (it % 1000) / 10)
+            else if (time >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
+            else if (time >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
             else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
         }
     }
@@ -50,6 +51,31 @@ class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<L
         items.add(0, item)
         notifyItemInserted(0)
         if (itemCount > 1) notifyItemChanged(1)
+    }
+
+    fun update(item: StopwatchLapse) {
+        items[0] = item
+        notifyItemChanged(0)
+        time = item.time
+
+        if (getTimeSection(time) != getTimeSection(items[1].time)) {
+            notifyItemRangeChanged(1, itemCount - 1)
+        }
+    }
+
+    private fun getTimeSection(i: Long) : Int {
+        return if (i >= 60 * 60 * 10 * 1000) 0
+        else if (i >= 60 * 60 * 1000) 1
+        else if (i >= 60 * 10 * 1000) 2
+        else 3
+    }
+
+    fun isEmpty(): Boolean = items.isEmpty()
+
+    fun clear() {
+        val size = itemCount
+        items.clear()
+        notifyItemRangeRemoved(0, size)
     }
 
     inner class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

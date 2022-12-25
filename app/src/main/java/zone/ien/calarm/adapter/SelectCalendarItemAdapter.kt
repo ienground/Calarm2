@@ -34,7 +34,7 @@ class SelectCalendarItemAdapter(var parentChecked: Boolean, var items: ArrayList
         holder.switchCalendar.setOnCheckedChangeListener { compoundButton, b ->
             sharedPreferences.edit().putBoolean("calendar_id_${items[holder.adapterPosition].id}", b).apply()
         }
-        holder.itemView.setOnClickListener { holder.switchCalendar.toggle() }
+        holder.itemView.setOnClickListener { if (parentChecked) holder.switchCalendar.toggle() }
     }
 
     override fun getItemCount(): Int = items.size

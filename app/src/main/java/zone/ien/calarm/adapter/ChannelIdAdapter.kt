@@ -26,6 +26,7 @@ import zone.ien.calarm.R
 import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.callback.ChannelIdCallback
 import zone.ien.calarm.callback.NotificationCallback
+import zone.ien.calarm.constant.ChannelID
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,7 +70,6 @@ class ChannelIdAdapter(var items: ArrayList<Pair<String, String>>): RecyclerView
         holder.title.text = items[holder.adapterPosition].second
 
         holder.btnClose.setOnClickListener {
-            Log.d(TAG, "${callbackListener}")
             callbackListener?.delete(holder.adapterPosition, "${items[holder.adapterPosition].first}☆${items[holder.adapterPosition].second}")
         }
 

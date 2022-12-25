@@ -136,6 +136,8 @@
             android:elevation="0dp"
             android:stateListAnimator="@null"
             app:icon="@drawable/ic_add_alarm"
+            app:backgroundTint="?attr/colorSecondary"
+            app:rippleColor="?attr/colorSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

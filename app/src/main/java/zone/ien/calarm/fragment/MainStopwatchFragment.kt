@@ -52,6 +52,11 @@ class MainStopwatchFragment : Fragment() {
     private lateinit var dateTimeFormat: SimpleDateFormat
     private var scheduledTime: Long = System.currentTimeMillis()
 
+    private var lapStopwatchResultReceiver: BroadcastReceiver? = null
+    private var stopStopwatchReceiver: BroadcastReceiver? = null
+    private var stopwatchTickReceiver: BroadcastReceiver? = null
+    private var playPauseStopwatchReceiver: BroadcastReceiver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -82,6 +87,37 @@ class MainStopwatchFragment : Fragment() {
             else -> getString(R.string.user_hello_night)
         }
 
+        val progressAnimator: ValueAnimator = ValueAnimator.ofInt(500, 0)
+
+        if (StopwatchService.isRunning) {
+            if (StopwatchService.lapses.isNotEmpty()) {
+                time = StopwatchService.time
+                adapter = LapseAdapter(StopwatchService.lapses)
+                binding.cardLapse.layoutParams = binding.cardLapse.layoutParams.apply { height = dpToPx(requireContext(), 200f) }
+                binding.cardLapse.visibility = View.VISIBLE
+                binding.progress.max = adapter.items.last().time.toInt()
+
+                progressAnimator.let {
+                    it.setIntValues(0, adapter.items.last().time.toInt())
+                    it.duration = adapter.items.last().time
+                    it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
+                    it.addUpdateListener {
+                        binding.progress.progress = (it.animatedValue as Int)
+                    }
+                    it.repeatMode = ValueAnimator.RESTART
+                }
+                progressAnimator.currentPlayTime = time - adapter.items[1].time
+                progressAnimator.start()
+
+//                if (StopwatchService.isPaused) {
+//                    progressAnimator.pause()
+//                    binding.btnPlay.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_play_arrow)
+//                } else {
+//                    binding.btnPlay.layoutParams = binding.btnPlay.layoutParams.apply { width = dpToPx(requireContext(), 120f) }
+//                }
+            }
+        }
+
         binding.cardSchedule.isChecked = sharedPreferences.getBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, SharedDefault.IS_STOPWATCH_SCHEDULED)
         if (binding.cardSchedule.isChecked) {
             scheduledTime = sharedPreferences.getLong(SharedKey.STOPWATCH_SCHEDULED_TIME, System.currentTimeMillis())
@@ -89,12 +125,12 @@ class MainStopwatchFragment : Fragment() {
             binding.btnPlay.isEnabled = false
         }
         binding.progress.setProgressFormatter { _, _ -> "" }
-        binding.progress.max = 2000
         binding.btnLap.text = (sharedPreferences.getString(SharedKey.LAST_EMOJI, SharedDefault.LAST_EMOJI) ?: SharedDefault.LAST_EMOJI).split(".").first()
 
         binding.btnReset.setOnClickListener {
             if (sharedPreferences.getBoolean(SharedKey.NO_SHOW_STOPWATCH_RESET_DIALOG, SharedDefault.NO_SHOW_STOPWATCH_RESET_DIALOG)) {
                 requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
+                (binding.list.adapter as LapseAdapter).clear()
             } else {
                 MaterialAlertDialogBuilder(requireContext()).apply {
                     setTitle(R.string.delete_title)
@@ -105,6 +141,7 @@ class MainStopwatchFragment : Fragment() {
 
                     setPositiveButton(android.R.string.ok) { dialog, id ->
                         requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
+                        (binding.list.adapter as LapseAdapter).clear()
                         sharedPreferences.edit().putBoolean(SharedKey.NO_SHOW_STOPWATCH_RESET_DIALOG, checkbox.isChecked).apply()
                     }
                     setNegativeButton(android.R.string.cancel) { dialog, id ->
@@ -170,9 +207,7 @@ class MainStopwatchFragment : Fragment() {
             }
         }
 
-        val progressAnimator: ValueAnimator = ValueAnimator.ofInt(500, 0)
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        lapStopwatchResultReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val flag = intent.getStringExtra(IntentKey.LAP_FLAG) ?: ""
                 val time = intent.getLongExtra(IntentKey.LAP_TIME, 0)
@@ -180,7 +215,7 @@ class MainStopwatchFragment : Fragment() {
                     binding.cardLapse.visibility = View.VISIBLE
                     ValueAnimator.ofFloat(dpToPx(context, 0.1f).toFloat(), dpToPx(context, 200f).toFloat()).apply {
                         duration = 200
-                        interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.accelerate_decelerate_interpolator)
+                        interpolator = AnimationUtils.loadInterpolator(binding.cardLapse.context, android.R.anim.accelerate_decelerate_interpolator)
                         addUpdateListener {
                             binding.cardLapse.layoutParams = binding.cardLapse.layoutParams.apply { height = (it.animatedValue as Float).toInt() }
                         }
@@ -191,22 +226,23 @@ class MainStopwatchFragment : Fragment() {
                     progressAnimator.let {
                         it.setIntValues(0, time.toInt())
                         it.duration = time
-                        it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
+                        it.interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.linear_interpolator)
                         it.addUpdateListener {
                             binding.progress.progress = (it.animatedValue as Int)
                         }
                         it.repeatMode = ValueAnimator.RESTART
                     }
                     progressAnimator.start()
+                    adapter.add(StopwatchLapse(flag, time))
                 }
                 adapter.add(StopwatchLapse(flag, time))
                 binding.list.smoothScrollToPosition(0)
                 binding.progress.progress = 0
+
                 progressAnimator.start()
             }
-        }, IntentFilter(IntentID.LAP_STOPWATCH_RESULT))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        stopStopwatchReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 isStopwatchRunning = false
                 time = 0
@@ -220,7 +256,7 @@ class MainStopwatchFragment : Fragment() {
 
                 binding.btnPlay.icon = ContextCompat.getDrawable(context, R.drawable.ic_play_arrow)
                 if (binding.btnPlay.layoutParams.width == dpToPx(context, 120f)) {
-                    ValueAnimator.ofInt(dpToPx(requireContext(), 120f), dpToPx(context, 80f)).apply {
+                    ValueAnimator.ofInt(dpToPx(context, 120f), dpToPx(context, 80f)).apply {
                         interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.accelerate_decelerate_interpolator)
                         addUpdateListener {
                             duration = 300
@@ -245,9 +281,8 @@ class MainStopwatchFragment : Fragment() {
                     }.start()
                 }
             }
-        }, IntentFilter(IntentID.STOP_STOPWATCH))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        stopwatchTickReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 time = intent.getLongExtra(IntentKey.COUNTDOWN_TIME, 0)
                 binding.tvTimeMilli.text = String.format("%02d", (time % 1000) / 10)
@@ -259,6 +294,7 @@ class MainStopwatchFragment : Fragment() {
                     }
                     else String.format("%02d", it % 60)
                 }
+                if (::adapter.isInitialized && !adapter.isEmpty()) adapter.update(StopwatchLapse(binding.btnLap.text.toString(), time))
                 if (!isStopwatchRunning) {
                     StopwatchService.isPaused = false
                     adapter = LapseAdapter(StopwatchService.lapses)
@@ -276,15 +312,14 @@ class MainStopwatchFragment : Fragment() {
                     }.start()
 
                     isStopwatchRunning = true
-                    requireActivity().invalidateMenu()
+                    if (activity != null) requireActivity().invalidateMenu()
                 }
             }
-        }, IntentFilter(IntentID.STOPWATCH_TICK))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        playPauseStopwatchReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                binding.btnPlay.icon = ContextCompat.getDrawable(context, if (StopwatchService.isPaused) R.drawable.ic_pause else R.drawable.ic_play_arrow)
-                if (StopwatchService.isPaused) {
+                binding.btnPlay.icon = ContextCompat.getDrawable(context, if (!StopwatchService.isPaused) R.drawable.ic_pause else R.drawable.ic_play_arrow)
+                if (!StopwatchService.isPaused) {
                     progressAnimator.resume()
                     binding.btnLap.visibility = View.VISIBLE
                     ValueAnimator.ofInt(dpToPx(context, 80f), dpToPx(context, 120f)).apply {
@@ -306,7 +341,12 @@ class MainStopwatchFragment : Fragment() {
                     }.start()
                 }
             }
-        }, IntentFilter(IntentID.PLAY_PAUSE_STOPWATCH))
+        }
+
+        requireContext().registerReceiver(lapStopwatchResultReceiver, IntentFilter(IntentID.LAP_STOPWATCH_RESULT))
+        requireContext().registerReceiver(stopStopwatchReceiver, IntentFilter(IntentID.STOP_STOPWATCH))
+        requireContext().registerReceiver(stopwatchTickReceiver, IntentFilter(IntentID.STOPWATCH_TICK))
+        requireContext().registerReceiver(playPauseStopwatchReceiver, IntentFilter(IntentID.PLAY_PAUSE_STOPWATCH_RESULT))
     }
 
     private fun getDatePickerDialog(): MaterialDatePicker<Long> {
@@ -368,6 +408,10 @@ class MainStopwatchFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
+        (mListener as Context).unregisterReceiver(lapStopwatchResultReceiver)
+        (mListener as Context).unregisterReceiver(stopStopwatchReceiver)
+        (mListener as Context).unregisterReceiver(stopwatchTickReceiver)
+        (mListener as Context).unregisterReceiver(playPauseStopwatchReceiver)
         mListener = null
     }
 
@@ -392,8 +436,7 @@ class MainStopwatchFragment : Fragment() {
                 }))
 
                 adapter.items.reversed().forEachIndexed { index, stopwatchLapse ->
-                    Log.d(TAG, "items[$index] = ${stopwatchLapse}")
-                    builder.append("${index + 1} ${stopwatchLapse.flag} ${(if (index == 0) stopwatchLapse.time else stopwatchLapse.time - adapter.items.reversed()[index - 1].time).let {
+                    if (index != adapter.items.lastIndex) builder.append("${index + 1} ${stopwatchLapse.flag} ${(if (index == 0) stopwatchLapse.time else stopwatchLapse.time - adapter.items.reversed()[index - 1].time).let {
                         if (it >= 60 * 60 * 10 * 1000) String.format("%02d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
                         else if (it >= 60 * 60 * 1000) String.format("%d %02d %02d.%02d", (it / 1000) / (60 * 60), (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
                         else if (it >= 60 * 10 * 1000) String.format("%02d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
@@ -405,7 +448,7 @@ class MainStopwatchFragment : Fragment() {
                         else String.format("%d %02d.%02d", (it / 1000 % (60 * 60)) / 60, (it / 1000) % 60, (it % 1000) / 10)
                     }}\n")
                 }
-                builder.append(getString(R.string.share_stopwatch_end, adapter.itemCount))
+                builder.append(getString(R.string.share_stopwatch_end, adapter.itemCount - 1))
 
                 val sharingIntent = Intent(Intent.ACTION_SEND)
                 sharingIntent.type = "text/html"

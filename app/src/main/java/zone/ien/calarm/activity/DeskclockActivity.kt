@@ -286,9 +286,9 @@ class DeskclockActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
         outState.putString(SavedInstanceExtra.TITLE, binding.tvMediaTitle.text.toString())
         outState.putString(SavedInstanceExtra.ARTIST, binding.tvMediaArtist.text.toString())
+        super.onSaveInstanceState(outState)
     }
 
     private fun sendButton(keycode: Int) {

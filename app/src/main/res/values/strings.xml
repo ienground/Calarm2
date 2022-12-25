@@ -10,12 +10,12 @@
 
     <!--Overall Using-->
     <string name="save">Save</string>
-    <string name="time_format_before_hour_minute">%1$d시간 %2$d분 전</string>
-    <string name="time_format_before_hour">%1$d시간 전</string>
-    <string name="time_format_before_minute">%1$d분 전</string>
-    <string name="time_format_hour_minute">%1$d시간 %2$d분</string>
-    <string name="time_format_hour">%1$d시간</string>
-    <string name="time_format_minute">%1$d분</string>
+    <string name="time_format_before_hour_minute">%1$d hours %2$d minutes before</string>
+    <string name="time_format_before_hour">%1$d hours before</string>
+    <string name="time_format_before_minute">%1$d minutes before</string>
+    <string name="time_format_hour_minute">%1$d hours %2$d minutes</string>
+    <string name="time_format_hour">%1$d hours</string>
+    <string name="time_format_minute">%1$d minutes</string>
     <string name="sub_alarm_dialog_title">minutes before</string>
     <string name="delete">Delete</string>
     <string name="delete_title">Delete?</string>
@@ -40,6 +40,8 @@
     <string name="user_hello_afternoon">Have a great lunch🍽️</string>
     <string name="user_hello_evening">Good evening🎆</string>
     <string name="user_hello_night">Sleep tight🌙</string>
+    <string name="no_show_dialog_msg">Do not show this dialog again.</string>
+    <string name="share">Share</string>
 
     <!--SettingsActivity-->
     <string name="home_address">Home address</string>
@@ -52,6 +54,10 @@
     <string name="calendar_source_of_calarm">Calendar source of Calarm</string>
     <string name="select_calendar">Select calendar..</string>
     <string name="time_to_go_out">Time to get ready to go out</string>
+    <string name="stopwatch_settings">Stopwatch Settings</string>
+    <string name="title_no_show_reset_dialog">Do not show reset dialog</string>
+    <string name="sum_on_no_show_reset_dialog">Never shows reset dialog again.</string>
+    <string name="sum_off_no_show_reset_dialog">Shows reset dialog.</string>
 
     <!--LocationActivity-->
     <string name="cannot_get_address">Cannot get address</string>
@@ -73,6 +79,7 @@
 
     <!--MainCalarmFragment-->
     <string name="calarm_event_count">You have %1$d events today</string>
+    <string name="set_today">Set date today</string>
 
     <!--MainTimerFragment-->
     <string name="add_new_timer">Add new timer</string>
@@ -81,6 +88,9 @@
 
     <!--MainStopwatchFragment-->
     <string name="tap_to_schedule_stopwatch">Tap to schedule stopwatch</string>
+    <string name="lap_no">Lap %1$d</string>
+    <string name="share_stopwatch_title">⏱️ %s Record!\n</string>
+    <string name="share_stopwatch_end">Recorded %d laps on Calarm</string>
 
     <!--EditActivity-->
     <string name="sun">Sun</string>
@@ -117,23 +127,13 @@
 
     <!--MainCalarmEventAdapter-->
     <string name="no_sub_calarms">No sub calarms</string>
-    <string name="lap_no">Lap %1$d</string>
-    <string name="no_show_dialog_msg">Do not show this dialog again.</string>
-    <string name="stopwatch_settings">Stopwatch Settings</string>
-    <string name="title_no_show_reset_dialog">Do not show reset dialog</string>
-    <string name="sum_on_no_show_reset_dialog">Never shows reset dialog again.</string>
-    <string name="sum_off_no_show_reset_dialog">Shows reset dialog.</string>
-    <string name="share">Share</string>
-    <string name="set_today">Set date today</string>
-    <string name="share_stopwatch_title">⏱️ %s Record!\n</string>
-    <string name="share_stopwatch_end">Recorded %d laps on Calarm</string>
 
     <!--DeskclockActivity-->
-    <string name="charging">%1$d%%, 충전 중</string>
-    <string name="block_notification">이 알림 차단</string>
-    <string name="block_channel_message">이 알림과 같은 채널에 대한 알림을 띄우지 않습니다.</string>
-    <string name="block_package_message">이 알림과 같은 어플리케이션에 대한 알림을 띄우지 않습니다.</string>
-    <string name="notification_access_setting">알림 액세스 설정</string>
+    <string name="charging">%1$d%%, Charging</string>
+    <string name="block_notification">Block this notification</string>
+    <string name="block_channel_message">Do not notify notifications for this channel.</string>
+    <string name="block_package_message">Do not notify notifications for this application.</string>
+    <string name="notification_access_setting">Notification access settings</string>
     <string name="deskclock_settings">Deskclock Settings</string>
     <string name="hidden_noti_channels">Hidden notification channels</string>
     <string name="no_items">No items</string>
