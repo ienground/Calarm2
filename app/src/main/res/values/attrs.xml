@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeAnimationButton">
+        <attr name="backgroundCardColor" format="color" />
+        <attr name="defaultDrawable" format="integer"/>
+        <attr name="defaultBackgroundColor" format="integer"/>
+        <attr name="rightSwipeDrawable" format="integer"/>
+        <attr name="rightSwipeBackgroundColor" format="color"/>
+        <attr name="leftSwipeDrawable" format="integer"/>
+        <attr name="leftSwipeBackgroundColor" format="color"/>
+        <attr name="duration" format="integer"/>
+        <attr name="fontType" format="integer" />
+        <attr name="text_size" format="dimension" />
+        <attr name="leftSwipeText" format="string" />
+        <attr name="rightSwipeText" format="string" />
+        <attr name="leftSwipeEnabled" format="boolean" />
+        <attr name="rightSwipeEnabled" format="boolean" />
+    </declare-styleable>
+</resources>

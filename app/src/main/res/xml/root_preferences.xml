@@ -38,6 +38,12 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/alarm_settings">
+        <Preference
+            app:title="@string/alarm_auto_dismiss_duration"
+            app:key="alarm_dismiss_duration" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/stopwatch_settings">
 
         <SwitchPreferenceCompat

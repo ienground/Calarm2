@@ -19,6 +19,7 @@ import android.provider.CalendarContract
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
@@ -101,6 +102,9 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         supportActionBar?.title = null
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        binding.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
+
         mapFragment = supportFragmentManager.findFragmentById(R.id.mapContainer) as SupportMapFragment
 
         dataId = intent.getLongExtra(IntentKey.ITEM_ID, -1)
@@ -134,10 +138,11 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
         binding.groupRing.setOnClickListener {
             val mediaPlayer = MediaPlayer().apply { setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()) }
-            MaterialAlertDialogBuilder(this).apply {
+            MaterialAlertDialogBuilder(this, R.style.Theme_Calarm_MaterialAlertDialog).apply {
                 var index = ringtones.values.indexOf(item.sound)
                 var checkedUri = item.sound
 
+                setIcon(R.drawable.ic_ring)
                 setTitle(R.string.alarm_ring)
                 setSingleChoiceItems(ringtones.getKeyArray(), index) { _, which ->
                     mediaPlayer.stop()
@@ -218,6 +223,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         binding.tvLabel.text = item.label
 
         binding.tvApm.text = apmFormat.format(time.time)
+        binding.tvApmKo.text = apmFormat.format(time.time)
         binding.tvTime.text = timeFormat.format(time.time)
         binding.tvRing.text = with(ringtones.filterValues { it == item.sound }.getKeyArray()) { if (this.isNotEmpty()) first() else "" }
         binding.switchVibrate.isChecked = data.vibrate
@@ -292,7 +298,7 @@ class EditCalarmActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
     override fun onMapClick(latLng: LatLng) {}
 
     private fun getCalendarEventByID(context: Context, id: Long): ArrayList<CalendarEvent> {
-        val events = java.util.ArrayList<CalendarEvent>()
+        val events = ArrayList<CalendarEvent>()
 
         context.contentResolver.query(
             CalendarContract.Events.CONTENT_URI,

@@ -17,7 +17,10 @@ class ItemTouchHelperCallback(private val listener: ItemActionListener): ItemTou
         val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
 
         return makeMovementFlags(0, when (viewHolder) {
-            is SubTimerAdapter.ItemViewHolder, is SubAlarmAdapter.ItemViewHolder, is SubCalarmAdapter.ItemViewHolder, is NotificationAdapter.ItemViewHolder -> swipeFlags
+            is SubAlarmAdapter.ItemViewHolder, is SubCalarmAdapter.ItemViewHolder, is NotificationAdapter.ItemViewHolder -> swipeFlags
+            is SubTimerAdapter.ItemViewHolder -> {
+                if ((recyclerView.adapter as SubTimerAdapter).getEditmode() && (recyclerView.adapter?.itemCount ?: 0) > 1) swipeFlags else 0
+            }
             else -> 0
         })
     }

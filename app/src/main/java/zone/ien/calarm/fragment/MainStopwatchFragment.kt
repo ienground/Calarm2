@@ -132,8 +132,10 @@ class MainStopwatchFragment : Fragment() {
                 requireContext().stopService(Intent(requireContext(), StopwatchService::class.java))
                 (binding.list.adapter as LapseAdapter).clear()
             } else {
-                MaterialAlertDialogBuilder(requireContext()).apply {
+                MaterialAlertDialogBuilder(requireContext(), R.style.Theme_Calarm_MaterialAlertDialog).apply {
+                    setIcon(R.drawable.ic_delete)
                     setTitle(R.string.delete_title)
+                    setMessage(R.string.cannot_be_undone)
                     val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_reset, LinearLayout(requireContext()), false)
                     val checkbox: MaterialCheckBox = dialogView.findViewById(R.id.checkbox)
 
@@ -302,7 +304,10 @@ class MainStopwatchFragment : Fragment() {
                     binding.btnLap.visibility = View.VISIBLE
                     binding.btnReset.visibility = View.VISIBLE
                     binding.cardSchedule.visibility = View.GONE
+                    binding.tvAlarm.text = getString(R.string.tap_to_schedule_stopwatch)
+                    binding.cardSchedule.isChecked = false
                     binding.btnPlay.icon = ContextCompat.getDrawable(context, R.drawable.ic_pause)
+                    binding.btnPlay.isEnabled = true
                     ValueAnimator.ofInt(dpToPx(context, 80f), dpToPx(context, 120f)).apply {
                         interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.accelerate_decelerate_interpolator)
                         addUpdateListener {
@@ -353,7 +358,7 @@ class MainStopwatchFragment : Fragment() {
         val constraintsBuilder= CalendarConstraints.Builder()
             .setValidator(DateValidatorPointForward.now())
         val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Hello World")
+            .setTitleText(R.string.date_picker_title)
             .setPositiveButtonText(android.R.string.ok)
             .setNegativeButtonText(android.R.string.cancel)
             .setSelection(scheduledTime)
@@ -362,7 +367,7 @@ class MainStopwatchFragment : Fragment() {
         datePicker.addOnPositiveButtonClickListener {
             val scheduledCalendar = Calendar.getInstance().apply { timeInMillis = scheduledTime }
             val timePicker = MaterialTimePicker.Builder()
-                .setTitleText("HV")
+                .setTitleText(R.string.time_picker_title)
                 .setPositiveButtonText(android.R.string.ok)
                 .setNegativeButtonText(android.R.string.cancel)
                 .setHour(scheduledCalendar.get(Calendar.HOUR_OF_DAY))

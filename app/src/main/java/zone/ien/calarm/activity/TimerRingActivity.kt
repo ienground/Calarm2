@@ -42,7 +42,7 @@ class TimerRingActivity : AppCompatActivity() {
 
         val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
 
-        binding.bgTimerOff.setOnClickListener {
+        binding.btnTimerOff.setOnClickListener {
             sendBroadcast(Intent(this, TimerOffReceiver::class.java).apply {
                 putExtra(IntentKey.ITEM_ID, id)
             })

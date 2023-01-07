@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.*
 import android.net.Uri
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -52,7 +53,8 @@ class MainTimerNumFragment : Fragment() {
         val nums: ArrayList<Int> = arrayListOf()
         val btnNum = listOf(binding.btnNum0, binding.btnNum1, binding.btnNum2, binding.btnNum3, binding.btnNum4, binding.btnNum5, binding.btnNum6, binding.btnNum7, binding.btnNum8, binding.btnNum9)
 
-        binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+        val typedValue = TypedValue().apply { requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorTertiary, this, true) }
+        binding.display.text = timeToText(requireContext(), nums, typedValue.data)
         btnNum.forEachIndexed { index, materialButton ->
             materialButton.setOnClickListener {
                 if (nums.size < 6 && !(nums.isEmpty() && index == 0)) {
@@ -65,7 +67,7 @@ class MainTimerNumFragment : Fragment() {
                         }.start()
                     }
                     nums.add(index)
-                    binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+                    binding.display.text = timeToText(requireContext(), nums, typedValue.data)
                 }
             }
         }
@@ -73,7 +75,7 @@ class MainTimerNumFragment : Fragment() {
         binding.btnDelete.setOnClickListener {
             if (nums.isNotEmpty()) {
                 nums.removeLast()
-                binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+                binding.display.text = timeToText(requireContext(), nums, typedValue.data)
 
                 if (nums.isEmpty()) {
                     ValueAnimator.ofFloat(1f, 0.3f).apply {
@@ -94,7 +96,7 @@ class MainTimerNumFragment : Fragment() {
                     binding.btnStart.alpha = it.animatedValue as Float
                 }
             }.start()
-            binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+            binding.display.text = timeToText(requireContext(), nums, typedValue.data)
             true
         }
 
@@ -119,7 +121,7 @@ class MainTimerNumFragment : Fragment() {
 
                     withContext(Dispatchers.Main) {
                         nums.clear()
-                        binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+                        binding.display.text = timeToText(requireContext(), nums, typedValue.data)
                         binding.btnSave.alpha = 0.3f
                         binding.btnStart.alpha = 0.3f
                         callbackListener?.addNewTimer(0)
@@ -141,7 +143,7 @@ class MainTimerNumFragment : Fragment() {
 
                 nums.clear()
 
-                binding.display.text = timeToText(requireContext(), nums, R.color.colorBLUE)
+                binding.display.text = timeToText(requireContext(), nums, typedValue.data)
                 binding.btnSave.alpha = 0.3f
                 binding.btnStart.alpha = 0.3f
                 callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_TIMER)

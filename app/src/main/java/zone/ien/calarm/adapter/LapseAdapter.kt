@@ -28,8 +28,8 @@ class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<L
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        if (holder.adapterPosition != 0) (holder.itemView as MaterialCardView).setCardBackgroundColor(Color.parseColor("#26212a"))
-        else (holder.itemView as MaterialCardView).setCardBackgroundColor(Color.parseColor("#49454f"))
+        if (holder.adapterPosition != 0) holder.cardFilled.visibility = View.GONE
+        else holder.cardFilled.visibility = View.VISIBLE
 
         holder.tvLapNo.text = context.getString(R.string.lap_no, itemCount - holder.adapterPosition)
         holder.tvFlag.text = items[holder.adapterPosition].flag
@@ -83,5 +83,6 @@ class LapseAdapter(var items: ArrayList<StopwatchLapse>): RecyclerView.Adapter<L
         val tvFlag: MaterialTextView = itemView.findViewById(R.id.tv_flag)
         val tvTimeLap: MaterialTextView = itemView.findViewById(R.id.tv_time_lap)
         val tvTimeFull: MaterialTextView = itemView.findViewById(R.id.tv_time_full)
+        val cardFilled: MaterialCardView = itemView.findViewById(R.id.card_filled)
     }
 }

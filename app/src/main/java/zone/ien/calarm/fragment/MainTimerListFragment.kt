@@ -1,5 +1,8 @@
 package zone.ien.calarm.fragment
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.*
 import android.net.Uri
@@ -44,8 +47,10 @@ class MainTimerListFragment : Fragment() {
         }
 
         override fun delete(position: Int, id: Long) {
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setMessage(R.string.delete_title)
+            MaterialAlertDialogBuilder(requireContext(), R.style.Theme_Calarm_MaterialAlertDialog).apply {
+                setIcon(R.drawable.ic_delete)
+                setTitle(R.string.delete_title)
+                setMessage(R.string.cannot_be_undone)
                 setPositiveButton(android.R.string.ok) { _, _ ->
                     GlobalScope.launch(Dispatchers.IO) {
                         timersDatabase?.getDao()?.delete(id)
@@ -124,6 +129,11 @@ class MainTimerListFragment : Fragment() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun refreshList() {
+        binding.shimmerFrame.startShimmer()
+        binding.shimmerFrame.visibility = View.VISIBLE
+        binding.list.visibility = View.INVISIBLE
+        binding.list.alpha = 0f
+
         GlobalScope.launch(Dispatchers.IO) {
             val timers = timersDatabase?.getDao()?.getAll()
             if (timers != null) {
@@ -136,7 +146,32 @@ class MainTimerListFragment : Fragment() {
                     adapter = MainTimerListAdapter(timers as ArrayList<TimersEntity>).apply {
                         setClickCallback(timerListCallback)
                     }
+
+                    delay(1000)
                     binding.list.adapter = adapter
+                    binding.icNoTimers.visibility = if (timers.isEmpty()) View.VISIBLE else View.GONE
+                    binding.tvNoTimers.visibility = if (timers.isEmpty()) View.VISIBLE else View.GONE
+                    binding.shimmerFrame.stopShimmer()
+
+                    ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = 500
+                        addUpdateListener {
+                            binding.list.alpha = it.animatedValue as Float
+//                            binding.appTitle.alpha = it.animatedValue as Float
+                            binding.shimmerFrame.alpha = 1f - it.animatedValue as Float
+                        }
+                        addListener(object: AnimatorListenerAdapter() {
+                            override fun onAnimationStart(animation: Animator) {
+                                super.onAnimationStart(animation)
+                                binding.list.visibility = View.VISIBLE
+//                                binding.appTitle.text = binding.appTitle.context.getString(R.string.active_alarm_count, activeAlarmsCount)
+                            }
+                            override fun onAnimationEnd(animation: Animator) {
+                                super.onAnimationEnd(animation)
+                                binding.shimmerFrame.visibility = View.INVISIBLE
+                            }
+                        })
+                    }.start()
                 }
             }
         }

@@ -26,7 +26,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calarm"
+        tools:replace="label"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.TestActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".activity.DeskclockActivity"
             android:exported="false">
@@ -72,6 +80,10 @@
             android:exported="false"
             android:showOnLockScreen="true" />
         <activity
+            android:name=".activity.CalarmRingActivity"
+            android:exported="false"
+            android:showOnLockScreen="true" />
+        <activity
             android:name=".activity.EditCalarmActivity"
             android:exported="false" />
         <activity
@@ -87,6 +99,7 @@
 
         <receiver android:name=".receiver.CalarmCreateReceiver" />
         <receiver android:name=".receiver.CalarmReceiver" />
+        <receiver android:name=".receiver.CalarmOffReceiver" />
         <receiver android:name=".receiver.AlarmReceiver" />
         <receiver android:name=".receiver.AlarmOffReceiver" />
         <receiver android:name=".receiver.AlarmSnoozeReceiver" />
@@ -104,10 +117,11 @@
                 <data android:host="com.android.calendar" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".service.NotificationListener"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>

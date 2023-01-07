@@ -22,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.textview.MaterialTextView
 import com.michalsvec.singlerowcalendar.calendar.CalendarChangesObserver
 import com.michalsvec.singlerowcalendar.calendar.CalendarViewManager
 import com.michalsvec.singlerowcalendar.calendar.SingleRowCalendarAdapter
@@ -124,63 +126,50 @@ class MainCalarmFragment : Fragment() {
                 val calendar = Calendar.getInstance().apply { time = date }
                 val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
                 val dateFormat = SimpleDateFormat("dd", Locale.getDefault())
-                val tvDate: TextView = holder.itemView.findViewById(R.id.tv_date)
-                val tvDay: TextView = holder.itemView.findViewById(R.id.tv_day)
+                val cardSelected: MaterialCardView = holder.itemView.findViewById(R.id.card_selected)
+                val cardUnselected: MaterialCardView = holder.itemView.findViewById(R.id.card_unselected)
+                val tvDateSelected: MaterialTextView = holder.itemView.findViewById(R.id.tv_date_selected)
+                val tvDaySelected: MaterialTextView = holder.itemView.findViewById(R.id.tv_day_selected)
+                val tvDateUnselected: MaterialTextView = holder.itemView.findViewById(R.id.tv_date_unselected)
+                val tvDayUnselected: MaterialTextView = holder.itemView.findViewById(R.id.tv_day_unselected)
 
                 if (position == 60) {
                     val params = holder.itemView.layoutParams as (ViewGroup.MarginLayoutParams)
                     params.marginEnd = MyUtils.dpToPx(requireContext(), 16f)
                 }
 
-                tvDay.text = dayFormat.format(calendar.time)
-                tvDate.text = dateFormat.format(calendar.time)
-
-                val white = ContextCompat.getColor(requireContext(), R.color.white)
-                val black = ContextCompat.getColor(requireContext(), R.color.black)
-                val colorAccent = ContextCompat.getColor(requireContext(), R.color.colorAccent)
-                val transparent = Color.parseColor("#26212A")
+                tvDaySelected.text = dayFormat.format(calendar.time)
+                tvDateSelected.text = dateFormat.format(calendar.time)
+                tvDayUnselected.text = dayFormat.format(calendar.time)
+                tvDateUnselected.text = dateFormat.format(calendar.time)
 
                 if (calendarViewSelected[position]) {
                     if (isSelected) {
-                        holder.itemView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorAccent))
-                        tvDay.setTextColor(black)
-                        tvDate.setTextColor(black)
+                        cardSelected.alpha = 1f
+                        cardUnselected.alpha = 0f
                     } else {
-
-                        ValueAnimator.ofObject(ArgbEvaluator(), colorAccent, transparent).apply {
+                        ValueAnimator.ofFloat(1f, 0f).apply {
                             duration = 300
                             addUpdateListener {
-                                holder.itemView.backgroundTintList = ColorStateList.valueOf(it.animatedValue as Int)
-                            }
-                        }.start()
-                        ValueAnimator.ofObject(ArgbEvaluator(), black, white).apply {
-                            duration = 300
-                            addUpdateListener {
-                                tvDay.setTextColor(it.animatedValue as Int)
-                                tvDate.setTextColor(it.animatedValue as Int)
+                                cardSelected.alpha = it.animatedValue as Float
+                                cardUnselected.alpha = 1f - it.animatedValue as Float
                             }
                         }.start()
                         calendarViewSelected[position] = false
                     }
                 } else {
                     if (isSelected) {
-                        ValueAnimator.ofObject(ArgbEvaluator(), transparent, colorAccent).apply {
-                            duration = 500
+                        ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = 300
                             addUpdateListener {
-                                holder.itemView.backgroundTintList = ColorStateList.valueOf(it.animatedValue as Int)
-                            }
-                        }.start()
-                        ValueAnimator.ofObject(ArgbEvaluator(), white, black).apply {
-                            duration = 500
-                            addUpdateListener {
-                                tvDay.setTextColor(it.animatedValue as Int)
-                                tvDate.setTextColor(it.animatedValue as Int)
+                                cardSelected.alpha = it.animatedValue as Float
+                                cardUnselected.alpha = 1f - it.animatedValue as Float
                             }
                         }.start()
                         calendarViewSelected[position] = true
                     } else {
-                        tvDay.setTextColor(white)
-                        tvDate.setTextColor(white)
+                        cardSelected.alpha = 0f
+                        cardUnselected.alpha = 1f
                     }
                 }
             }
@@ -194,6 +183,8 @@ class MainCalarmFragment : Fragment() {
                 binding.shimmerFrame.startShimmer()
                 binding.shimmerFrame.visibility = View.VISIBLE
                 binding.listEvent.visibility = View.INVISIBLE
+                binding.icNoCalarms.alpha = 0f
+                binding.tvNoCalarms.alpha = 0f
                 binding.shimmerFrame.alpha = 1f
                 binding.listEvent.alpha = 0f
 
@@ -219,7 +210,6 @@ class MainCalarmFragment : Fragment() {
                         delay(1000)
                         adapter = MainCalarmEventAdapter(datas).apply { setClickCallback(alarmListCallback) }
                         binding.listEvent.adapter = adapter
-
                         binding.shimmerFrame.stopShimmer()
 
                         ValueAnimator.ofFloat(0f, 1f).apply {
@@ -239,6 +229,16 @@ class MainCalarmFragment : Fragment() {
                                 }
                             })
                         }.start()
+
+                        if (datas.isEmpty()) {
+                            ValueAnimator.ofFloat(0f, 0.4f).apply {
+                                duration = 500
+                                addUpdateListener {
+                                    binding.icNoCalarms.alpha = it.animatedValue as Float
+                                    binding.tvNoCalarms.alpha = it.animatedValue as Float
+                                }
+                            }.start()
+                        }
                     }
 
                 }
@@ -375,7 +375,7 @@ class MainCalarmFragment : Fragment() {
     }
 
     private fun getCalendarEventByID(context: Context, id: Long): ArrayList<CalendarEvent> {
-        val events = java.util.ArrayList<CalendarEvent>()
+        val events = ArrayList<CalendarEvent>()
 
         context.contentResolver.query(
             CalendarContract.Events.CONTENT_URI,

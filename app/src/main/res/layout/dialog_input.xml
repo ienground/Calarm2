@@ -9,7 +9,8 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

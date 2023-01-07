@@ -1,17 +1,23 @@
 package zone.ien.calarm.adapter
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 import zone.ien.calarm.R
@@ -21,16 +27,20 @@ import zone.ien.calarm.databinding.DialogTimerNumBinding
 import zone.ien.calarm.room.SubAlarmEntity
 import zone.ien.calarm.room.SubTimerEntity
 import zone.ien.calarm.utils.ItemActionListener
+import zone.ien.calarm.utils.MyUtils.Companion.dpToPx
 import zone.ien.calarm.utils.MyUtils.Companion.timeToText
 
 class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long): RecyclerView.Adapter<SubTimerAdapter.ItemViewHolder>(), ItemActionListener {
 
     lateinit var context: Context
+    lateinit var parentView: ViewGroup
 
     private var callbackListener: EditTimerListCallback? = null
+    private var isEditmode = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         context = parent.context
+        parentView = parent
         val view = LayoutInflater.from(context).inflate(R.layout.adapter_sub_timer, parent, false)
         return ItemViewHolder(view)
     }
@@ -44,15 +54,13 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
         }
 
         holder.btnInsertUp.setOnClickListener {
-            getNumpadDialog(false, holder.adapterPosition).show()
+            getNumpadDialog(context, false, holder.adapterPosition).show()
         }
-
         holder.btnInsertDown.setOnClickListener {
-            getNumpadDialog(false, holder.adapterPosition + 1).show()
+            getNumpadDialog(context, false, holder.adapterPosition + 1).show()
         }
-
         holder.tvLabel.setOnClickListener {
-            MaterialAlertDialogBuilder(context).apply {
+            MaterialAlertDialogBuilder(context, R.style.Theme_Calarm_MaterialAlertDialog).apply {
                 val view = LayoutInflater.from(context).inflate(R.layout.dialog_input, LinearLayout(context), false)
                 val inputLayout: TextInputLayout = view.findViewById(R.id.inputLayout)
                 inputLayout.hint = context.getString(R.string.label)
@@ -69,32 +77,101 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
                 setView(view)
             }.show()
         }
-
         holder.tvTime.setOnClickListener {
-            getNumpadDialog(true, holder.adapterPosition).show()
+            getNumpadDialog(context, true, holder.adapterPosition).show()
         }
-//        holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
         holder.btnDelete.setOnClickListener {
-            items.removeAt(holder.adapterPosition)
-            notifyItemRemoved(holder.adapterPosition)
+            if (itemCount > 1) {
+                items.removeAt(holder.adapterPosition)
+                notifyItemRemoved(holder.adapterPosition)
+            } else {
+                Snackbar.make(parentView, context.getString(R.string.at_least_one_item), Snackbar.LENGTH_SHORT).show()
+            }
         }
+
+        if (isEditmode) {
+            holder.btnInsertUp.visibility = View.VISIBLE
+            holder.btnInsertDown.visibility = View.VISIBLE
+            holder.btnDelete.visibility = View.VISIBLE
+            holder.btnStart.visibility = View.GONE
+            holder.tvLabel.isClickable = true
+            holder.tvTime.isClickable = true
+        } else {
+            holder.btnInsertUp.visibility = View.GONE
+            holder.btnInsertDown.visibility = View.GONE
+            holder.btnDelete.visibility = View.GONE
+            holder.btnStart.visibility = View.VISIBLE
+            holder.tvLabel.isClickable = false
+            holder.tvTime.isClickable = false
+        }
+
+        /*
+        if (isEditmode) {
+            Log.d(TAG, "editmode ${holder.btnInsertUp.visibility}")
+            if (true) {
+//            if (holder.btnInsertUp.visibility == View.GONE) {
+                ValueAnimator.ofInt(1, dpToPx(context, 24f)).apply {
+                    duration = 300
+                    interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.linear_interpolator)
+                    addUpdateListener {
+                        holder.btnInsertUp.layoutParams = holder.btnInsertUp.layoutParams.apply { width = it.animatedValue as Int }
+                        holder.btnInsertDown.layoutParams = holder.btnInsertDown.layoutParams.apply { width = it.animatedValue as Int }
+                        holder.btnDelete.layoutParams = holder.btnDelete.layoutParams.apply { width = (it.animatedValue as Int) * 2 }
+                    }
+                    addListener(object: AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator) {
+                            Log.d(TAG, "animationStart")
+                            super.onAnimationStart(animation)
+                            holder.btnInsertUp.visibility = View.VISIBLE
+                            holder.btnInsertDown.visibility = View.VISIBLE
+                            holder.btnDelete.visibility = View.VISIBLE
+                        }
+                    })
+                }.start()
+            }
+        } else {
+            Log.d(TAG, "not editmode ${holder.btnInsertUp.visibility}")
+            if (true) {
+//            if (holder.btnInsertUp.visibility == View.VISIBLE) {
+                ValueAnimator.ofInt(dpToPx(context, 24f), 1).apply {
+                    duration = 300
+                    interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.linear_interpolator)
+                    addUpdateListener {
+                        holder.btnInsertUp.layoutParams = holder.btnInsertUp.layoutParams.apply { width = it.animatedValue as Int }
+                        holder.btnInsertDown.layoutParams = holder.btnInsertDown.layoutParams.apply { width = it.animatedValue as Int }
+                        holder.btnDelete.layoutParams = holder.btnDelete.layoutParams.apply { width = (it.animatedValue as Int) * 2 }
+                    }
+                    addListener(object: AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            Log.d(TAG, "animationEnd")
+                            super.onAnimationEnd(animation)
+                            holder.btnInsertUp.visibility = View.GONE
+                            holder.btnInsertDown.visibility = View.GONE
+                            holder.btnDelete.visibility = View.GONE
+                        }
+                    })
+                }.start()
+            }
+        }
+
+         */
 
     }
 
     override fun getItemCount(): Int = items.size
 
-    private fun getNumpadDialog(isEdit: Boolean, position: Int): MaterialAlertDialogBuilder {
+    private fun getNumpadDialog(context: Context, isEdit: Boolean, position: Int): MaterialAlertDialogBuilder {
         return MaterialAlertDialogBuilder(context).apply {
             val binding: DialogTimerNumBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.dialog_timer_num, null, false)
             val btnNum = listOf(binding.btnNum0, binding.btnNum1, binding.btnNum2, binding.btnNum3, binding.btnNum4, binding.btnNum5, binding.btnNum6, binding.btnNum7, binding.btnNum8, binding.btnNum9)
             val nums: ArrayList<Int> = arrayListOf()
-
-            binding.display.text = timeToText(context, nums, R.color.colorBLUE, 32, 16)
+            val typedValue = TypedValue().apply { context.theme.resolveAttribute(com.google.android.material.R.attr.colorTertiary, this, true) }
+            binding.display.text = timeToText(context, nums, typedValue.data, 32, 16)
             btnNum.forEachIndexed { index, materialButton ->
                 materialButton.setOnClickListener {
                     if (nums.size < 6 && !(nums.isEmpty() && index == 0)) {
                         nums.add(index)
-                        binding.display.text = timeToText(context, nums, R.color.colorBLUE, 32, 16)
+                        binding.display.text = timeToText(context, nums, typedValue.data, 32, 16)
                     }
                 }
             }
@@ -102,13 +179,13 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
             binding.btnDelete.setOnClickListener {
                 if (nums.isNotEmpty()) {
                     nums.removeLast()
-                    binding.display.text = timeToText(context, nums, R.color.colorBLUE, 32, 16)
+                    binding.display.text = timeToText(context, nums, typedValue.data, 32, 16)
                 }
             }
 
             binding.btnDelete.setOnLongClickListener {
                 nums.clear()
-                binding.display.text = timeToText(context, nums, R.color.colorBLUE, 32, 16)
+                binding.display.text = timeToText(context, nums, typedValue.data, 32, 16)
                 true
             }
 
@@ -141,12 +218,13 @@ class SubTimerAdapter(var items: ArrayList<SubTimerEntity>, var parentId: Long):
         }
     }
 
-    fun add(item: SubAlarmEntity) {
-//        items.add(item)
-//        items.sortBy { it.time }
-//        val newIndex = items.indexOf(item)
-//        notifyItemInserted(newIndex)
+    fun setEditmode(mode: Boolean) {
+        isEditmode = mode
+        Log.d(TAG, "Update to $mode")
+        notifyItemRangeChanged(0, itemCount)
     }
+
+    fun getEditmode() : Boolean = isEditmode
 
     fun setCallbackListener(callbackListener: EditTimerListCallback) {
         this.callbackListener = callbackListener

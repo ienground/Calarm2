@@ -46,7 +46,10 @@ class MainTimerClockFragment : Fragment() {
     private var item: TimersEntity? = null
     private var isTimerInitialized = false
 
-    private var currentStep = 0
+    private var countdownTickReceiver: BroadcastReceiver? = null
+    private var countdownTickTimeoutReceiver: BroadcastReceiver? = null
+    private var playPauseTimerReceiver: BroadcastReceiver? = null
+    private var stopTimerReceiver: BroadcastReceiver? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main_timer_clock, container, false)
@@ -96,7 +99,7 @@ class MainTimerClockFragment : Fragment() {
         val subProgressAnimator: ValueAnimator = ValueAnimator.ofInt(500, 0)
         var preOrder = -1
 
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        countdownTickReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val duration = intent.getLongExtra(IntentKey.DURATION, -1).toInt()
                 val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
@@ -109,7 +112,7 @@ class MainTimerClockFragment : Fragment() {
                         binding.progressSub.visibility = View.INVISIBLE
                         binding.tvLabelSub.visibility = View.GONE
                         binding.tvTimeTotal.visibility = View.GONE
-                        binding.tvLabel.text = "Sample"
+                        binding.tvLabel.text = "TIme"
                         binding.tvTimeSub.text = (duration / 1000).let {
                             if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
                             else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
@@ -181,7 +184,7 @@ class MainTimerClockFragment : Fragment() {
                             totalProgressAnimator.let {
                                 it.setIntValues(duration, 0)
                                 it.duration = duration.toLong()
-                                it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
+                                it.interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.linear_interpolator)
                                 it.addUpdateListener {
                                     binding.progressTotal.progress = (it.animatedValue as Int)
                                 }
@@ -194,7 +197,7 @@ class MainTimerClockFragment : Fragment() {
                                 subProgressAnimator.let {
                                     it.setIntValues((item?.subTimers?.get(order)?.time ?: 0) * 1000, 0)
                                     it.duration = (item?.subTimers?.get(order)?.time ?: 0) * 1000L
-                                    it.interpolator = AnimationUtils.loadInterpolator(requireContext(), android.R.anim.linear_interpolator)
+                                    it.interpolator = AnimationUtils.loadInterpolator(context, android.R.anim.linear_interpolator)
                                     it.addUpdateListener {
                                         binding.progressSub.progress = (it.animatedValue as Int)
                                     }
@@ -247,9 +250,8 @@ class MainTimerClockFragment : Fragment() {
                     }
                 }
             }
-        }, IntentFilter(IntentID.COUNTDOWN_TICK))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        countdownTickTimeoutReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 binding.tvTimeSub.text = "-${intent.getIntExtra(IntentKey.COUNTDOWN_TIME, 0).let {
                     if (it / 3600 != 0) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
@@ -260,9 +262,8 @@ class MainTimerClockFragment : Fragment() {
                     context.sendBroadcast(Intent(context, TimerOffReceiver::class.java))
                 }
             }
-        }, IntentFilter(IntentID.COUNTDOWN_TICK_TIMEOUT))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        playPauseTimerReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 binding.btnPlay.icon = ContextCompat.getDrawable(context, if (TimerService.isPaused) R.drawable.ic_pause else R.drawable.ic_play_arrow)
                 if (TimerService.isPaused) {
@@ -278,9 +279,8 @@ class MainTimerClockFragment : Fragment() {
                     totalProgressAnimator.pause()
                 }
             }
-        }, IntentFilter(IntentID.PLAY_PAUSE_TIMER))
-
-        requireContext().registerReceiver(object: BroadcastReceiver() {
+        }
+        stopTimerReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 item = null
                 isTimerInitialized = false
@@ -292,7 +292,14 @@ class MainTimerClockFragment : Fragment() {
                 binding.tvLabelSub.visibility = View.VISIBLE
                 callbackListener?.scrollTo(MainTimerFragment.TIMER_PAGE_LIST)
             }
-        }, IntentFilter(IntentID.STOP_TIMER))
+        }
+        requireContext().registerReceiver(countdownTickReceiver, IntentFilter(IntentID.COUNTDOWN_TICK))
+
+        requireContext().registerReceiver(countdownTickTimeoutReceiver, IntentFilter(IntentID.COUNTDOWN_TICK_TIMEOUT))
+
+        requireContext().registerReceiver(playPauseTimerReceiver, IntentFilter(IntentID.PLAY_PAUSE_TIMER))
+
+        requireContext().registerReceiver(stopTimerReceiver, IntentFilter(IntentID.STOP_TIMER))
 
 
 
@@ -320,6 +327,10 @@ class MainTimerClockFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
+        (mListener as Context).unregisterReceiver(countdownTickReceiver)
+        (mListener as Context).unregisterReceiver(countdownTickTimeoutReceiver)
+        (mListener as Context).unregisterReceiver(stopTimerReceiver)
+        (mListener as Context).unregisterReceiver(playPauseTimerReceiver)
         mListener = null
     }
 

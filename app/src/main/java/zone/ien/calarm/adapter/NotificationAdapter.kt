@@ -82,9 +82,10 @@ class NotificationAdapter(var items: ArrayList<StatusBarNotification>): Recycler
             Toast.makeText(context, "${items[holder.adapterPosition].id}", Toast.LENGTH_SHORT).show()
         }
         holder.itemView.setOnLongClickListener {
-            MaterialAlertDialogBuilder(context).apply {
-                setTitle(context.getString(R.string.block_notification))
-                setMessage(context.getString(R.string.block_channel_message))
+            MaterialAlertDialogBuilder(context, R.style.Theme_Calarm_MaterialAlertDialog).apply {
+                setIcon(R.drawable.ic_notifications_off)
+                setTitle(R.string.block_notification)
+                setMessage(R.string.block_channel_message)
                 setPositiveButton(android.R.string.ok) { _, _ ->
                     callbackListener?.longClick(holder.adapterPosition, items[holder.adapterPosition])
                 }

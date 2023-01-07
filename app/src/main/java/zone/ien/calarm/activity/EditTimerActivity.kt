@@ -64,6 +64,8 @@ class EditTimerActivity : AppCompatActivity() {
     private val timeFormat = SimpleDateFormat("h:mm", Locale.getDefault())
     private lateinit var dateTimeFormat : SimpleDateFormat
 
+    private var isEditmode = false
+
     var item = TimersEntity("", "", 0L, false, System.currentTimeMillis())
     var id = -1L
 
@@ -80,6 +82,10 @@ class EditTimerActivity : AppCompatActivity() {
                     else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
                 }
             }
+        }
+
+        override fun startPart() {
+
         }
     }
 
@@ -114,7 +120,12 @@ class EditTimerActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            binding.etLabel.isEnabled = false
+            binding.switchSchedule.isEnabled = false
+            binding.groupSchedule.isClickable = false
         } else {
+            isEditmode = true
             invalidateMenu()
             inflateData(item)
         }
@@ -165,7 +176,7 @@ class EditTimerActivity : AppCompatActivity() {
         val constraintsBuilder= CalendarConstraints.Builder()
             .setValidator(DateValidatorPointForward.now())
         val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Hello World")
+            .setTitleText(R.string.date_picker_title)
             .setPositiveButtonText(android.R.string.ok)
             .setNegativeButtonText(android.R.string.cancel)
             .setSelection(item.scheduledTime)
@@ -174,7 +185,7 @@ class EditTimerActivity : AppCompatActivity() {
         datePicker.addOnPositiveButtonClickListener {
             val scheduledTime = Calendar.getInstance().apply { timeInMillis = item.scheduledTime }
             val timePicker = MaterialTimePicker.Builder()
-                .setTitleText("HV")
+                .setTitleText(R.string.time_picker_title)
                 .setPositiveButtonText(android.R.string.ok)
                 .setNegativeButtonText(android.R.string.cancel)
                 .setHour(scheduledTime.get(Calendar.HOUR_OF_DAY))
@@ -197,13 +208,18 @@ class EditTimerActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_edit, menu)
-        if (id == -1L) menu?.findItem(R.id.menu_delete)?.isVisible = false
+        if (id == -1L) {
+            menu?.findItem(R.id.menu_delete)?.isVisible = false
+            menu?.findItem(R.id.menu_edit)?.isVisible = false
+        } else {
+            menu?.findItem(R.id.menu_save)?.isVisible = isEditmode
+            menu?.findItem(R.id.menu_edit)?.isVisible = !isEditmode
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -214,6 +230,12 @@ class EditTimerActivity : AppCompatActivity() {
                 onBackPressedDispatcher.onBackPressed()
             }
             R.id.menu_save -> {
+                isEditmode = false
+                adapter.setEditmode(isEditmode)
+                binding.etLabel.isEnabled = false
+                binding.switchSchedule.isEnabled = false
+                binding.groupSchedule.isClickable = false
+
                 this.item.label = binding.etLabel.editText?.text.toString()
 //                this.item.scheduledTime
                 GlobalScope.launch(Dispatchers.IO) {
@@ -235,13 +257,17 @@ class EditTimerActivity : AppCompatActivity() {
                             putExtra(IntentKey.ITEM_ID, id)
                             putExtra(IntentKey.ACTION_TYPE, IntentValue.ACTION_EDIT)
                         })
-                        finish()
+//                        finish()
                     }
                 }
+
+                invalidateMenu()
             }
             R.id.menu_delete -> {
-                MaterialAlertDialogBuilder(this).apply {
-                    setMessage(R.string.delete_title)
+                MaterialAlertDialogBuilder(this, R.style.Theme_Calarm_MaterialAlertDialog).apply {
+                    setIcon(R.drawable.ic_delete)
+                    setTitle(R.string.delete_title)
+                    setMessage(R.string.cannot_be_undone)
                     setPositiveButton(android.R.string.ok) { _, _ ->
                         GlobalScope.launch(Dispatchers.IO) {
                             timersDatabase?.getDao()?.delete(this@EditTimerActivity.item.id ?: -1)
@@ -257,6 +283,16 @@ class EditTimerActivity : AppCompatActivity() {
                 }.show()
 
 
+            }
+            R.id.menu_edit -> {
+                isEditmode = true
+                adapter.setEditmode(isEditmode)
+
+                binding.etLabel.isEnabled = true
+                binding.switchSchedule.isEnabled = true
+                binding.groupSchedule.isClickable = binding.switchSchedule.isChecked
+
+                invalidateMenu()
             }
         }
         return super.onOptionsItemSelected(item)

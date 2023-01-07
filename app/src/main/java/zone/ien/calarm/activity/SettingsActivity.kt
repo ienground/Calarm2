@@ -86,6 +86,7 @@ class SettingsActivity : AppCompatActivity() {
             val prefFixedTime = findPreference<Preference>(SharedKey.FIXED_TIME)
             val prefReadyTime = findPreference<Preference>(SharedKey.READY_TIME)
             val prefHiddenNotiChannel = findPreference<Preference>("hidden_noti_channels")
+            val prefAlarmAutoDismiss = findPreference<Preference>("alarm_dismiss_duration")
 
             val fixedTimeCalendar = Calendar.getInstance().apply {
                 val time = sharedPreferences.getInt(SharedKey.FIXED_TIME, SharedDefault.FIXED_TIME)
@@ -184,11 +185,13 @@ class SettingsActivity : AppCompatActivity() {
             }, 1000)
 
             prefSelectCalendar?.setOnPreferenceClickListener {
-                MaterialAlertDialogBuilder(requireContext()).apply {
+                MaterialAlertDialogBuilder(requireContext(), R.style.Theme_Calarm_MaterialAlertDialog).apply {
                     val binding: DialogSelectCalendarBinding = DataBindingUtil.inflate(LayoutInflater.from(requireContext()), R.layout.dialog_select_calendar, null, false)
 
                     binding.list.adapter = SelectCalendarParentAdapter(calendarObjectMap)
 
+                    setIcon(R.drawable.ic_today)
+                    setTitle(R.string.select_calendar)
                     setPositiveButton(android.R.string.ok) { dialog, id ->
                         dialog.cancel()
                     }
@@ -230,9 +233,13 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             prefReadyTime?.summary = sharedPreferences.getInt(SharedKey.READY_TIME, SharedDefault.READY_TIME).let {
-                if (it / 60 != 0 && it % 60 != 0) getString(R.string.time_format_hour_minute, it / 60, it % 60)
-                else if (it / 60 == 0) getString(R.string.time_format_minute, it % 60)
-                else getString(R.string.time_format_hour, it / 60)
+                val timeArray: ArrayList<String> = arrayListOf()
+                if (it / 60 == 1) timeArray.add(getString(R.string.time_format_1hour))
+                else if (it / 60 != 0) timeArray.add(getString(R.string.time_format_hour, it / 60))
+                if (it % 60 == 1) timeArray.add(getString(R.string.time_format_1minute))
+                else if (it % 60 != 0) timeArray.add(getString(R.string.time_format_minute, it %60))
+
+                timeArray.joinToString(" ")
             }
             prefReadyTime?.setOnPreferenceClickListener { preference ->
                 val value = sharedPreferences.getInt(SharedKey.READY_TIME, SharedDefault.READY_TIME)
@@ -246,9 +253,15 @@ class SettingsActivity : AppCompatActivity() {
                     .build()
                 timePicker.addOnPositiveButtonClickListener {
                     sharedPreferences.edit().putInt(SharedKey.READY_TIME, timePicker.hour * 60 + timePicker.minute).apply()
-                    preference.summary = if (timePicker.hour != 0 && timePicker.minute != 0) getString(R.string.time_format_hour_minute, timePicker.hour, timePicker.minute)
-                    else if (timePicker.hour == 0) getString(R.string.time_format_minute, timePicker.minute)
-                    else getString(R.string.time_format_hour, timePicker.hour)
+                    preference.summary = (timePicker.hour * 60 + timePicker.minute).let {
+                        val timeArray: ArrayList<String> = arrayListOf()
+                        if (it / 60 == 1) timeArray.add(getString(R.string.time_format_1hour))
+                        else if (it / 60 != 0) timeArray.add(getString(R.string.time_format_hour, it / 60))
+                        if (it % 60 == 1) timeArray.add(getString(R.string.time_format_1minute))
+                        else if (it % 60 != 0) timeArray.add(getString(R.string.time_format_minute, it %60))
+
+                        timeArray.joinToString(" ")
+                    }
                 }
                 timePicker.show(parentFragmentManager, "READY_TIME_PICKER")
 
@@ -256,7 +269,7 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             prefHiddenNotiChannel?.setOnPreferenceClickListener {
-                MaterialAlertDialogBuilder(requireContext()).apply {
+                MaterialAlertDialogBuilder(requireContext(), R.style.Theme_Calarm_MaterialAlertDialog).apply {
                     val binding: DialogNotiChannelBinding = DataBindingUtil.inflate(LayoutInflater.from(requireContext()), R.layout.dialog_noti_channel, null, false)
 
                     var adapter: ChannelIdAdapter? = null
@@ -278,12 +291,49 @@ class SettingsActivity : AppCompatActivity() {
                     adapter = ChannelIdAdapter(channels)
                     binding.list.adapter = adapter.apply { setClickCallback(callback) }
 
+                    setIcon(R.drawable.ic_notifications)
                     setTitle(R.string.hidden_noti_channels)
 
                     if (channels.isEmpty()) binding.tvEmpty.visibility = View.VISIBLE
 
                     setView(binding.root)
                 }.show()
+                true
+            }
+
+            prefAlarmAutoDismiss?.summary = sharedPreferences.getInt(SharedKey.ALARM_DISMISS_TIME, SharedDefault.ALARM_DISMISS_TIME).let {
+                val timeArray: ArrayList<String> = arrayListOf()
+                if (it / 60 == 1) timeArray.add(getString(R.string.time_format_1hour))
+                else if (it / 60 != 0) timeArray.add(getString(R.string.time_format_hour, it / 60))
+                if (it % 60 == 1) timeArray.add(getString(R.string.time_format_1minute))
+                else if (it % 60 != 0) timeArray.add(getString(R.string.time_format_minute, it %60))
+
+                timeArray.joinToString(" ")
+            }
+            prefAlarmAutoDismiss?.setOnPreferenceClickListener { preference ->
+                val value = sharedPreferences.getInt(SharedKey.ALARM_DISMISS_TIME, SharedDefault.ALARM_DISMISS_TIME)
+                val timePicker = MaterialTimePicker.Builder()
+                    .setTitleText(R.string.set_fixed_time)
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setPositiveButtonText(android.R.string.ok)
+                    .setNegativeButtonText(android.R.string.cancel)
+                    .setHour(value / 60)
+                    .setMinute(value % 60)
+                    .build()
+                timePicker.addOnPositiveButtonClickListener {
+                    sharedPreferences.edit().putInt(SharedKey.ALARM_DISMISS_TIME, timePicker.hour * 60 + timePicker.minute).apply()
+                    preference.summary = (timePicker.hour * 60 + timePicker.minute).let {
+                        val timeArray: ArrayList<String> = arrayListOf()
+                        if (it / 60 == 1) timeArray.add(getString(R.string.time_format_1hour))
+                        else if (it / 60 != 0) timeArray.add(getString(R.string.time_format_hour, it / 60))
+                        if (it % 60 == 1) timeArray.add(getString(R.string.time_format_1minute))
+                        else if (it % 60 != 0) timeArray.add(getString(R.string.time_format_minute, it %60))
+
+                        timeArray.joinToString(" ")
+                    }
+                }
+                timePicker.show(parentFragmentManager, "ALARM_DISMISS_PICKER")
+
                 true
             }
         }

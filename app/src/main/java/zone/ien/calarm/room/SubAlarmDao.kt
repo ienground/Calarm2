@@ -8,7 +8,7 @@ interface SubAlarmDao {
     fun getAll(): List<SubAlarmEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(data: SubAlarmEntity)
+    fun add(data: SubAlarmEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(data: SubAlarmEntity)

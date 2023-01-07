@@ -3,6 +3,7 @@ package zone.ien.calarm.fragment
 import android.content.*
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -10,11 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
+import zone.ien.calarm.activity.TAG
 import zone.ien.calarm.adapter.MainTimerPageAdapter
 import zone.ien.calarm.callback.TimerFragmentCallback
+import zone.ien.calarm.constant.SavedInstanceExtra
 import zone.ien.calarm.databinding.FragmentMainTimerBinding
 import zone.ien.calarm.room.SubTimerDatabase
 import zone.ien.calarm.room.TimersDatabase
+import zone.ien.calarm.service.TimerService
 import java.util.*
 
 class MainTimerFragment : Fragment() {
@@ -24,7 +28,7 @@ class MainTimerFragment : Fragment() {
     private var timersDatabase: TimersDatabase? = null
     private var subTimerDatabase: SubTimerDatabase? = null
 
-    private var pagePosition = TIMER_PAGE_NUMPAD
+    private var pagePosition = TIMER_PAGE_LIST
     lateinit var pages: List<Fragment>
     lateinit var timerClockFragment: MainTimerClockFragment
     lateinit var timerListFragment: MainTimerListFragment
@@ -103,8 +107,9 @@ class MainTimerFragment : Fragment() {
         GlobalScope.launch(Dispatchers.IO) {
             val data = timersDatabase?.getDao()?.getAll()
             withContext(Dispatchers.Main) {
-                pagePosition = if (data?.isNotEmpty() == true) TIMER_PAGE_LIST else TIMER_PAGE_NUMPAD
-                binding.viewpager.setCurrentItem(pagePosition, true)
+                pagePosition = if (TimerService.isRunning) TIMER_PAGE_TIMER
+                else if (data?.isNotEmpty() == true) TIMER_PAGE_LIST else TIMER_PAGE_NUMPAD
+                binding.viewpager.setCurrentItem(pagePosition, false)
             }
         }
 
@@ -112,7 +117,6 @@ class MainTimerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        binding.viewpager.setCurrentItem(pagePosition, false)
     }
 
     override fun onAttach(context: Context) {

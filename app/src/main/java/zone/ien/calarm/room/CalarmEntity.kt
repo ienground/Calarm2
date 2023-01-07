@@ -3,6 +3,8 @@ package zone.ien.calarm.room
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Entity (tableName = "CalarmDatabase")
 class CalarmEntity(
@@ -23,14 +25,13 @@ class CalarmEntity(
     @Ignore var label: String = ""
 
 
-//    override fun toString(): String {
-//        val builder = StringBuilder("[$id] $label - ${time / 60}:${time % 60} : isEnabled $isEnabled ")
-//        builder.append("${repeat.toString(2)} [")
-//
-//        for (calarm in subCalarms) {
-//            builder.append("${calarm}, ")
-//        }
-//        builder.append("]")
-//        return builder.toString()
-//    }
+    override fun toString(): String {
+        val builder = StringBuilder("[$id] $label - ${Date(time)} : isEnabled $isEnabled [")
+
+        for (calarm in subCalarms) {
+            builder.append("${calarm}, ")
+        }
+        builder.append("]")
+        return builder.toString()
+    }
 }

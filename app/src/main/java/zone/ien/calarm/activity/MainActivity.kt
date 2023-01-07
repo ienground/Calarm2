@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.util.Log
+import android.util.TypedValue
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -26,6 +27,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -86,7 +88,15 @@ class MainActivity : AppCompatActivity(),
         lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         sharedPreferences = getSharedPreferences("${packageName}_preferences", Context.MODE_PRIVATE)
 
-        nm.createNotificationChannel(NotificationChannel(ChannelID.DEFAULT_ID, getString(R.string.calarm_alarm), NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(ChannelID.DEFAULT_ID, getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(ChannelID.ALARM_ID, getString(R.string.calarm_alarm), NotificationManager.IMPORTANCE_HIGH).apply {
+            vibrationPattern = longArrayOf(0L)
+            enableVibration(true)
+        })
+        nm.createNotificationChannel(NotificationChannel(ChannelID.CALARM_ID, getString(R.string.calarm_calendar), NotificationManager.IMPORTANCE_HIGH).apply {
+            vibrationPattern = longArrayOf(0L)
+            enableVibration(true)
+        })
 
         loadFragment(MainAlarmFragment())
 
@@ -109,7 +119,10 @@ class MainActivity : AppCompatActivity(),
             set(Calendar.MINUTE, 5)
         }
         val calarmCreatePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(applicationContext, CalarmCreateReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calarmCreateCalendar.timeInMillis, AlarmManager.INTERVAL_DAY, calarmCreatePendingIntent)
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calarmCreateCalendar.timeInMillis, AlarmManager.INTERVAL_DAY, calarmCreatePendingIntent) //        binding.navigationRail?.setOnLongClickListener {
+        //            sendBroadcast(Intent(applicationContext, CalarmCreateReceiver::class.java))
+        //            true
+        //        }
 
         val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { group ->
             group.forEach {
@@ -137,20 +150,27 @@ class MainActivity : AppCompatActivity(),
         }
         permissionLauncher.launch(permissions.toTypedArray())
 
-
-        binding.bottomNav.setOnItemSelectedListener {
-            loadFragment(
-                when (it.itemId) {
-                    R.id.navigation_alarm -> MainAlarmFragment()
-                    R.id.navigation_calarm -> MainCalarmFragment()
-                    R.id.navigation_timer -> MainTimerFragment()
-                    R.id.navigation_stopwatch -> MainStopwatchFragment()
-                    else -> MainAlarmFragment()
-                }
-            )
+        binding.bottomNav?.setOnItemSelectedListener {
+            loadFragment(when (it.itemId) {
+                R.id.navigation_alarm -> MainAlarmFragment()
+                R.id.navigation_calarm -> MainCalarmFragment()
+                R.id.navigation_timer -> MainTimerFragment()
+                R.id.navigation_stopwatch -> MainStopwatchFragment()
+                else -> MainAlarmFragment()
+            })
+        }
+        binding.navigationRail?.setOnItemSelectedListener {
+            loadFragment(when (it.itemId) {
+                R.id.navigation_alarm -> MainAlarmFragment()
+                R.id.navigation_calarm -> MainCalarmFragment()
+                R.id.navigation_timer -> MainTimerFragment()
+                R.id.navigation_stopwatch -> MainStopwatchFragment()
+                else -> MainAlarmFragment()
+            })
         }
 
-        binding.bottomNav.setOnItemReselectedListener {  }
+        binding.bottomNav?.setOnItemReselectedListener { }
+        binding.navigationRail?.setOnItemReselectedListener { }
 
         // Alarm Activity
         GlobalScope.launch(Dispatchers.IO) {
@@ -168,6 +188,8 @@ class MainActivity : AppCompatActivity(),
                 }
             }
         }
+
+//        startActivity(Intent(this, AlarmRingActivity::class.java))
     }
 
     private fun loadFragment(fragment: Fragment?): Boolean {

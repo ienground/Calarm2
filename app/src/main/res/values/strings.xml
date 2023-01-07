@@ -10,13 +10,14 @@
 
     <!--Overall Using-->
     <string name="save">Save</string>
-    <string name="time_format_before_hour_minute">%1$d hours %2$d minutes before</string>
-    <string name="time_format_before_hour">%1$d hours before</string>
-    <string name="time_format_before_minute">%1$d minutes before</string>
-    <string name="time_format_hour_minute">%1$d hours %2$d minutes</string>
+    <string name="time_format_before">%1$s before</string>
     <string name="time_format_hour">%1$d hours</string>
     <string name="time_format_minute">%1$d minutes</string>
-    <string name="sub_alarm_dialog_title">minutes before</string>
+    <string name="time_format_second">%1$d seconds</string>
+    <string name="time_format_1hour">1 hour</string>
+    <string name="time_format_1minute">1 minute</string>
+    <string name="time_format_1second">1 second</string>
+    <string name="sub_alarm_dialog_title">How far ahead of schedule can we be notified?</string>
     <string name="delete">Delete</string>
     <string name="delete_title">Delete?</string>
     <string name="delete_content">Are you sure to delete?</string>
@@ -27,6 +28,7 @@
     <string name="no_label">No label</string>
     <string name="dateTimeFormat">MMM dd yyyy, hh:mm a</string>
     <string name="dateFormat">MMM dd yyyy</string>
+    <string name="dateFormatNoYear">EEEE, MMM dd</string>
     <string name="alarm_content_format">EEE hh:mm a</string>
     <string name="apmTimeFormat">h:mm a</string>
     <string name="label">Label</string>
@@ -36,12 +38,18 @@
     <string name="close">Close</string>
     <string name="stop">Stop</string>
     <string name="calarm_alarm">Calarm Alarm</string>
+    <string name="calarm_calendar">Calarm Calendar Alarm</string>
     <string name="user_hello_morning">Good morning☀️</string>
     <string name="user_hello_afternoon">Have a great lunch🍽️</string>
     <string name="user_hello_evening">Good evening🎆</string>
     <string name="user_hello_night">Sleep tight🌙</string>
     <string name="no_show_dialog_msg">Do not show this dialog again.</string>
     <string name="share">Share</string>
+    <string name="edit">Edit</string>
+    <string name="at_least_one_item">At least one item</string>
+    <string name="date_picker_title">Select date</string>
+    <string name="time_picker_title">Select time</string>
+    <string name="cannot_be_undone">This action cannot be undone.</string>
 
     <!--SettingsActivity-->
     <string name="home_address">Home address</string>
@@ -65,12 +73,16 @@
     <string name="search">Search</string>
     <string name="set_home_location">Set home location</string>
 
-    <!--AlarmService-->
+    <!--AlarmReceiver-->
     <string name="from_alarm_name">from %1$s</string>
     <string name="missed_notification">Missed Alarm Notification</string>
     <string name="missed_alarm">Missed Alarm</string>
-    <string name="snooze">snooze</string>
+    <string name="snooze">Snooze</string>
     <string name="alarm_off">Alarm Off</string>
+
+    <!--CalarmReceiver-->
+    <string name="missed_notification_calarm">Missed Calarm Notification</string>
+    <string name="missed_calarm">Missed Calarm</string>
 
     <!--MainAlarmFragment-->
     <string name="no_alarms">No alarms</string>
@@ -78,6 +90,7 @@
     <string name="active_alarm_count">There are %1$d alarms activated</string>
 
     <!--MainCalarmFragment-->
+    <string name="no_calarms">No calarms</string>
     <string name="calarm_event_count">You have %1$d events today</string>
     <string name="set_today">Set date today</string>
 
@@ -85,6 +98,7 @@
     <string name="add_new_timer">Add new timer</string>
     <string name="time_is_up">Time\'s Up!</string>
     <string name="countdown">Countdown</string>
+    <string name="no_timers">No timers</string>
 
     <!--MainStopwatchFragment-->
     <string name="tap_to_schedule_stopwatch">Tap to schedule stopwatch</string>
@@ -122,7 +136,7 @@
     <string name="day_format">%1$d days</string>
     <string name="hour_format">%1$d hours</string>
     <string name="minute_format">%1$d minutes</string>
-    <string name="alarm_toast_format">Alarm set for %1$s from now</string>
+    <string name="alarm_toast_format">Alarm set for %1$sfrom now</string>
     <string name="alarm_toast_min">Alarm set for less than 1 minute from now</string>
 
     <!--MainCalarmEventAdapter-->
@@ -137,4 +151,6 @@
     <string name="deskclock_settings">Deskclock Settings</string>
     <string name="hidden_noti_channels">Hidden notification channels</string>
     <string name="no_items">No items</string>
+    <string name="alarm_settings">Alarm settings</string>
+    <string name="alarm_auto_dismiss_duration">Alarm auto dismiss duration</string>
 </resources>

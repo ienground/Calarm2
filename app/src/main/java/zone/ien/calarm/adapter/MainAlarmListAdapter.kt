@@ -43,6 +43,8 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
                 set(Calendar.MINUTE, it % 60)
             }
         }
+        holder.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        holder.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
         holder.tvRepeatDay.text = MyUtils.getRepeatlabel(context, items[holder.adapterPosition].repeat, items[holder.adapterPosition].time)
 
         items[holder.adapterPosition].label.let {
@@ -55,9 +57,11 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
         }
         holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
         holder.tvApm.text = apmFormat.format(time.time)
+        holder.tvApmKo.text = apmFormat.format(time.time)
         holder.tvTime.text = timeFormat.format(time.time)
 
         holder.tvApm.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
+        holder.tvApmKo.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
         holder.tvTime.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
 
         holder.chipsMiniAlarm.removeAllViews()
@@ -67,15 +71,27 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
             calendar.add(Calendar.MINUTE, -alarm.time)
             chip.isCheckable = true
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
-            chip.text = if (alarm.time / 60 != 0 && alarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, alarm.time / 60, alarm.time % 60)
-            else if (alarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, alarm.time / 60)
-            else context.getString(R.string.time_format_before_minute, alarm.time % 60)
+            chip.text = context.getString(R.string.time_format_before, alarm.time.let {
+                val timeArray: ArrayList<String> = arrayListOf()
+                if (it / 60 == 1) timeArray.add(context.getString(R.string.time_format_1hour))
+                else if (it / 60 != 0) timeArray.add(context.getString(R.string.time_format_hour, it / 60))
+                if (it % 60 == 1) timeArray.add(context.getString(R.string.time_format_1minute))
+                else if (it % 60 != 0) timeArray.add(context.getString(R.string.time_format_minute, it %60))
+
+                timeArray.joinToString(" ")
+            })
 
             chip.setOnCheckedChangeListener { compoundButton, b ->
                 chip.text = if (b) apmTimeFormat.format(calendar.time) else {
-                    if (alarm.time / 60 != 0 && alarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, alarm.time / 60, alarm.time % 60)
-                    else if (alarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, alarm.time / 60)
-                    else context.getString(R.string.time_format_before_minute, alarm.time % 60)
+                    context.getString(R.string.time_format_before, alarm.time.let {
+                        val timeArray: ArrayList<String> = arrayListOf()
+                        if (it / 60 == 1) timeArray.add(context.getString(R.string.time_format_1hour))
+                        else if (it / 60 != 0) timeArray.add(context.getString(R.string.time_format_hour, it / 60))
+                        if (it % 60 == 1) timeArray.add(context.getString(R.string.time_format_1minute))
+                        else if (it % 60 != 0) timeArray.add(context.getString(R.string.time_format_minute, it % 60))
+
+                        timeArray.joinToString(" ")
+                    })
                 }
             }
 
@@ -93,6 +109,7 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
         holder.switchOn.setOnCheckedChangeListener { compoundButton, b ->
             callbackListener?.toggle(holder.adapterPosition, items[holder.adapterPosition].id ?: -1, b)
             holder.tvApm.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
+            holder.tvApmKo.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
             holder.tvTime.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
         }
 
@@ -136,6 +153,7 @@ class MainAlarmListAdapter(var items: ArrayList<AlarmEntity>): RecyclerView.Adap
         val switchOn: MaterialSwitch = itemView.findViewById(R.id.switch_on)
         val tvRepeatDay: MaterialTextView = itemView.findViewById(R.id.tv_repeat_day)
         val tvApm: MaterialTextView = itemView.findViewById(R.id.tv_apm)
+        val tvApmKo: MaterialTextView = itemView.findViewById(R.id.tv_apm_ko)
         val tvTime: MaterialTextView = itemView.findViewById(R.id.tv_time)
         val chipsMiniAlarm: ChipGroup = itemView.findViewById(R.id.chips_mini_alarm)
     }

@@ -37,18 +37,10 @@ class AlarmSnoozeReceiver: BroadcastReceiver() {
         am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         sharedPreferences = context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
 
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            manager.defaultVibrator
-        } else {
-            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
-
-        vibrator.cancel()
 
         val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
 
-        LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.SNOOZE_ALARM).apply { putExtra(IntentKey.ITEM_ID, id) })
+        LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.STOP_ALARM).apply { putExtra(IntentKey.ITEM_ID, id) })
 
         if (id != -1L) {
             nm.cancel((NotificationID.CALARM_ALARM + id).toInt())

@@ -4,6 +4,7 @@ class IntentKey {
     companion object {
         const val ITEM_ID = "item_id" // Long
         const val SUBALARM_ID = "sub_alarm_id" // Long
+        const val SUBCALARM_ID = "sub_calarm_id" // Long
         const val ACTION_TYPE = "action_type" // Int
         const val POSITION = "position"
         const val LABEL = "label"

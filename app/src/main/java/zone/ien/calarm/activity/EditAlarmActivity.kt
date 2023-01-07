@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -84,6 +85,9 @@ class EditAlarmActivity : AppCompatActivity() {
             item.time = it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) + 1
         }
 
+        binding.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
+
         if (id != -1L) {
             GlobalScope.launch(Dispatchers.IO) {
                 alarmDatabase?.getDao()?.get(id).let {
@@ -103,7 +107,7 @@ class EditAlarmActivity : AppCompatActivity() {
 
         binding.groupTime.setOnClickListener {
             val timePicker = MaterialTimePicker.Builder()
-                .setTitleText("HI:")
+                .setTitleText(R.string.time_picker_title)
                 .setHour(item.time / 60)
                 .setMinute(item.time % 60)
                 .build()
@@ -114,6 +118,7 @@ class EditAlarmActivity : AppCompatActivity() {
                     set(Calendar.MINUTE, timePicker.minute)
                 }
                 binding.tvApm.text = apmFormat.format(time.time)
+                binding.tvApmKo.text = apmFormat.format(time.time)
                 binding.tvTime.text = timeFormat.format(time.time)
             }
             timePicker.show(supportFragmentManager, "TIME_PICKER")
@@ -129,10 +134,11 @@ class EditAlarmActivity : AppCompatActivity() {
 
         binding.groupRing.setOnClickListener {
             val mediaPlayer = MediaPlayer().apply { setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()) }
-            MaterialAlertDialogBuilder(this).apply {
+            MaterialAlertDialogBuilder(this, R.style.Theme_Calarm_MaterialAlertDialog).apply {
                 var index = ringtones.values.indexOf(item.sound)
                 var checkedUri = item.sound
 
+                setIcon(R.drawable.ic_ring)
                 setTitle(R.string.alarm_ring)
                 setSingleChoiceItems(ringtones.getKeyArray(), index) { _, which ->
                     mediaPlayer.stop()
@@ -198,6 +204,7 @@ class EditAlarmActivity : AppCompatActivity() {
         }
         binding.tvRepeat.text = MyUtils.getRepeatlabel(applicationContext, item.repeat, item.time)
         binding.tvApm.text = apmFormat.format(time.time)
+        binding.tvApmKo.text = apmFormat.format(time.time)
         binding.tvTime.text = timeFormat.format(time.time)
         binding.tvRing.text = with(ringtones.filterValues { it == item.sound }.getKeyArray()) { if (this.isNotEmpty()) first() else "" }
         binding.switchVibrate.isChecked = data.vibrate
@@ -236,7 +243,7 @@ class EditAlarmActivity : AppCompatActivity() {
                         subAlarmDatabase?.getDao()?.deleteParentId(id ?: -1)
                         for (entity in this@EditAlarmActivity.item.subAlarms) {
                             entity.parentId = id ?: -1
-                            subAlarmDatabase?.getDao()?.add(entity)
+                            entity.id = subAlarmDatabase?.getDao()?.add(entity)
                         }
                         val alarmTime = MyUtils.setAlarmClock(applicationContext, am, this@EditAlarmActivity.item)
                         withContext(Dispatchers.Main) {
@@ -251,8 +258,10 @@ class EditAlarmActivity : AppCompatActivity() {
                 }
             }
             R.id.menu_delete -> {
-                MaterialAlertDialogBuilder(this).apply {
-                    setMessage(R.string.delete_title)
+                MaterialAlertDialogBuilder(this, R.style.Theme_Calarm_MaterialAlertDialog).apply {
+                    setIcon(R.drawable.ic_delete)
+                    setTitle(R.string.delete_title)
+                    setMessage(R.string.cannot_be_undone)
                     setPositiveButton(android.R.string.ok) { _, _ ->
                         GlobalScope.launch(Dispatchers.IO) {
                             MyUtils.deleteAlarmClock(applicationContext, am, this@EditAlarmActivity.item)

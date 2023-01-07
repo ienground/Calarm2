@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="activity"
+            type="zone.ien.calarm.activity.CalarmRingActivity" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/group_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_apm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard"
+                android:text="AM"
+                android:textSize="30sp"
+                android:textColor="@color/white"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@id/tv_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBaseline_toBaselineOf="@id/tv_time" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_apm_ko"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard"
+                android:text="AM"
+                android:textSize="30sp"
+                android:textColor="@color/white"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_time"
+                app:layout_constraintBaseline_toBaselineOf="@id/tv_time" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard"
+                android:text="09:00"
+                android:textSize="60sp"
+                android:textColor="@color/white"
+                android:layout_marginStart="4dp"
+                app:layout_constraintStart_toEndOf="@id/tv_apm_ko"
+                app:layout_constraintEnd_toStartOf="@id/tv_apm"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="@string/dateFormat"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_time"
+                app:layout_constraintBottom_toTopOf="@id/tv_label"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="LABEL"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textAlignment="center"
+                android:layout_marginHorizontal="@dimen/usual_margin"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_date"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_margin="@dimen/usual_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/group_time">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/usual_margin">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.CardView.Filled"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_apm_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard"
+                        android:text="AM"
+                        android:textSize="18sp"
+                        android:textColor="@color/white"
+                        android:layout_marginStart="4dp"
+                        app:layout_constraintStart_toEndOf="@id/tv_time_parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBaseline_toBaselineOf="@id/tv_time_parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_apm_ko_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard"
+                        android:text="AM"
+                        android:textSize="18sp"
+                        android:textColor="@color/white"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv_time_parent"
+                        app:layout_constraintBaseline_toBaselineOf="@id/tv_time_parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_time_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard"
+                        android:text="09:00"
+                        android:textSize="36sp"
+                        android:textColor="@color/white"
+                        android:layout_marginStart="4dp"
+                        app:layout_constraintStart_toEndOf="@id/tv_apm_ko_parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv_apm_parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_time_diff"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="10 mins before"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/pretendard_regular"
+                    android:textSize="24sp"
+                    android:layout_marginTop="@dimen/usual_margin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/card_time" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <zone.ien.calarm.utils.SwipeAnimationButton
+            android:id="@+id/slider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/usual_margin"
+            app:backgroundCardColor="?attr/colorSecondaryContainer"
+            app:defaultBackgroundColor="?attr/colorSecondary"
+            app:defaultDrawable="@drawable/ic_alarm"
+            app:rightSwipeBackgroundColor="?attr/colorPrimary"
+            app:rightSwipeDrawable="@drawable/ic_snooze"
+            app:leftSwipeBackgroundColor="?attr/colorPrimary"
+            app:leftSwipeEnabled="false"
+            app:duration="200"
+            app:fontType="@font/pretendard_regular"
+            app:text_size="8sp"
+            app:rightSwipeText="@string/alarm_off"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

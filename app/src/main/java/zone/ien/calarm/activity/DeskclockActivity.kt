@@ -34,7 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class DeskclockActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityDeskclockBinding
@@ -87,6 +86,9 @@ class DeskclockActivity : AppCompatActivity() {
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         dateFormat = SimpleDateFormat(getString(R.string.dateFormat), Locale.getDefault())
+
+        binding.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
 
         binding.progressVolume.max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         binding.progressVolume.progress = am.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -272,6 +274,7 @@ class DeskclockActivity : AppCompatActivity() {
 
         val time = Date(System.currentTimeMillis())
         binding.tvApm.text = apmFormat.format(time)
+        binding.tvApmKo.text = apmFormat.format(time)
         binding.tvTime.text = timeFormat.format(time)
         binding.tvDate.text = dateFormat.format(time)
 
@@ -279,6 +282,7 @@ class DeskclockActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
                 val time2 = Date(System.currentTimeMillis())
                 binding.tvApm.text = apmFormat.format(time2)
+                binding.tvApmKo.text = apmFormat.format(time2)
                 binding.tvTime.text = timeFormat.format(time2)
                 binding.tvDate.text = dateFormat.format(time2)
             }

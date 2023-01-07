@@ -45,35 +45,58 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_apm"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/group_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="오후"
-            android:textSize="14sp"
-            android:fontFamily="@font/pretendard_black"
-            android:layout_marginEnd="@dimen/usual_margin_half"
-            android:layout_marginBottom="@dimen/usual_margin"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_time"
-            app:layout_constraintBottom_toBottomOf="@id/tv_time"/>
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="5:40"
-            android:textSize="54sp"
-            android:fontFamily="@font/pretendard_black"
             app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@id/tv_apm"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_date" />
+            app:layout_constraintBottom_toTopOf="@id/tv_date">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_apm_ko"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="오후"
+                android:textSize="27sp"
+                android:fontFamily="@font/pretendard_black"
+                android:layout_marginEnd="@dimen/usual_margin_half"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_time"
+                app:layout_constraintBaseline_toBaselineOf="@id/tv_time"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_apm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="PM"
+                android:textSize="27sp"
+                android:fontFamily="@font/pretendard_black"
+                android:layout_marginStart="@dimen/usual_margin_half"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/tv_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBaseline_toBaselineOf="@id/tv_time"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="5:40"
+                android:textSize="54sp"
+                android:fontFamily="@font/pretendard_black"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/tv_apm_ko"
+                app:layout_constraintEnd_toStartOf="@id/tv_apm"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_date"
@@ -82,9 +105,9 @@
             android:text="2021년 5월 15일 토요일"
             android:textColor="@color/white"
             android:fontFamily="@font/pretendard_regular"
-            app:layout_constraintStart_toStartOf="@id/tv_apm"
-            app:layout_constraintEnd_toEndOf="@id/tv_time"
-            app:layout_constraintTop_toBottomOf="@id/tv_time"
+            app:layout_constraintStart_toStartOf="@id/group_time"
+            app:layout_constraintEnd_toEndOf="@id/group_time"
+            app:layout_constraintTop_toBottomOf="@id/group_time"
             app:layout_constraintBottom_toTopOf="@id/guideline1" />
 
         <com.google.android.material.textview.MaterialTextView

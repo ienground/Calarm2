@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/Widget.Material3.CardView.Filled"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_filled"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        style="@style/Widget.Material3.CardView.Filled"
+        app:layout_constraintStart_toStartOf="@id/root"
+        app:layout_constraintEnd_toEndOf="@id/root"
+        app:layout_constraintTop_toTopOf="@id/root"
+        app:layout_constraintBottom_toBottomOf="@id/root"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/usual_margin_half">
@@ -86,4 +97,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,5 +19,7 @@ class SharedKey {
         const val IS_STOPWATCH_SCHEDULED = "is_stopwatch_scheduled"
         const val STOPWATCH_SCHEDULED_TIME = "stopwatch_scheduled_time"
         const val NO_SHOW_STOPWATCH_RESET_DIALOG = "no_show_stopwatch_reset_dialog"
+
+        const val ALARM_DISMISS_TIME = "alarm_dismiss_time"
     }
 }

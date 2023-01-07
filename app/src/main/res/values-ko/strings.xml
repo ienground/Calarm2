@@ -10,13 +10,14 @@
 
     <!--Overall Using-->
     <string name="save">저장</string>
-    <string name="time_format_before_hour_minute">%1$d시간 %2$d분 전</string>
-    <string name="time_format_before_hour">%1$d시간 전</string>
-    <string name="time_format_before_minute">%1$d분 전</string>
-    <string name="time_format_hour_minute">%1$d시간 %2$d분</string>
+    <string name="time_format_before">%1$s 전</string>
     <string name="time_format_hour">%1$d시간</string>
     <string name="time_format_minute">%1$d분</string>
-    <string name="sub_alarm_dialog_title">minutes before</string>
+    <string name="time_format_second">%1$d초</string>
+    <string name="time_format_1hour">1시간</string>
+    <string name="time_format_1minute">1분</string>
+    <string name="time_format_1second">1초</string>
+    <string name="sub_alarm_dialog_title">일정보다 얼마나 먼저 알려드릴까요?</string>
     <string name="delete">삭제</string>
     <string name="delete_title">삭제할까요?</string>
     <string name="delete_content">정말로 삭제할까요?</string>
@@ -27,6 +28,7 @@
     <string name="no_label">라벨 없음</string>
     <string name="dateTimeFormat">yyyy년 M월 d일 a hh:mm</string>
     <string name="dateFormat">yyyy년 M월 d일</string>
+    <string name="dateFormatNoYear">M월 d일 E요일</string>
     <string name="alarm_content_format">EEE a hh:mm</string>
     <string name="apmTimeFormat">a h:mm</string>
     <string name="label">라벨</string>
@@ -36,12 +38,18 @@
     <string name="close">닫기</string>
     <string name="stop">정지</string>
     <string name="calarm_alarm">캘람 알람</string>
+    <string name="calarm_calendar">캘람 캘린더 알람</string>
     <string name="user_hello_morning">좋은 아침이에요☀️</string>
     <string name="user_hello_afternoon">점심 맛있게 드세요🍽️</string>
     <string name="user_hello_evening">행복한 저녁이에요🎆</string>
     <string name="user_hello_night">오늘은 어떠셨나요?🌙</string>
     <string name="no_show_dialog_msg">이 창을 다시 보지 않습니다.</string>
     <string name="share">공유</string>
+    <string name="edit">수정</string>
+    <string name="at_least_one_item">최소 하나의 아이템은 있어야 합니다</string>
+    <string name="date_picker_title">날짜 선택</string>
+    <string name="time_picker_title">시간 선택</string>
+    <string name="cannot_be_undone">이 작업은 취소할 수 없습니다.</string>
 
     <!--SettingsActivity-->
     <string name="home_address">집 주소</string>
@@ -65,12 +73,16 @@
     <string name="search">검색</string>
     <string name="set_home_location">이곳을 집으로 설정</string>
 
-    <!--AlarmService-->
+    <!--AlarmReceiver-->
     <string name="from_alarm_name">%1$s에서</string>
     <string name="missed_notification">부재중 알람 알림</string>
     <string name="missed_alarm">부재중 알람</string>
     <string name="snooze">스누즈</string>
     <string name="alarm_off">알람 끄기</string>
+
+    <!--CalarmReceiver-->
+    <string name="missed_notification_calarm">부재중 캘람 알림</string>
+    <string name="missed_calarm">부재중 캘람</string>
 
     <!--MainAlarmFragment-->
     <string name="no_alarms">알람 없음</string>
@@ -78,6 +90,7 @@
     <string name="active_alarm_count">%1$d개의 활성화된 알람이 있어요</string>
 
     <!--MainCalarmFragment-->
+    <string name="no_calarms">캘람 없음</string>
     <string name="calarm_event_count">오늘은 %1$d개의 일정이 있어요</string>
     <string name="set_today">오늘로 설정</string>
 
@@ -85,6 +98,7 @@
     <string name="add_new_timer">새 타이머 추가</string>
     <string name="time_is_up">시간이 다 됐어요!</string>
     <string name="countdown">카운트다운 타이머</string>
+    <string name="no_timers">타이머 없음</string>
 
     <!--MainStopwatchFragment-->
     <string name="tap_to_schedule_stopwatch">스톱워치 예약하기</string>
@@ -122,7 +136,7 @@
     <string name="day_format">%1$d일</string>
     <string name="hour_format">%1$d시간</string>
     <string name="minute_format">%1$d분</string>
-    <string name="alarm_toast_format">알람이 %1$s 후에 울립니다</string>
+    <string name="alarm_toast_format">알람이 %1$s후에 울립니다</string>
     <string name="alarm_toast_min">알람이 1분 이내에 울립니다</string>
 
     <!--MainCalarmEventAdapter-->

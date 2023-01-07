@@ -1,6 +1,7 @@
 package zone.ien.calarm
 
 import android.app.Application
+import com.google.android.material.color.DynamicColors
 
 class MyApplication: Application() {
 
@@ -17,6 +18,11 @@ class MyApplication: Application() {
         fun timerWindowPaused() {
             timerWindowActivated = false
         }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 
 

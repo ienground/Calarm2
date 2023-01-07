@@ -12,6 +12,35 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
+        <ImageView
+            android:id="@+id/ic_no_timers"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:src="@drawable/ic_timer_off"
+            android:alpha="0.4"
+            android:visibility="gone"
+            app:tint="@color/white"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list"
+            app:layout_constraintBottom_toTopOf="@id/tv_no_timers" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_no_timers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_timers"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:alpha="0.4"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_no_timers"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="0dp"
@@ -24,17 +53,42 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_frame"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/adapter_main_timer_list_shimmer" />
+                <include layout="@layout/adapter_main_timer_list_shimmer" />
+                <include layout="@layout/adapter_main_timer_list_shimmer" />
+                <include layout="@layout/adapter_main_timer_list_shimmer" />
+                <include layout="@layout/adapter_main_timer_list_shimmer" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/btn_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_new_timer"
             android:textAlignment="textEnd"
+            android:textColor="?attr/colorOnSecondary"
             android:layout_margin="@dimen/usual_margin"
             android:elevation="0dp"
             android:stateListAnimator="@null"
             android:layout_marginBottom="@dimen/usual_margin"
-            app:icon="@drawable/ic_add"
+            app:icon="@drawable/ic_hourglass_add"
+            app:iconTint="?attr/colorOnSecondary"
             app:backgroundTint="?attr/colorSecondary"
             app:rippleColor="?attr/colorSecondary"
             app:layout_constraintStart_toStartOf="parent"

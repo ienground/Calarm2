@@ -8,12 +8,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
 import android.util.Log
+import android.util.TypedValue
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -24,10 +26,7 @@ import kotlinx.coroutines.launch
 import zone.ien.calarm.R
 import zone.ien.calarm.activity.AlarmRingActivity
 import zone.ien.calarm.activity.TAG
-import zone.ien.calarm.constant.ChannelID
-import zone.ien.calarm.constant.IntentID
-import zone.ien.calarm.constant.IntentKey
-import zone.ien.calarm.constant.NotificationID
+import zone.ien.calarm.constant.*
 import zone.ien.calarm.room.AlarmDatabase
 import zone.ien.calarm.room.SubAlarmDatabase
 import java.text.SimpleDateFormat
@@ -38,13 +37,19 @@ class AlarmReceiver: BroadcastReceiver() {
     private var alarmDatabase: AlarmDatabase? = null
     private var subAlarmDatabase: SubAlarmDatabase? = null
     private lateinit var nm: NotificationManager
+    private lateinit var sharedPreferences: SharedPreferences
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
         alarmDatabase = AlarmDatabase.getInstance(context)
         subAlarmDatabase = SubAlarmDatabase.getInstance(context)
         nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.createNotificationChannel(NotificationChannel(ChannelID.DEFAULT_ID, context.getString(R.string.calarm_alarm), NotificationManager.IMPORTANCE_HIGH))
+        sharedPreferences = context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
+        nm.createNotificationChannel(NotificationChannel(ChannelID.DEFAULT_ID, context.getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(ChannelID.ALARM_ID, context.getString(R.string.calarm_alarm), NotificationManager.IMPORTANCE_HIGH).apply {
+            vibrationPattern = longArrayOf(0L)
+            enableVibration(true)
+        })
         nm.createNotificationChannel(NotificationChannel(ChannelID.MISSING_ID, context.getString(R.string.missed_notification), NotificationManager.IMPORTANCE_HIGH))
 
         val mediaPlayer = MediaPlayer().apply { setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()) }
@@ -56,13 +61,13 @@ class AlarmReceiver: BroadcastReceiver() {
         val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
         val subAlarmId = intent.getLongExtra(IntentKey.SUBALARM_ID, -1)
 
-        Log.d(TAG, "id: ${id}")
+        Log.d(TAG, "id: ${id} subalarm $subAlarmId")
         if (id != -1L) {
             GlobalScope.launch(Dispatchers.IO) {
                 val data = alarmDatabase?.getDao()?.get(id)
                 val subAlarm = subAlarmDatabase?.getDao()?.get(subAlarmId)
                 if (data != null) {
-                    if ((data.isEnabled && subAlarmId == -1L) || (subAlarm != null && subAlarm.isEnabled)) {
+                    if ((data.isEnabled && subAlarmId == -1L) || (data.isEnabled && subAlarm != null && subAlarm.isEnabled)) {
                         val ringtoneUri: Uri = if (data.sound != "") Uri.parse(data.sound) else RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
                         if (data.vibrate) {
@@ -88,13 +93,15 @@ class AlarmReceiver: BroadcastReceiver() {
                         val snoozePendingIntent = PendingIntent.getBroadcast(context, (300000 + id).toInt(), snoozeIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                         val offIntent = Intent(context, AlarmOffReceiver::class.java).apply { putExtra(IntentKey.ITEM_ID, id) }
                         val offPendingIntent = PendingIntent.getBroadcast(context, (200000 + id).toInt(), offIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                        val builder = NotificationCompat.Builder(context, ChannelID.DEFAULT_ID).apply {
+                        val builder = NotificationCompat.Builder(context, ChannelID.ALARM_ID).apply {
                             setSmallIcon(R.drawable.ic_alarm)
                             setContentTitle(context.getString(R.string.calarm_alarm))
                             setContentText(timeFormat.format(Calendar.getInstance().time))
                             setAutoCancel(false)
                             setOngoing(true)
                             setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_VIBRATE)
+                            setSound(null)
+                            setVibrate(longArrayOf(0L))
                             setCategory(NotificationCompat.CATEGORY_ALARM)
                             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             setLocalOnly(true)
@@ -104,12 +111,13 @@ class AlarmReceiver: BroadcastReceiver() {
                             setContentIntent(fullScreenPendingIntent)
                             setFullScreenIntent(fullScreenPendingIntent, true)
 
-                            color = ContextCompat.getColor(context, R.color.amber)
+                            color = ContextCompat.getColor(context, R.color.colorAccent)
                         }
 
                         nm.notify((NotificationID.CALARM_ALARM + id).toInt(), builder.build())
 
                         Handler(Looper.getMainLooper()).postDelayed({
+                            context.sendBroadcast(offIntent)
                             val missingBuilder = NotificationCompat.Builder(context, ChannelID.MISSING_ID).apply {
                                 setSmallIcon(R.drawable.ic_icon)
                                 setContentTitle(context.getString(R.string.missed_alarm))
@@ -125,14 +133,15 @@ class AlarmReceiver: BroadcastReceiver() {
                                 priority = NotificationCompat.PRIORITY_DEFAULT
 //                               TODO  setContentIntent(fullScreenPendingIntent)
 
-                                color = ContextCompat.getColor(context, R.color.amber)
+                                color = ContextCompat.getColor(context, R.color.colorAccent)
                             }
 
                             if (subAlarmId == -1L) {
-                                nm.notify((NotificationID.CALARM_ALARM + id).toInt(), missingBuilder.build())
+                                Log.d(TAG, "NOTIFY!")
+                                nm.notify((NotificationID.CALARM_ALARM_MISSING + id).toInt(), missingBuilder.build())
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(IntentID.STOP_ALARM))
                             }
-                        }, 3 * 60 * 1000)
+                        }, sharedPreferences.getInt(SharedKey.ALARM_DISMISS_TIME, SharedDefault.ALARM_DISMISS_TIME) * 60 * 1000L)
                     }
                 }
             }

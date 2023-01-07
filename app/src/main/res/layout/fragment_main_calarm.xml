@@ -85,6 +85,33 @@
             app:layout_constraintTop_toBottomOf="@id/list_date"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <ImageView
+            android:id="@+id/ic_no_calarms"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:src="@drawable/ic_calarm_off"
+            android:alpha="0"
+            app:tint="@color/white"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/list_event"
+            app:layout_constraintBottom_toTopOf="@id/tv_no_calarms" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_no_calarms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_calarms"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard"
+            android:alpha="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_no_calarms"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/shimmer_frame"
             android:layout_width="0dp"

@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
+import android.util.TypedValue
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
@@ -40,6 +41,7 @@ class TimerService : Service() {
     private var timer: Timer? = null
     private var id: Long = -1
     private var duration = 0L
+    private var label = ""
 
     private var timeUntilFinished: ArrayList<Long> = arrayListOf()
     private var millisLeft = 0L
@@ -51,14 +53,16 @@ class TimerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         countDownTimer?.cancel()
+        isRunning = false
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.cancel(NotificationID.CALARM_TIMER)
         timer?.cancel()
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent): IBinder? = null
@@ -68,16 +72,19 @@ class TimerService : Service() {
         timersDatabase = TimersDatabase.getInstance(applicationContext)
         subTimerDatabase = SubTimerDatabase.getInstance(applicationContext)
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.createNotificationChannel(NotificationChannel(ChannelID.COUNTDOWN_ID, getString(R.string.countdown), NotificationManager.IMPORTANCE_HIGH))
+        nm.createNotificationChannel(NotificationChannel(ChannelID.COUNTDOWN_ID, getString(R.string.countdown), NotificationManager.IMPORTANCE_HIGH).apply {
+            vibrationPattern = longArrayOf(0L)
+            enableVibration(true)
+        })
         playPausePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(IntentID.PLAY_PAUSE_TIMER), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         id = intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1
         duration = intent?.getLongExtra(IntentKey.DURATION, 0L) ?: 0L
-        Log.d(TAG, duration.toString())
         GlobalScope.launch(Dispatchers.IO) {
             if (id != -1L) {
                 item = timersDatabase?.getDao()?.get(id)
                 if (item != null) {
+                    label = item?.label ?: ""
                     item?.subTimers = subTimerDatabase?.getDao()?.getByParentId(intent?.getLongExtra(IntentKey.ITEM_ID, -1) ?: -1) as ArrayList<SubTimerEntity>
                     timeUntilFinished = arrayListOf()
 
@@ -116,6 +123,7 @@ class TimerService : Service() {
                 }
             } else if (duration != 0L) {
                 withContext(Dispatchers.Main) {
+                    label = ""
                     timerStart(duration)
                     countDownTimer?.start()
                     isPaused = false
@@ -149,6 +157,10 @@ class TimerService : Service() {
             setContentText("")
             setSmallIcon(R.drawable.ic_hourglass_full)
             setOnlyAlertOnce(true)
+            setSound(null)
+            setVibrate(longArrayOf(0L))
+
+            color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
 
             startForeground(NotificationID.CALARM_TIMER, build())
             nm.cancel(NotificationID.CALARM_TIMER)
@@ -193,6 +205,10 @@ class TimerService : Service() {
                                 }))
                                 setSmallIcon(R.drawable.ic_check_circle)
                                 setShowWhen(false)
+                                setSound(null)
+                                setVibrate(longArrayOf(0L))
+
+                                color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
 
                                 nm.notify(NotificationID.CALARM_TIMER_SUB_FINISHED + (item?.subTimers?.get(order - 1)?.id ?: 0).toInt(), build())
                             }
@@ -224,7 +240,11 @@ class TimerService : Service() {
                         setOngoing(true)
                         setShowWhen(false)
                         setOnlyAlertOnce(true)
+                        setSound(null)
+                        setVibrate(longArrayOf(0L))
                         addAction(if (isPaused) R.drawable.ic_play_arrow else R.drawable.ic_pause, getString(if (isPaused) R.string.resume else R.string.pause), playPausePendingIntent)
+
+                        color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
                     }
                 } else if (duration != 0L) {
                     sendBroadcast(Intent(IntentID.COUNTDOWN_TICK).apply {
@@ -244,7 +264,11 @@ class TimerService : Service() {
                         setOngoing(true)
                         setShowWhen(false)
                         setOnlyAlertOnce(true)
+                        setSound(null)
+                        setVibrate(longArrayOf(0L))
                         addAction(if (isPaused) R.drawable.ic_play_arrow else R.drawable.ic_pause, getString(if (isPaused) R.string.resume else R.string.pause), playPausePendingIntent)
+
+                        color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
                     }
                 }
 
@@ -296,12 +320,14 @@ class TimerService : Service() {
                                 setLocalOnly(true)
                                 setOnlyAlertOnce(true)
                                 setShowWhen(false)
+                                setSound(null)
+                                setVibrate(longArrayOf(0L))
                                 priority = NotificationCompat.PRIORITY_MAX
                                 setContentIntent(fullScreenPendingIntent)
                                 setFullScreenIntent(fullScreenPendingIntent, true)
                                 addAction(R.drawable.ic_close, getString(R.string.close), pendingIntent)
 
-                                color = ContextCompat.getColor(applicationContext, R.color.amber)
+                                color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
                             }
 
 
@@ -349,12 +375,14 @@ class TimerService : Service() {
                                 setLocalOnly(true)
                                 setOnlyAlertOnce(true)
                                 setShowWhen(false)
+                                setSound(null)
+                                setVibrate(longArrayOf(0L))
                                 priority = NotificationCompat.PRIORITY_MAX
                                 setContentIntent(fullScreenPendingIntent)
                                 setFullScreenIntent(fullScreenPendingIntent, true)
                                 addAction(R.drawable.ic_close, getString(R.string.close), pendingIntent)
 
-                                color = ContextCompat.getColor(applicationContext, R.color.amber)
+                                color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
                             }
 
 
@@ -371,6 +399,7 @@ class TimerService : Service() {
     }
 
     companion object {
+        var isRunning = false
         var isPaused = false
     }
 

@@ -29,31 +29,19 @@
             app:layout_constraintBottom_toBottomOf="parent" />
 
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/bg_timer_off"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="?attr/colorAccent"
-            android:alpha="0.8"
-            android:background="?attr/selectableItemBackgroundBorderless"
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/btn_timer_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             android:layout_marginBottom="80dp"
+            app:icon="@drawable/ic_stop"
+            app:iconTint="?attr/colorOnSecondary"
+            app:backgroundTint="?attr/colorSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ImageView
-            android:id="@+id/ic_timer_off"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_stop"
-            android:contentDescription="@string/stop"
-            app:tint="@color/white"
-            app:layout_constraintStart_toStartOf="@id/bg_timer_off"
-            app:layout_constraintEnd_toEndOf="@id/bg_timer_off"
-            app:layout_constraintTop_toTopOf="@id/bg_timer_off"
-            app:layout_constraintBottom_toBottomOf="@id/bg_timer_off" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

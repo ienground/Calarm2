@@ -5,13 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.*
 import zone.ien.calarm.R
+import zone.ien.calarm.callback.SwipeAnimationListener
+import zone.ien.calarm.constant.IntentID
 import zone.ien.calarm.constant.IntentKey
 import zone.ien.calarm.databinding.ActivityAlarmRingBinding
 import zone.ien.calarm.receiver.AlarmOffReceiver
@@ -38,19 +41,29 @@ class AlarmRingActivity : AppCompatActivity() {
 
         turnScreenOnAndKeyguardOff()
 
-        val apmFormat = SimpleDateFormat("a", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("hh\nmm", Locale.getDefault())
-        val timeFormat2 = SimpleDateFormat("hh:mm", Locale.getDefault())
+        binding.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmParent.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        binding.tvApmKoParent.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
 
+        val apmFormat = SimpleDateFormat("a", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat(getString(R.string.dateFormatNoYear), Locale.getDefault())
+
+        binding.tvDate.text = dateFormat.format(Date(System.currentTimeMillis()))
         binding.tvTime.text = timeFormat.format(Date(System.currentTimeMillis()))
         binding.tvApm.text = apmFormat.format(Date(System.currentTimeMillis()))
+        binding.tvApmKo.text = apmFormat.format(Date(System.currentTimeMillis()))
 
         val id = intent.getLongExtra(IntentKey.ITEM_ID, -1)
         val subAlarmId = intent.getLongExtra(IntentKey.SUBALARM_ID, -1)
 
-        binding.bgSnooze.visibility = if (subAlarmId != -1L) View.GONE else View.VISIBLE
-        binding.icSnooze.visibility = if (subAlarmId != -1L) View.GONE else View.VISIBLE
         binding.cardParent.visibility = if (subAlarmId == -1L) View.GONE else View.VISIBLE
+
+        if (subAlarmId != -1L) {
+            binding.slider.setRightSwipeText("")
+            binding.slider.setRightSwipeEnabled(false)
+        }
 
         if (id != -1L) {
             GlobalScope.launch(Dispatchers.IO) {
@@ -72,29 +85,54 @@ class AlarmRingActivity : AppCompatActivity() {
                         val initialGap = data.time - Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
 
                         binding.tvLabel.text = data.label
-                        binding.tvParentApm.text = apmFormat.format(calendar.time)
-                        binding.tvParentTime.text = timeFormat2.format(calendar.time)
-                        binding.tvTimeDiff.text = if (initialGap / 60 != 0 && initialGap % 60 != 0) getString(R.string.time_format_before_hour_minute, initialGap / 60, initialGap % 60)
-                        else if (initialGap % 60 == 0) getString(R.string.time_format_before_hour, initialGap / 60)
-                        else getString(R.string.time_format_before_minute, initialGap % 60)
+                        binding.tvApmParent.text = apmFormat.format(calendar.time)
+                        binding.tvApmKoParent.text = apmFormat.format(calendar.time)
+                        binding.tvTimeParent.text = timeFormat.format(calendar.time)
 
-                        binding.bgSnooze.setOnClickListener { sendBroadcast(snoozeIntent); finish() }
-                        binding.bgAlarmOff.setOnClickListener { sendBroadcast(offIntent); finish() }
+                        val timeDiffArray: ArrayList<String> = arrayListOf()
+                        if (initialGap / 60 == 1) timeDiffArray.add(getString(R.string.time_format_1hour))
+                        else if (initialGap / 60 != 0) timeDiffArray.add(getString(R.string.time_format_hour, initialGap / 60))
+                        if (initialGap % 60 == 1) timeDiffArray.add(getString(R.string.time_format_1minute))
+                        else if (initialGap % 60 != 0) timeDiffArray.add(getString(R.string.time_format_minute, initialGap % 60))
+
+                        binding.tvTimeDiff.text = getString(R.string.time_format_before, timeDiffArray.joinToString(" "))
+
+                        binding.slider.setOnSwipeAnimationListener(object: SwipeAnimationListener {
+                            override fun onSwiped(isRight: Boolean) {
+                                if (isRight) {
+                                    sendBroadcast(snoozeIntent); finish()
+                                } else {
+                                    sendBroadcast(offIntent); finish()
+                                }
+                            }
+                        })
 
                         registerReceiver(object : BroadcastReceiver() {
                             override fun onReceive(context: Context, intent: Intent) {
                                 val gap = data.time - Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
                                 binding.tvTime.text = timeFormat.format(Date(System.currentTimeMillis()))
                                 binding.tvApm.text = apmFormat.format(Date(System.currentTimeMillis()))
-                                binding.tvTimeDiff.text = if (gap / 60 != 0 && gap % 60 != 0) context.getString(R.string.time_format_before_hour_minute, gap / 60, gap % 60)
-                                else if (gap % 60 == 0) context.getString(R.string.time_format_before_hour, gap / 60)
-                                else context.getString(R.string.time_format_before_minute, gap % 60)
+                                binding.tvApmKo.text = apmFormat.format(Date(System.currentTimeMillis()))
+
+                                timeDiffArray.clear()
+                                if (gap / 60 == 1) timeDiffArray.add(getString(R.string.time_format_1hour))
+                                else if (gap / 60 != 0) timeDiffArray.add(getString(R.string.time_format_hour, gap / 60))
+                                if (gap % 60 == 1) timeDiffArray.add(getString(R.string.time_format_1minute))
+                                else if (gap % 60 != 0) timeDiffArray.add(getString(R.string.time_format_minute, gap % 60))
+
+                                binding.tvTimeDiff.text = getString(R.string.time_format_before, timeDiffArray.joinToString(" "))
                             }
                         }, IntentFilter(Intent.ACTION_TIME_TICK))
                     }
                 }
             }
         }
+
+        LocalBroadcastManager.getInstance(applicationContext).registerReceiver(object: BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                finish()
+            }
+        }, IntentFilter(IntentID.STOP_ALARM))
 
     }
 

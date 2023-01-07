@@ -164,6 +164,7 @@ class MyUtils {
         }
 
         fun setCalarmClock(context: Context, am: AlarmManager, calarm : CalarmEntity): Calendar {
+            Log.d(TAG, "${calarm}")
             val calendar = Calendar.getInstance().apply { timeInMillis = calarm.time }
             val calarmIntent = Intent(context, CalarmReceiver::class.java).apply {
                 action = ActionKey.TIMER_ALARM
@@ -175,8 +176,9 @@ class MyUtils {
                 if (subCalarm.isEnabled) {
                     val subCalendar = calendar.clone() as Calendar
                     subCalendar.add(Calendar.MINUTE, -subCalarm.time)
-                    val subPendingIntent = PendingIntent.getBroadcast(context, 200000 + (subCalarm.id?.toInt() ?: -1), calarmIntent.apply { putExtra(IntentKey.SUBALARM_ID, subCalarm.id) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    val subPendingIntent = PendingIntent.getBroadcast(context, 200000 + (subCalarm.id?.toInt() ?: -1), calarmIntent.apply { putExtra(IntentKey.SUBCALARM_ID, subCalarm.id) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                     if (subCalendar.timeInMillis < System.currentTimeMillis()) continue
+                    Log.d(TAG, "calarm set ${subCalendar.time}")
                     am.setAlarmClock(AlarmManager.AlarmClockInfo(subCalendar.timeInMillis, subPendingIntent), subPendingIntent)
                 }
             }
@@ -219,32 +221,32 @@ class MyUtils {
             nums.addAll(data)
 
             val span01 = SpannableStringBuilder("${nums[0]}${nums[1]}").apply {
-                if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 5) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val span02 = SpannableStringBuilder(context.getString(R.string.hour) + "  ").apply {
-                if (dataSize >= 5) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 5) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val span03 = SpannableStringBuilder("${nums[2]}${nums[3]}").apply {
-                if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 3) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val span04 = SpannableStringBuilder(context.getString(R.string.minute) + "  ").apply {
-                if (dataSize >= 3) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 3) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val span05 = SpannableStringBuilder("${nums[4]}${nums[5]}").apply {
-                if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 1) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize1, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val span06 = SpannableStringBuilder(context.getString(R.string.second)).apply {
-                if (dataSize >= 1) setSpan(ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (dataSize >= 1) setSpan(ForegroundColorSpan(color), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(AbsoluteSizeSpan(textSize2, true), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
@@ -252,6 +254,7 @@ class MyUtils {
         }
 
         fun dpToPx(context: Context, size: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, context.resources.displayMetrics).toInt()
+        fun spToPx(context: Context, size: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, context.resources.displayMetrics).toInt()
 
         fun Cursor.getSafeLong(columnIndex: Int, defaultValue: Long) = if (isNull(columnIndex)) { defaultValue } else { getLong(columnIndex) }
         fun Cursor.getSafeString(columnIndex: Int, defaultValue: String) = if (isNull(columnIndex)) { defaultValue } else { getString(columnIndex) }

@@ -40,6 +40,9 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
             timeInMillis = items[holder.adapterPosition].time
         }
 
+        holder.tvApm.visibility = if (Locale.getDefault() == Locale.KOREA) View.GONE else View.VISIBLE
+        holder.tvApmKo.visibility = if (Locale.getDefault() != Locale.KOREA) View.GONE else View.VISIBLE
+
         items[holder.adapterPosition].label.let {
             if (it != "") {
                 holder.tvLabel.visibility = View.VISIBLE
@@ -59,9 +62,11 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
 
         holder.switchOn.isChecked = items[holder.adapterPosition].isEnabled
         holder.tvApm.text = apmFormat.format(time.time)
+        holder.tvApmKo.text = apmFormat.format(time.time)
         holder.tvTime.text = timeFormat.format(time.time)
 
         holder.tvApm.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
+        holder.tvApmKo.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
         holder.tvTime.typeface = ResourcesCompat.getFont(context, if (items[holder.adapterPosition].isEnabled) R.font.pretendard_black else R.font.pretendard)
 
         holder.chipsMiniAlarm.removeAllViews()
@@ -73,15 +78,27 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
             chip.typeface = ResourcesCompat.getFont(context, R.font.pretendard_regular)
             chip.chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
             if (calarm.timeMoving != 0) chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_bus)
-            chip.text = if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, calarm.time / 60, calarm.time % 60)
-            else if (calarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, calarm.time / 60)
-            else context.getString(R.string.time_format_before_minute, calarm.time % 60)
+            chip.text = context.getString(R.string.time_format_before, calarm.time.let {
+                val timeArray: ArrayList<String> = arrayListOf()
+                if (it / 60 == 1) timeArray.add(context.getString(R.string.time_format_1hour))
+                else if (it / 60 != 0) timeArray.add(context.getString(R.string.time_format_hour, it / 60))
+                if (it % 60 == 1) timeArray.add(context.getString(R.string.time_format_1minute))
+                else if (it % 60 != 0) timeArray.add(context.getString(R.string.time_format_minute, it %60))
+
+                timeArray.joinToString(" ")
+            })
 
             chip.setOnCheckedChangeListener { compoundButton, b ->
                 chip.text = if (b) apmTimeFormat.format(calendar.time) else {
-                    if (calarm.time / 60 != 0 && calarm.time % 60 != 0) context.getString(R.string.time_format_before_hour_minute, calarm.time / 60, calarm.time % 60)
-                    else if (calarm.time % 60 == 0) context.getString(R.string.time_format_before_hour, calarm.time / 60)
-                    else context.getString(R.string.time_format_before_minute, calarm.time % 60)
+                    context.getString(R.string.time_format_before, calarm.time.let {
+                        val timeArray: ArrayList<String> = arrayListOf()
+                        if (it / 60 == 1) timeArray.add(context.getString(R.string.time_format_1hour))
+                        else if (it / 60 != 0) timeArray.add(context.getString(R.string.time_format_hour, it / 60))
+                        if (it % 60 == 1) timeArray.add(context.getString(R.string.time_format_1minute))
+                        else if (it % 60 != 0) timeArray.add(context.getString(R.string.time_format_minute, it %60))
+
+                        timeArray.joinToString(" ")
+                    })
                 }
             }
 
@@ -99,6 +116,7 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
         holder.switchOn.setOnCheckedChangeListener { compoundButton, b ->
             callbackListener?.toggle(holder.adapterPosition, items[holder.adapterPosition].id ?: -1, b)
             holder.tvApm.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
+            holder.tvApmKo.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
             holder.tvTime.typeface = ResourcesCompat.getFont(context, if (b) R.font.pretendard_black else R.font.pretendard)
         }
 
@@ -126,6 +144,7 @@ class MainCalarmEventAdapter(var items: ArrayList<CalarmEntity>): RecyclerView.A
         val switchOn: MaterialSwitch = itemView.findViewById(R.id.switch_on)
         val tvAddress: MaterialTextView = itemView.findViewById(R.id.tv_address)
         val tvApm: MaterialTextView = itemView.findViewById(R.id.tv_apm)
+        val tvApmKo: MaterialTextView = itemView.findViewById(R.id.tv_apm_ko)
         val tvTime: MaterialTextView = itemView.findViewById(R.id.tv_time)
         val chipsMiniAlarm: ChipGroup = itemView.findViewById(R.id.chips_mini_alarm)
     }

@@ -9,6 +9,7 @@ import android.content.SharedPreferences
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
+import android.util.TypedValue
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
@@ -52,7 +53,6 @@ class StopwatchService : Service() {
         isPaused = true
         isRunning = false
         lapses.clear()
-        sharedPreferences.edit().putBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, false).apply()
 
         sendBroadcast(Intent(IntentID.STOP_STOPWATCH))
 
@@ -65,13 +65,17 @@ class StopwatchService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm.createNotificationChannel(NotificationChannel(ChannelID.STOPWATCH_ID, getString(R.string.stopwatch), NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel(ChannelID.STOPWATCH_ID, getString(R.string.stopwatch), NotificationManager.IMPORTANCE_DEFAULT).apply {
+            vibrationPattern = longArrayOf(0L)
+            enableVibration(true)
+        })
         sharedPreferences = getSharedPreferences("${packageName}_preferences", Context.MODE_PRIVATE)
         playPausePendingIntent = PendingIntent.getBroadcast(applicationContext, 0, Intent(IntentID.PLAY_PAUSE_STOPWATCH), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         duration = intent?.getLongExtra(IntentKey.DURATION, 0L) ?: 0L
         stopwatchStart()
         isPaused = false
+        sharedPreferences.edit().putBoolean(SharedKey.IS_STOPWATCH_SCHEDULED, false).apply()
 
         registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -111,6 +115,10 @@ class StopwatchService : Service() {
             setContentText("")
             setSmallIcon(R.drawable.ic_timer)
             setOnlyAlertOnce(true)
+            setSound(null)
+            setVibrate(longArrayOf(0L))
+
+            color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
 
             startForeground(NotificationID.CALARM_STOPWATCH, build())
             nm.cancel(NotificationID.CALARM_STOPWATCH)
@@ -132,17 +140,19 @@ class StopwatchService : Service() {
                             if (it / 3600 != 0L) String.format("%02d:%02d:%02d", it / 3600, (it % 3600) / 60, it % 60)
                             else String.format("%02d:%02d", (it % 3600) / 60, it % 60)
                         })
-                        setContentText("J")
                         setSmallIcon(R.drawable.ic_timer)
                         setOnlyAlertOnce(true)
                         setShowWhen(false)
+                        setSound(null)
+                        setVibrate(longArrayOf(0L))
+
+                        color = ContextCompat.getColor(applicationContext, R.color.colorAccent)
                     }
 
                     nm.notify(NotificationID.CALARM_STOPWATCH, timerNotification?.build())
                 }
             }
         }
-
 
         timer = Timer()
         timer?.schedule(timerTask, 0, 10)
